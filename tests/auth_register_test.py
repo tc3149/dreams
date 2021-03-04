@@ -6,8 +6,8 @@ from src.error import InputError
 
 
 def test_auth_register_v1():
-    assert auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe") == {'auth_user_id': 1}
-    assert auth_register_v1("newemail@google.co", "Newpassword", "Jane", "Doe") == {'auth_user_id': 2}
+    assert auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe") == {'auth_user_id': 0}
+    assert auth_register_v1("newemail@google.co", "Newpassword", "Jane", "Doe") == {'auth_user_id': 1}
 
 
 
