@@ -2,6 +2,24 @@ import re
 from src.database import memberSize, accData
 from src.error import InputError
 
+'''
+auth_login_v1 takes in an email string and password string. 
+The function then checks if the email is valid, if a user exists for that email and if the password is correct.
+Returns the user id associated with that email if above conditions are met, otherwise raises an InputError
+
+Arguments:
+    email (string)    - Email of user
+    password (string)    - Password of user
+    ...
+
+Exceptions:
+    InputError  - Occurs when given email does not match regex
+    InputError  - Occurs when given email is not registered
+    InputError  - Occurs when given password does not exist or match
+
+Return Value:
+    Returns user id | 'auth_user_id': get_user_id(email)
+'''
 def auth_login_v1(email, password):
 
     # Check if email is valid
@@ -26,7 +44,31 @@ def auth_login_v1(email, password):
         # Email is not valid
         raise InputError("Email given is not a valid email")
 
+'''
+auth_register_v1 takes in an email string, password string, first name string and last name string. 
+The function then checks if the names are within length, password is wwithin lengh and email is a valid email
+according to the regex.
+If all conditions are met, the function will create a handle for the user, assign a id and append accData list 
+with a dictionary of the users information (first name, last name, email, password, id, handle).
+Returns the user id that is associated the the new user if above conditions are met, otherwise raises an InputError
 
+Arguments:
+    email (string)    - Email of user
+    password (string)    - Password of user
+    name_first (string)    - First name of user
+    name_last (string)    - Last name of user
+    ...
+
+Exceptions:
+    InputError  - Occurs when given email does not match regex
+    InputError  - Occurs when given length of first name is < 1 or > 50
+    InputError  - Occurs when given length of last name is < 1 or > 50
+    InputError  - Occurs when given length of password < 6
+    InputError  - Occurs when given email is already registered
+
+Return Value:
+    Returns user id | 'auth_user_id': userID
+'''
 def auth_register_v1(email, password, name_first, name_last):
 
     # Checking length of input variables | Error checking for inputs
@@ -80,6 +122,7 @@ def auth_register_v1(email, password, name_first, name_last):
         'auth_user_id': userID,
     }
 
+# Helper functions
 def search_email(email):
     for items in accData:
         if items["email"] == email:
