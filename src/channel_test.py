@@ -1,15 +1,20 @@
 # Tests for Channel Functions
-# TC - channel_messages
+import auth
+import channels
+import channel
 
+# TC - channel_messages
 
 def test_invalidChannel_messages():
     #Test 1: Invalid channel
-    user = auth_register_v1()
+    user = auth.auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels.channels_create_v1(user.get("auth_user_id"), "testchannel", True)
     
-    # make user connect to a channel that has not been created
 
-
-
+    # make user connect to channel (23) that has not been created
+    with pytest.raises(InputError):
+        channel_messages_v1(user.get("auth_user_id"), 23, 0)
+    
 def test_startGreaterEnd_messages():
     #Test 2: Start is greater than the total messages
 
@@ -18,8 +23,5 @@ def test_startGreaterEnd_messages():
 def test_userInvalid_messages():
     #Test 3: User is invalid to check messages
 
-    user1 = auth_register_v1()
-
     #make user1 create a channel then user2 try see the messages of their channel
-
 
