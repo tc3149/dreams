@@ -66,10 +66,13 @@ def test_channel_create_noname():
 def test_channel_create_private():
 
     clear_v1()
-    print("cleared database...")
-
+    
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    user_id = user.get("auth_user_id")
+
+    channel = channels_create_v1(user_id, "testChannel", False)
+
+    assert channelList[0].get("is_public") == False
 
 
     
