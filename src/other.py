@@ -9,9 +9,10 @@ def clear_v1():
     '''
     Reset Everything to default state
     '''
-    global accData, channelList, memberSize
+    global accData, channelList
     accData.clear() 
     channelList.clear() 
+    global memberSize
     memberSize = 0
 
 
