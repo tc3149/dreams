@@ -1,5 +1,6 @@
 import re
 from src.database import accData
+
 from src.error import InputError
 
 '''
@@ -29,8 +30,8 @@ def auth_login_v1(email, password):
         # Check if user exists for that email
         if search_email(email):
             # User exists, now check if password is correct
-            if search_password(password):
-                # Password exists, return user_id
+            if verify_password(email, password):
+                # Password is correct, return user_id
                 return {
                     'auth_user_id': get_user_id(email),
                 }
@@ -130,11 +131,13 @@ def search_email(email):
             return True
     return False
 
-def search_password(password):
+def verify_password(email, password):
     for items in accData:
-        if items["password"] == password:
-            return True
-    return False
+        if items["email"] == email:
+            if items["password"] == password:
+                return True
+            else:
+                return False
 
 def search_handle(currUserHandle):
     for items in accData:
