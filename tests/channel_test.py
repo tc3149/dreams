@@ -4,7 +4,7 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v1
 from src.channels import channels_create_v1
-from src.database import memberSize, accData, channelList
+from src.database import accData, channelList
 
 # Channel Create Tests
 
@@ -70,11 +70,6 @@ def test_channel_create_private():
 
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
-
-    print("creating new user... should have user_id of 0")
-
-    print("memberSize: ", memberSize)
-    print("user2_id: ", user2.get("auth_user_id"))
 
 
     
