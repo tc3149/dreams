@@ -103,17 +103,18 @@ def auth_register_v1(email, password, name_first, name_last):
             if search_handle(userHandle):
                 # Same handle exists, appending latest handle according to spec
                 userHandle = append_handle(userHandle)
+            
+            userID = len(accData)
+            
             userData = {
                 "name_first": name_first,
                 "name_last": name_last,
                 "email": email,
                 "password": password,
-                "id": memberSize,
+                "id": userID,
                 "handle": userHandle, 
             }
             accData.append(userData)
-            userID = memberSize
-            memberSize += 1
     else:
         # Error
         raise InputError("Error: Email is not valid")
