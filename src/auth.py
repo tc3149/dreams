@@ -1,5 +1,5 @@
 import re
-from src.database import memberSize, accData
+from src.database import accData
 from src.error import InputError
 
 '''
