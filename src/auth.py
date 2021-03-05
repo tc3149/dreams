@@ -1,5 +1,6 @@
 import re
-from src.database import memberSize, accData
+from src.database import accData
+
 from src.error import InputError
 
 '''
@@ -93,7 +94,6 @@ def auth_register_v1(email, password, name_first, name_last):
             raise InputError("Error: Email already registered")
         else:
             # Valid input, generate handle & register user by inputing given details into database
-            global memberSize
             userHandle = create_handle(name_first, name_last)
             # Check if handle is over 20 characters
             if len(userHandle) > 20:
@@ -103,17 +103,16 @@ def auth_register_v1(email, password, name_first, name_last):
             if search_handle(userHandle):
                 # Same handle exists, appending latest handle according to spec
                 userHandle = append_handle(userHandle)
+            userID = len(accData)
             userData = {
                 "name_first": name_first,
                 "name_last": name_last,
                 "email": email,
                 "password": password,
-                "id": memberSize,
+                "id": userID,
                 "handle": userHandle, 
             }
             accData.append(userData)
-            userID = memberSize
-            memberSize += 1
     else:
         # Error
         raise InputError("Error: Email is not valid")

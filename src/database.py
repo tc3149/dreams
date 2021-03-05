@@ -1,2 +1,2 @@
-memberSize = 0
 accData = []
+channelList = []
