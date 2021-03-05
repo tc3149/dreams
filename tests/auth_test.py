@@ -48,6 +48,10 @@ def test_auth_login_v1():
     assert auth_login_v1("testemail@hotmail.com", "testpassword") == {'auth_user_id': 2}
 
 def test_auth_login_v1_except():
+    # Wrong password, using another registered password
+    with pytest.raises(InputError):
+        auth_login_v1("testemail@institute.com", "testpassword")
+
     # Not registered
     with pytest.raises(InputError):
         auth_login_v1("notregistered@hotmail.com", "newpassword")
