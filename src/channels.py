@@ -1,5 +1,5 @@
 import re
-from src.database import memberSize, accData, channelList
+from src.database import accData, channelList
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 
