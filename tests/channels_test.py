@@ -8,14 +8,14 @@ from src.database import accData, channelList
 
 # Channel Create Tests
 
-def test_channel_create():
+def test_channels_create():
 
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
     
     assert channel == {'channel_id': 0}
 
-def test_channel_create_invalid():
+def test_channels_create_invalid():
 
     clear_v1()
     invalid_token = 0
@@ -23,7 +23,7 @@ def test_channel_create_invalid():
     with pytest.raises(AccessError):
         assert channels_create_v1(invalid_token, "testchannel", True) == AccessError
 
-def test_channel_create_many():
+def test_channels_create_many():
 
     clear_v1()
     
@@ -42,7 +42,7 @@ def test_channel_create_many():
     assert channel5 == {'channel_id': 4}
     assert channel6 == {'channel_id': 5}
 
-def test_channel_create_longerthan20():
+def test_channels_create_longerthan20():
 
     clear_v1()
 
@@ -52,7 +52,7 @@ def test_channel_create_longerthan20():
     with pytest.raises(InputError):
         assert channels_create_v1(user_id, "a" *21, True) == InputError
 
-def test_channel_create_noname():
+def test_channels_create_noname():
     
     clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
@@ -63,7 +63,7 @@ def test_channel_create_noname():
     with pytest.raises(InputError):
         assert channels_create_v1(user_id, "", True) == InputError
 
-def test_channel_create_private():
+def test_channels_create_private():
 
     clear_v1()
     
