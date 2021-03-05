@@ -48,6 +48,7 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     channelData = {
         'name': name,
+        'id': channel_id,
         'is_public': is_public,
         'member_ids': [],
         'owner_ids': [],
