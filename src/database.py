@@ -1,4 +1,2 @@
-data = {
-    'accData' = []
-    'channelList' = []
-}
+accData = []
+channelList = []
