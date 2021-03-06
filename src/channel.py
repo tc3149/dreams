@@ -69,14 +69,12 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         starting_index = start + msg_amt
         if starting_index >= end or starting_index >= len(messages):
             break
-        # TO-do once iteration 2 is released
-        # using 1 as placeholder integer to prevent errors until
-        # messagesend spec gets released
+        # TO-do/fix once iteration 2 is released
         msg = {
-            'message_id': 1, 
-            'u_id': 1,
-            'message': "Require message sending spec to be released.",
-            'time_created': 1,
+            'message_id': messages[starting_index]["message_id"], 
+            'u_id': messages[starting_index]["u_id"],
+            'message': messages[starting_index]["message"],
+            'time_created': messages[starting_index]["time_created"],
         }
         messages_shown.append(msg)
         msg_amt = msg_amt + 1
