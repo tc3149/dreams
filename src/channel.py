@@ -113,7 +113,6 @@ def channel_join_v1(auth_user_id, channel_id):
             channel["member_ids"].append(auth_user_id)
 
     return {
-
     }
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
@@ -157,3 +156,4 @@ def check_useralreadyinchannel(auth_user_id, channel_id):
                 if auth_user_id is member:
                     return True
     return False
+    
