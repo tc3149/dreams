@@ -14,14 +14,10 @@ def channels_list_v1(auth_user_id):
     }
 
 def channels_listall_v1(auth_user_id):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+    channelsList = []
+    for channel in channelList:
+        channelsList.append(channel.get("name"))
+    return channelsList
 
 def channels_create_v1(auth_user_id, name, is_public):
     '''

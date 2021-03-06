@@ -4,6 +4,7 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v1
 from src.channels import channels_create_v1
+from src.channels import channels_listall_v1
 from src.database import accData, channelList
 
 # Channel Create Tests
@@ -74,8 +75,58 @@ def test_channels_create_private():
 
     assert channelList[0].get("is_public") == False
 
+#Channels_listall
 
+def test_channels_listall():
     
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    channel2 = channels_create_v1(user.get("auth_user_id"), "testchannel2", True)
+    result = channels_listall_v1("auth_user_id") 
+
+    assert result == "{'channels': [{'channel_id': 0, 'Name': 'testchannel'}, {'channel_id': 1, 'Name': 'testchannel2'}]}"
+
+def test_channels_listall_invalid():
+
+    clear_v1()
+
+    invalid_token = 0
+
+    with pytest.raises(AccessError):
+        assert channels_listall_v1(invalid_token, "testchannel", True) == AccessError
+
+def test_channels_listall_no_users():
+    
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    result = channels_listall_v1("auth_user_id") 
+
+    assert result == "{}"
+
+def test_channels_listall_private():
+
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
+    channel2 = channels_create_v1(user.get("auth_user_id"), "testChannel2", False)
+    result = channels_listall_v1("auth_user_id")
+
+    assert result == "{'channels': [{'channel_id': 0, 'Name': 'testchannel'}, {'channel_id': 1, 'Name': 'testchannel2'}]}"
+
+def test_channels_listall_public_private():
+
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
+    channel2 = channels_create_v1(user.get("auth_user_id"), "testChannel2",True)
+    result = channels_listall_v1("auth_user_id")
+    
+    assert result == "{'channels': [{'channel_id': 0, 'Name': 'testchannel'}, {'channel_id': 1, 'Name': 'testchannel2'}]}"
 
 
 #def test_invalidChannel_messages():
