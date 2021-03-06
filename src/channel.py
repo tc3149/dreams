@@ -91,36 +91,30 @@ def channel_leave_v1(auth_user_id, channel_id):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
+
     # check whether id is valid
-    if check_id(auth_user_id).get('status'):
-        raise error.InputError("User ID invalid")
+    if valid_userid(auth_user_id) is False:
+        raise InputError("Error: Invalid user id")
 
     # check whether channel is invalid
-    channel_id_status = False
-    for channel in database.channelList
-        if channel.get("id") is channel_id:
-            channel_id_status = True
-            break
-    if channel_id_status is False:
-        raise AccessError("Error: Invalid channel")
+    if valid_channelid(channel_id) is False:
+        raise InputError("Error: Invalid channel")
 
-    iduser = check_id(auth_user_id).get("u_id")
+    # check if channel is private
+    if check_channelprivate(channel_id) is True:
+        raise AccessError("Private Channel")
+    
+    # check user already in channel
+    if check_useralreadyinchannel(auth_user_id, channel_id) is True:
+        raise AccessError("User already in channel")
 
-    channels = data['channelList']
+    for channel in channelList:
+        if channel["id"] is channel_id:
+            channel["member_ids"].append(auth_user_id)
 
-    for channel1 in channels:
-        if channel_id is channel1['channel_id']:
-            if channel1['is public']:
-                if iduser not in channel1['all_members']:
-                    channel1['all_members'].append(iduser)
+    return {
 
-                else:
-                    raise AccessError("User already in channel")
-
-            else:
-                raise AccessError("Private Channel")
-
-    return {}
+    }
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
     return {
@@ -144,4 +138,22 @@ def valid_channelid(channel_id):
     for channel in channelList:
         if channel.get("id") is channel_id:
             return True
+    return False
+
+
+def check_channelprivate(channel_id):
+
+    for channel in channelList:
+        if channel.get("id") is channel_id:
+            if channel.get("is_public") is True:
+                return False
+    return True
+
+def check_useralreadyinchannel(auth_user_id, channel_id):
+
+    for channel in channelList:
+        if channel.get("id") is channel_id:
+            for member in channel["member_ids"]:
+                if auth_user_id is member:
+                    return True
     return False
