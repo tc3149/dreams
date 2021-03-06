@@ -70,13 +70,13 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if starting_index >= end or starting_index >= len(messages):
             break
         # TO-do once iteration 2 is released
-        # using 1 and 0 as placeholder integers to prevent errors until
+        # using 1 as placeholder integer to prevent errors until
         # messagesend spec gets released
         msg = {
             'message_id': 1, 
             'u_id': 1,
-            'message': "Not completed send function yet",
-            'time_created': 0,
+            'message': "Require message sending spec to be released.",
+            'time_created': 1,
         }
         messages_shown.append(msg)
         msg_amt = msg_amt + 1
