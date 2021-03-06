@@ -78,7 +78,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         }
         messages_shown.append(msg)
         msg_amt = msg_amt + 1
-    if len(messages) is 0 or counter < 50:
+    if len(messages) is 0 or msg_amt < 50:
         end = -1
     return {
         'messages': messages_shown,
@@ -91,7 +91,29 @@ def channel_leave_v1(auth_user_id, channel_id):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
+
+    # check whether id is valid
+    if valid_userid(auth_user_id) is False:
+        raise InputError("Error: Invalid user id")
+
+    # check whether channel is invalid
+    if valid_channelid(channel_id) is False:
+        raise InputError("Error: Invalid channel")
+
+    # check if channel is private
+    if check_channelprivate(channel_id) is True:
+        raise AccessError("Private Channel")
+    
+    # check user already in channel
+    if check_useralreadyinchannel(auth_user_id, channel_id) is True:
+        raise AccessError("User already in channel")
+
+    for channel in channelList:
+        if channel["id"] is channel_id:
+            channel["member_ids"].append(auth_user_id)
+
     return {
+
     }
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
@@ -116,4 +138,22 @@ def valid_channelid(channel_id):
     for channel in channelList:
         if channel.get("id") is channel_id:
             return True
+    return False
+
+
+def check_channelprivate(channel_id):
+
+    for channel in channelList:
+        if channel.get("id") is channel_id:
+            if channel.get("is_public") is True:
+                return False
+    return True
+
+def check_useralreadyinchannel(auth_user_id, channel_id):
+
+    for channel in channelList:
+        if channel.get("id") is channel_id:
+            for member in channel["member_ids"]:
+                if auth_user_id is member:
+                    return True
     return False
