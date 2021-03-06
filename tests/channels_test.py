@@ -66,58 +66,116 @@ def test_channels_create_private():
     channel = channels_create_v1(user_id, "testChannel", False)
     assert channelList[0].get("is_public") == False
 
+#Channels_list
+def test_channels_list():
+    
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
+    channel2 = channels_create_v1(user2.get("auth_user_id"), "testChannel2", True)
+    result = channels_list_v1(user.get("auth_user_id")) 
+
+    assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}]}
+
+def test_channels_list_empty():
+    
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
+    result = channels_list_v1(user2.get("auth_user_id")) 
+
+    assert result == {'channels': []}
+
+def test_channels_list_invalid():
+    
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
+    result = channels_list_v1(user2.get("auth_user_id")) 
+
+    assert result == {'channels': []}
+
+def test_channels_list_private():
+    
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
+    channel2 = channels_create_v1(user2.get("auth_user_id"), "testChannel2", False)
+    result = channels_list_v1(user.get("auth_user_id")) 
+
+    assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}]}
+
+def test_channels_list_private_public():
+    
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
+    channel2 = channels_create_v1(user2.get("auth_user_id"), "testChannel2", False)
+    channel3 = channels_create_v1(user2.get("auth_user_id"), "testChannel3", True)
+    result = channels_list_v1(user.get("auth_user_id")) 
+
+    assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}, {'channel_id': 2, 'name': 'testChannel3'}]}
+
 #Channels_listall
 
 def test_channels_listall():
     
     clear_v1()
 
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
-    channel2 = channels_create_v1(user.get("auth_user_id"), "testchannel2", True)
-    result = channels_listall_v1("auth_user_id") 
+    invalid_user_id = 0
 
-    assert result == "{'channels': [{'channel_id': 0, 'Name': 'testchannel'}, {'channel_id': 1, 'Name': 'testchannel2'}]}"
+    with pytest.raises(AccessError):
+        assert channels_listall_v1(invalid_user_id) == AccessError
 
 def test_channels_listall_invalid():
 
     clear_v1()
 
-    invalid_token = 0
+    invalid_user_id = 0
 
     with pytest.raises(AccessError):
-        assert channels_listall_v1(invalid_token, "testchannel", True) == AccessError
+        assert channels_listall_v1(invalid_user_id) == AccessError
 
 def test_channels_listall_no_users():
     
     clear_v1()
 
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    result = channels_listall_v1("auth_user_id") 
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    result = channels_listall_v1(user.get("auth_user_id")) 
 
-    assert result == "{}"
+    assert result == {'channels': []}
 
 def test_channels_listall_private():
 
     clear_v1()
 
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
     channel2 = channels_create_v1(user.get("auth_user_id"), "testChannel2", False)
-    result = channels_listall_v1("auth_user_id")
+    result = channels_listall_v1(user.get("auth_user_id"))
 
-    assert result == "{'channels': [{'channel_id': 0, 'Name': 'testchannel'}, {'channel_id': 1, 'Name': 'testchannel2'}]}"
+    assert result == {'channels': [{'channel_id': 0, 'name': 'testChannel'}, {'channel_id': 1, 'name': 'testChannel2'}]}
 
 def test_channels_listall_public_private():
 
     clear_v1()
 
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
     channel2 = channels_create_v1(user.get("auth_user_id"), "testChannel2",True)
-    result = channels_listall_v1("auth_user_id")
+    result = channels_listall_v1(user.get("auth_user_id"))
     
-    assert result == "{'channels': [{'channel_id': 0, 'Name': 'testchannel'}, {'channel_id': 1, 'Name': 'testchannel2'}]}"
+    assert result == {'channels': [{'channel_id': 0, 'name': 'testChannel'}, {'channel_id': 1, 'name': 'testChannel2'}]}
 
 
 #def test_invalidChannel_messages():
