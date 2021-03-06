@@ -3,14 +3,11 @@ from src.database import accData, channelList
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 
+
 def channels_list_v1(auth_user_id):
+
     return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
+
     }
 
 def channels_listall_v1(auth_user_id):
@@ -44,6 +41,7 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     channelData = {
         'name': name,
+        'id': channel_id,
         'is_public': is_public,
         'member_ids': [],
         'owner_ids': [],
@@ -55,6 +53,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     channelData['member_ids'].append(auth_user_id)
 
     channelList.append(channelData)
+
 
     return {
         'channel_id': channel_id,

@@ -21,6 +21,9 @@ Exceptions:
 Return Value:
     Returns user id | 'auth_user_id': get_user_id(email)
 '''
+
+total_id = []
+
 def auth_login_v1(email, password):
 
     # Check if email is valid
@@ -32,6 +35,10 @@ def auth_login_v1(email, password):
             # User exists, now check if password is correct
             if verify_password(email, password):
                 # Password is correct, return user_id
+                correct = {
+                    'auth_user_id': get_user_id(email)
+                }
+                total_id.append(correct)
                 return {
                     'auth_user_id': get_user_id(email),
                 }
