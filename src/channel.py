@@ -52,7 +52,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     for channel in channelList:
         if channel["id"] is channel_id:
             messages = channel["messages"]
-            
+
     if start > len(messages):
         raise InputError("Start is greater than total number of messages")
 
@@ -70,8 +70,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if starting_index >= end or starting_index >= len(messages):
             break
         # TO-do once iteration 2 is released
+        # using 1 and 0 as placeholder integers to prevent errors until
+        # messagesend spec gets released
         msg = {
-            'message_id': 1,
+            'message_id': 1, 
             'u_id': 1,
             'message': "Not completed send function yet",
             'time_created': 0,
