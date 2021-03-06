@@ -16,9 +16,7 @@ def channels_list_v1(auth_user_id):
 
     newchannelList = []
     for channel in channelList:
-        for id in channel.get('member_ids'):
-            print(id)
-            if id is auth_user_id:
+        if auth_user_id in channel.get('member_ids'):
                 channelDict = {}
                 channelDict['channel_id'] = channel.get('id')
                 channelDict['name'] = channel.get('name')
