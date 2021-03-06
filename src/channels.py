@@ -5,16 +5,15 @@ from src.error import InputError, AccessError
 
 
 def channels_list_v1(auth_user_id):
-    id_status = False
-    for user in accData:
-        if user.get("id") is auth_user_id:
-            id_status = True
-            break
-    
-    if id_status is False:
-        raise AccessError("Error: Invalid user id")
     return {
+        'channels': [
+        	{
+        		'channel_id': 1,
+        		'name': 'My Channel',
+        	}
+        ],
     }
+
 
 def channels_listall_v1(auth_user_id):
     id_status = False
@@ -78,6 +77,8 @@ def channels_create_v1(auth_user_id, name, is_public):
         'channel_id': channel_id,
     }
 
+
+'''
 if __name__ == "__main__":
     user0 = auth_register_v1("email2@gmail.com", "password1", "1Name", "1Lastname")
     user1 = auth_register_v1("email3@gmail.com", "password3", "3Name", "3Lastname")
@@ -89,3 +90,4 @@ if __name__ == "__main__":
     print(user2.get("auth_user_id"))
     
     print(channels_create_v1(user2.get("auth_user_id"), "Channel", True))
+'''
