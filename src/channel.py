@@ -78,7 +78,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         }
         messages_shown.append(msg)
         msg_amt = msg_amt + 1
-    if len(messages) is 0 or counter < 50:
+    if len(messages) is 0 or msg_amt < 50:
         end = -1
     return {
         'messages': messages_shown,
