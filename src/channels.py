@@ -2,24 +2,12 @@ import re
 from src.database import accData, channelList
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
-import database
-import channel
+
 
 def channels_list_v1(auth_user_id):
-    # check whether id is valid
-    if check_id(auth_user_id).get('status'):
-        raise error.InputError("User ID invalid")
-
-    channels_users = []
-
-    for chan in data['channelList']:
-        for people in channel[]
-
-
-
 
     return {
-        'channels': users_channels
+
     }
 
 def channels_listall_v1(auth_user_id):
