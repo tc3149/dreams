@@ -5,14 +5,24 @@ from src.error import InputError, AccessError
 
 
 def channels_list_v1(auth_user_id):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+    id_status = False
+    for user in accData:
+        if user.get("id") is auth_user_id:
+            id_status = True
+            break
+    
+    if id_status is False:
+        raise AccessError("Error: Invalid user id")
+
+    newchannelList = []
+    for channel in channelList:
+        if channel.get('member_ids') == [auth_user_id]:
+            channelDict = {}
+            channelDict['channel_id'] = channel.get('id')
+            channelDict['name'] = channel.get('name')
+            newchannelList.append(channelDict)
+
+    return {'channels': newchannelList}
 
 
 def channels_listall_v1(auth_user_id):
