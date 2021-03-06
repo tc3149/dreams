@@ -5,6 +5,50 @@ from src.error import InputError, AccessError
 from src.channel import channel_messages_v1
 from src.channels import channels_create_v1
 from src.database import accData, channelList
+import channels.py
+
+# Channel 
+
+def test_no_channels():
+    clear_v1():
+    user1 = auth_register_v1("gordonl1@gmail.com", "gordonisverygood", "Gordon", "Liang")
+    assert channels_list_v1(user1.get("auth_user_id")) == []
+
+def test_channels_valid():
+    clear_v1():
+    user1 = auth_register_v1("visejoy@gmail.com", "sikk", "Jonathan", "Qiu")
+
+    newchannel1 = channels_create_v1(user1.get("auth_user_id"), "channel1", True)
+    newchannel2 = channels_create_v1(user1.get("auth_user_id"), "channel2", True)
+    newchannel3 = channels_create_v1(user1.get("auth_user_id"), "channel3", True)
+
+    listchannel = channels_list_v1(user1.get("auth_user_id"))
+
+    assert listchannel.get('channels')[0]["channel_id"] == channel1.get("channel_id")
+    assert listchannel.get('channels')[1]["channel_id"] == channel2.get("channel_id")
+    assert listchannel.get('channels')[2]["channel_id"] == channel3.get("channel_id")
+    assert len(channel_list.get('channels')) == 3
+
+
+def test_both_priv_pub():
+    clear_v1():
+    user1 = auth_register_v1("visejoy@gmail.com", "sikk", "Jonathan", "Qiu") 
+    user2 = auth_register_v1("thomaschen@gmail.com", "rak", "Thomas", "Chen")
+
+    newchannel1 = channels_create_v1(user1.get("auth_user_id"), "channel1", True)
+    newchannel2 = channels_create_v1(user1.get("auth_user_id"), "channel2", False)
+    newchannel3 = channels_create_v1(user1.get("auth_user_id"), "channel3", True)
+
+    user1_id = user1.get("auth_user_id")
+
+    listchannel = channels_list_v1(user1_id.get('channels'))
+
+    assert listchannel.get('channels')[0]["channel_id"] == channel1.get("channel_id")
+    assert listchannel.get('channels')[1]["channel_id"] == channel2.get("channel_id")
+    assert listchannel.get('channels')[2]["channel_id"] == channel3.get("channel_id")
+    assert len(channel_list.get('channels')) == 3
+
+
 
 # Channel Create Tests
 
