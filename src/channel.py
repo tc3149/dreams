@@ -52,7 +52,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     for channel in channelList:
         if channel["id"] is channel_id:
             messages = channel["messages"]
-
+            
     if start > len(messages):
         raise InputError("Start is greater than total number of messages")
 
@@ -64,7 +64,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     messages_shown = []
     end = start + 50
     msg_amt = 0
-
     while msg_amt < 50:
         # Where we start and increment from
         starting_index = start + msg_amt
@@ -79,10 +78,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         }
         messages_shown.append(msg)
         msg_amt = msg_amt + 1
-
     if len(messages) is 0 or counter < 50:
         end = -1
-
     return {
         'messages': messages_shown,
         'start': start,
