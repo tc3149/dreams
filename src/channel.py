@@ -70,6 +70,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if starting_index >= end or starting_index >= len(messages):
             break
         # TO-do/fix once iteration 2 is released
+        '''
         msg = {
             'message_id': messages[starting_index]["message_id"], 
             'u_id': messages[starting_index]["u_id"],
@@ -77,6 +78,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             'time_created': messages[starting_index]["time_created"],
         }
         messages_shown.append(msg)
+        '''
+        messages_shown.append(messages[starting_index])
         msg_amt = msg_amt + 1
     if len(messages) is 0 or msg_amt < 50:
         end = -1
@@ -113,7 +116,6 @@ def channel_join_v1(auth_user_id, channel_id):
             channel["member_ids"].append(auth_user_id)
 
     return {
-
     }
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
@@ -157,3 +159,4 @@ def check_useralreadyinchannel(auth_user_id, channel_id):
                 if auth_user_id is member:
                     return True
     return False
+    
