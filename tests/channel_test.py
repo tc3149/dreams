@@ -71,9 +71,9 @@ def test_channel_messages_endnegativeone():
 
 def test_join_correct():
     clear_v1()
-    user1 = auth_register_v1("visejoy@gmail.com", "sikk423423432", "Jonathan", "Qiu")
-    user2 = auth_register_v1("thomaschen333@gmail.com", "rak4234324243", "Thomas", "Chen")
-    user3 = auth_register_v1("gordonl1@gmail.com", "gordonisreallygood12", "Gordon", "Liang")
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v1("email3@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user1["auth_user_id"], "testchannel", True)
 
     inner = channelList[0]
@@ -88,8 +88,8 @@ def test_join_correct():
 # joining empty
 def test_joining_nonexistant_channel():
     clear_v1()
-    user1 = auth_register_v1("visejoy@gmail.com", "sikk42342432", "Jonathan", "Qiu")
-    user2 = auth_register_v1("thomaschen@gmail.com", "rak432432424", "Thomas", "Chen")
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
     channels_create_v1(user1.get("auth_user_id"), "channel1", True)
 
     with pytest.raises(InputError):
@@ -98,7 +98,7 @@ def test_joining_nonexistant_channel():
 # invalid user id 
 def test_joining_invalid_user():
     clear_v1()
-    user1 = auth_register_v1("visejoy@gmail.com", "sikk43242342", "Jonathan", "Qiu")
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     new = channels_create_v1(user1.get("auth_user_id"), "channel1", True)
     temp = 21492144
     
@@ -109,8 +109,8 @@ def test_joining_invalid_user():
 # invalid channel id
 def test_joining_invalid_channel():
     clear_v1()
-    user1 = auth_register_v1("visejoy@gmail.com", "sikk77466", "Jonathan", "Qiu")
-    user2 = auth_register_v1("thomaschen@gmail.com", "rak54354543", "Thomas", "Chen")
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
     channels_create_v1(user1.get("auth_user_id"), "channel1", True)
 
     temp = 312312321321
@@ -123,8 +123,8 @@ def test_joining_invalid_channel():
 
 def test_private_channel():
     clear_v1()
-    user1 = auth_register_v1("visejoy@gmail.com", "sikk432432", "Jonathan", "Qiu")
-    user2 = auth_register_v1("thomaschen@gmail.com", "rak42342432", "Thomas", "Chen")
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
     new = channels_create_v1(user1.get("auth_user_id"), "channel1", False)
 
     with pytest.raises(AccessError):
