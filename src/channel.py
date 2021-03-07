@@ -14,46 +14,54 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             #channel does not exist
             raise InputError ("Channel does not exis")
     
-    #check if auth_user_id exists
+    #check if auth_user_id exists 
+    auth_id_status = False
     for user in accData:
         if user.get("id") is auth_user_id:
             #auth_user_id exists
+            auth_id_status = True
             break
-        else:
-            # auth_user_id does not exist
-            raise InputError ("Inviting user does not exist")
+   
+    if auth_id_status is False:
+        # auth_user_id does not exist
+        raise InputError ("Inviting user does not exist")
+            
     
     #check if auth_user_id owner member of channel
-    for user in channelList[channel_id][channelData]['owner_ids']:
-        
-        if user.get("id") is auth_user_id:
+    owner_status = False
+    for user in channelList[channel_id]['owner_ids']:   
+        if auth_user_id in channelList[channel_id]['owner_ids']:
             #user is owner member of channel
+            owner_status = True
             break
-        else:
-            #user does not have access
-            raise AccessError ("User does not have access")
-    
+               
+    if owner_status is False:
+        #user does not have access
+        raise AccessError ("User does not have access")
+
     #check if u_id exists
+    u_id_status = False
     for user2 in accData:
         if user2.get("id") is u_id:
             #u_id exists
+            u_id_status = True
             break
-        else:
-            # u_id does not exist
-            raise InputError ("Invited user does not exist")
+            
+    if u_id_status is False:
+        # u_id does not exist
+        raise InputError ("Invited user does not exist")
     
     #check if u_id already member of the channel
-    for user2 in channelList[channel_id][channelData]['member_ids']:
+    for user2 in channelList[channel_id]['member_ids']:
         
-        if user2.get("id") is auth_user_id:
+        if u_id in channelList[channel_id]['member_ids']:
             #u_id is member of channel
             raise InputError ("User already a member")    
-        else:
-            #u_id not a member
-            break
+
+            
     
     #add u_id to channel
-    channelData['member_ids'].append(u_id)
+    channelList[channel_id]['member_ids'].append(u_id)
 
     return {
 
@@ -69,30 +77,36 @@ def channel_details_v1(auth_user_id, channel_id):
         else:
             #channel does not exist
             raise InputError ("Channel does not exis")
-    
-    #check if auth_user_id exists
+    #check if auth_user_id exists 
+    auth_id_status = False
     for user in accData:
         if user.get("id") is auth_user_id:
             #auth_user_id exists
+            auth_id_status = True
             break
-        else:
-            # auth_user_id does not exist
-            raise InputError ("Inviting user does not exist")
+   
+    if auth_id_status is False:
+        # auth_user_id does not exist
+        raise AccessError ("User does not exist")
+            
     
-    #check if auth_user_id member of channel
-    for user in channelList[channel_id][channelData]['member_ids']:
+    #check if auth_user_id owner member of channel
+    member_status = False
+    for user in channelList[channel_id]['member_ids']:
         
-        if user.get("id") is auth_user_id:
-            #user is member of channel
+        if auth_user_id in channelList[channel_id]['member_ids']:
+            #user is owner member of channel
+            member_status = True
             break
-        else:
-            #user does not have access
-            raise AccessError ("User does not have access")
-
+               
+    if member_status is False:
+        #user does not have access
+        raise AccessError ("User does not have access")
+    
     return {
-        'name': channelList[channel_id][channelData]['name'],
-        'owner_members':channelList[channel_id][channelData]['owner_ids'],
-        'member_owners':channelList[channel_id][channelData]['member_ids']
+        'name': channelList[channel_id]['name'],
+        'owner_members':channelList[channel_id]['owner_ids'],
+        'member_owners':channelList[channel_id]['member_ids']
     
     }
 
