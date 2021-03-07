@@ -1,7 +1,7 @@
 import re
 from src.database import accData
-
 from src.error import InputError
+
 
 '''
 auth_login_v1 takes in an email string and password string. 
@@ -44,6 +44,7 @@ def auth_login_v1(email, password):
     else:
         # Email is not valid
         raise InputError("Email given is not a valid email")
+
 
 '''
 auth_register_v1 takes in an email string, password string, first name string and last name string. 

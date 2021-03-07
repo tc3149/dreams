@@ -5,98 +5,131 @@ from src.error import InputError, AccessError
 from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1
 from src.channels import channels_create_v1
 from src.database import accData, channelList
+from src.channel import channel_join_v1
 
-# Channel Create Tests
 
-def test_channel_create():
+# Channel Messages Tests
 
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
-    
-    assert channel == {'channel_id': 0}
-
-def test_channel_create_invalid():
+def test_channel_messages():
 
     clear_v1()
-    invalid_token = 0
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user["auth_user_id"], "testchannel", True)
+    messages = channel_messages_v1(user["auth_user_id"], channel["channel_id"], 0)
+    assert messages == {'messages': [], 'start': 0, 'end': -1}
+
+def test_channel_messages_invalid_userid():
+
+    clear_v1()
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user["auth_user_id"], "testchannel", True)
+    invalid_id = 1
+    with pytest.raises(AccessError):
+        assert channel_messages_v1(invalid_id, channel["channel_id"], 0) == AccessError
+
+def test_channel_messages_invalid_channelid():
+
+    clear_v1()
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user["auth_user_id"], "testchannel", True)
+    invalid_channel_id = 1
+    with pytest.raises(AccessError):
+        assert channel_messages_v1(user["auth_user_id"], invalid_channel_id, 0) == AccessError
+
+def test_channel_messages_unauthorised_user():
+
+    clear_v1()
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user["auth_user_id"], "testchannel", True)
+    
+    with pytest.raises(AccessError):
+        assert channel_messages_v1(user2["auth_user_id"], channel["channel_id"], 0) == AccessError
+    
+def test_channel_messages_startgreater():
+
+    clear_v1()
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user["auth_user_id"], "testchannel", True)
+    
+    with pytest.raises(InputError):
+        assert channel_messages_v1(user["auth_user_id"], channel["channel_id"], 1) == InputError
+
+def test_channel_messages_endnegativeone():
+
+    clear_v1()
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user["auth_user_id"], "testchannel", True)
+    messages = channel_messages_v1(user["auth_user_id"], channel["channel_id"], 0)
+    assert messages["end"] == -1
+
+
+
+# TEST JOINING
+
+# VALID CASES
+
+def test_join_correct():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v1("email3@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user1["auth_user_id"], "testchannel", True)
+
+    inner = channelList[0]
+    channel_join_v1(user2["auth_user_id"], channel["channel_id"])
+    channel_join_v1(user3["auth_user_id"], channel["channel_id"])
+
+    assert inner["member_ids"] == [0,1,2]
+
+    
+# FAIL CASES
+
+# joining empty
+def test_joining_nonexistant_channel():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    channels_create_v1(user1.get("auth_user_id"), "channel1", True)
+
+    with pytest.raises(InputError):
+        channel_join_v1(user2.get("auth_user_id"), "")
+
+# invalid user id 
+def test_joining_invalid_user():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    new = channels_create_v1(user1.get("auth_user_id"), "channel1", True)
+    temp = 21492144
+    
+    with pytest.raises(InputError):
+        channel_join_v1(temp, new.get("channel_id"))
+
+
+# invalid channel id
+def test_joining_invalid_channel():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    channels_create_v1(user1.get("auth_user_id"), "channel1", True)
+
+    temp = 312312321321
+
+    with pytest.raises(InputError):
+        channel_join_v1(user2.get("auth_user_id"), temp)
+
+    
+# private channel accesserror...?
+
+def test_private_channel():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    new = channels_create_v1(user1.get("auth_user_id"), "channel1", False)
 
     with pytest.raises(AccessError):
-        assert channels_create_v1(invalid_token, "testchannel", True) == AccessError
+        channel_join_v1(user2["auth_user_id"], new["channel_id"])
 
-def test_channel_create_many():
-
-    clear_v1()
-    
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    channel1 = channels_create_v1(user.get("auth_user_id"), "channel1", True)
-    channel2 = channels_create_v1(user.get("auth_user_id"), "channel2", True)
-    channel3 = channels_create_v1(user.get("auth_user_id"), "channel3", True)
-    channel4 = channels_create_v1(user.get("auth_user_id"), "channel4", True)
-    channel5 = channels_create_v1(user.get("auth_user_id"), "channel5", True)
-    channel6 = channels_create_v1(user.get("auth_user_id"), "channel6", True)
-
-    assert channel1 == {'channel_id': 0}
-    assert channel2 == {'channel_id': 1}
-    assert channel3 == {'channel_id': 2}
-    assert channel4 == {'channel_id': 3}
-    assert channel5 == {'channel_id': 4}
-    assert channel6 == {'channel_id': 5}
-
-def test_channel_create_longerthan20():
-
-    clear_v1()
-
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    user_id = user.get("auth_user_id")
-
-    with pytest.raises(InputError):
-        assert channels_create_v1(user_id, "a" *21, True) == InputError
-
-def test_channel_create_noname():
-    
-    clear_v1()
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v1("email3@gmail.com", "password", "Name", "Lastname")
-    user3 = auth_register_v1("email33@gmail.com", "password", "Name", "Lastname")
-    user_id = user.get("auth_user_id")
-
-    with pytest.raises(InputError):
-        assert channels_create_v1(user_id, "", True) == InputError
-
-def test_channel_create_private():
-
-    clear_v1()
-    
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    user_id = user.get("auth_user_id")
-
-    channel = channels_create_v1(user_id, "testChannel", False)
-
-    assert channelList[0].get("is_public") == False
-
-
-    
-
-
-#def test_invalidChannel_messages():
-    #Test 1: Invalid channel
-    #user = auth.auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    #channel = channels.channels_create_v1(user.get("auth_user_id"), "testchannel", True)
-    
-
-    # make user connect to channel (23) that has not been created
-    #with pytest.raises(InputError):
-        #channel_messages_v1(user.get("auth_user_id"), 23, 0)
-    
-#def test_startGreaterEnd_messages():
-    #Test 2: Start is greater than the total messages
-
-
-
-#def test_userInvalid_messages():
-    #Test 3: User is invalid to check messages
-
-    #make user1 create a channel then user2 try see the messages of their channel
 
 #Channel_invite tests
 
