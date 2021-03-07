@@ -175,13 +175,14 @@ def channel_details_v1(auth_user_id, channel_id):
         for mem in accData:
             if memberID is mem['id']:
                 new_member = {
-                'u_id':memberID,
-                'email': accData[memberID]['email'],
-                'name_first': accData[memberID]['name_first'],
-                'name_last': accData[memberID]['name_last'],
-                'handle_str': accData[memberID]['handle']
+                    'u_id':memberID,
+                    'email': accData[memberID]['email'],
+                    'name_first': accData[memberID]['name_first'],
+                    'name_last': accData[memberID]['name_last'],
+                    'handle_str': accData[memberID]['handle']
                 }
                 allMembers.append(new_member)
+                break
             
             
     #loop to add owner details
@@ -190,13 +191,14 @@ def channel_details_v1(auth_user_id, channel_id):
         for own in accData:
             if ownerID is own['id']:
                 owner = {
-                'u_id':ownerID,
-                'email': accData[ownerID]['email'],
-                'name_first': accData[ownerID]['name_first'],
-                'name_last': accData[ownerID]['name_last'],
-                'handle_str': accData[ownerID]['handle']
+                    'u_id':ownerID,
+                    'email': accData[ownerID]['email'],
+                    'name_first': accData[ownerID]['name_first'],
+                    'name_last': accData[ownerID]['name_last'],
+                    'handle_str': accData[ownerID]['handle']
                 }
                 ownMembers.append(owner)
+                break
             
             
     
@@ -239,6 +241,14 @@ Return Value:
 
 def channel_messages_v1(auth_user_id, channel_id, start):
 
+    # Check if user id is valid
+    if valid_userid(auth_user_id) is False:
+        raise AccessError("Error: Invalid user id")
+
+    # Check if channel id is valid
+    if valid_channelid(channel_id) is False:
+        raise AccessError("Error: Invalid channel")
+
     #Check if user is authorised to be in the channel
     authorisation = False
     for channel in channelList:
@@ -250,13 +260,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if authorisation is False:
         raise AccessError("User is not in channel")
 
-    # Check if user id is valid
-    if valid_userid(auth_user_id) is False:
-        raise AccessError("Error: Invalid user id")
 
-    # Check if channel id is valid
-    if valid_channelid(channel_id) is False:
-        raise AccessError("Error: Invalid channel")
 
     # Return Function
     for channel in channelList:
