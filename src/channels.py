@@ -45,6 +45,27 @@ def channels_listall_v1(auth_user_id):
 
     return {'channels': newchannelList}
 
+'''
+channels_create_v1 takes in a user id, a specified channel name, and a boolean for 
+whether or not the channel is intended to be public. This function creates an empty channel dictionary 
+and appends the user id as an owner and member of the channel, then returns the newly created
+channel id.
+
+Arguments:
+    auth_user_id (integer) - User id created by auth_register_v1
+    name (string) - Name of the channel
+    is_public (boolean) - Either true or false, sets the channel to public or private
+
+Exceptions:
+    InputError - Occurs when length of name is greater than 20 characters
+    InputError - Occurs when length of name is less than 1 character (not listed on spec but added anyways)
+    AccessError - Occurs when auth_user_id is not valid
+
+Return Value:
+    Returns channel_id | 'channel_id': channel_id,
+
+'''
+
 def channels_create_v1(auth_user_id, name, is_public):
     '''
     Creates a new channel with that name that is either a public or private channel
