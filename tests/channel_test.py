@@ -2,7 +2,7 @@ import pytest
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
-from src.channel import channel_messages_v1
+from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1
 from src.channels import channels_create_v1
 from src.database import accData, channelList
 from src.channel import channel_join_v1
@@ -131,3 +131,154 @@ def test_private_channel():
         channel_join_v1(user2["auth_user_id"], new["channel_id"])
 
 
+#Channel_invite tests
+
+def channel_does_not_exist():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+
+    with pytest.raises(InputError):
+        assert channel_invite_v1(0,1,1) == InputError
+
+
+def test_adding_user_not_created():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    
+    with pytest.raises(InputError):
+        assert channel_invite_v1(0,0,1) == InputError
+
+def test_user_not_owner_member_of_channel():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
+    user3 = auth_register_v1("email3@gmail.com", "password3", "Fname", "Lname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    
+    with pytest.raises(AccessError):
+        assert channel_invite_v1(1,0,2) == AccessError
+
+def test_successful_invite():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+
+    assert channel_invite_v1(0,0,1) == {}
+
+def test_multi_add():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
+    user3 = auth_register_v1("email3@gmail.com", "password3", "Fname", "Lname")
+    user4 = auth_register_v1("email4@gmail.com", "password4", "First", "Last")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    
+    assert channel_invite_v1(0,0,1) == {}
+    assert channel_invite_v1(0,0,2) == {}
+    assert channel_invite_v1(0,0,3) == {}
+    
+
+
+
+#channel_details tests
+
+def test_non_existing_channel ():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+
+    with pytest.raises(InputError):
+        assert channel_details_v1(0,123456789) == InputError
+
+def test_user_not_member_of_channel (): 
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    
+    with pytest.raises(AccessError):
+        assert channel_details_v1(2,0) == AccessError
+
+def test_valid_input ():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+
+    assert channel_details_v1(0,0) == {
+                                        'name': 'testchannel',
+                                        'owner_members': [
+                                            {
+                                                'u_id': 0,
+                                                'email': 'email@gmail.com',
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',
+                                                
+                                            }
+                                        ],
+                                        'all_members': [
+                                            {
+                                                'u_id': 0,
+                                                'email': 'email@gmail.com',
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',
+                                                
+                                            }
+                                        ],
+                                        } 
+def tets_empty():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    
+    with pytest.raises(InputError):
+        assert channel_details_v1("") == InputError 
+
+def test_identical_handles_details():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Name", "Lastname")
+    auth2 = channel_invite_v1(0,0,1)
+    assert channel_details_v1(0,0) == {
+                                        'name': 'testchannel',
+                                        'owner_members': [
+                                            {
+                                                'u_id': 0,
+                                                'email': 'email@gmail.com',
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',                                             
+                                            }
+                                        ],
+                                        'all_members': [
+                                            {
+                                                'u_id': 0,
+                                                'email': 'email@gmail.com',
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',                                               
+                                            },
+                                            {
+                                                'u_id': 1,
+                                                'email':'email2@gmail.com',
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                'handle_str': 'namelastname0',
+                                            }
+                                        ],
+                                        } 
