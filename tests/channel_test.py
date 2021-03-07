@@ -214,12 +214,12 @@ def tets_empty():
     with pytest.raises(InputError):
         assert channel_details_v1("") == InputError 
 
-def test_multiple_calls_for_details():
+def test_identical_handles_details():
     clear_v1()
 
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
-    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Name", "Lastname")
     auth2 = channel_invite_v1(0,0,1)
     assert channel_details_v1(0,0) == {
                                         'name': 'testchannel',
@@ -229,8 +229,7 @@ def test_multiple_calls_for_details():
                                                 'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
-                                                'handle_str': 'namelastname',
-                                                
+                                                'handle_str': 'namelastname',                                             
                                             }
                                         ],
                                         'all_members': [
@@ -239,16 +238,14 @@ def test_multiple_calls_for_details():
                                                 'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
-                                                'handle_str': 'namelastname',
-                                                
+                                                'handle_str': 'namelastname',                                               
                                             },
                                             {
                                                 'u_id': 1,
                                                 'email':'email2@gmail.com',
-                                                'name_first': 'Firstname',
-                                                'name_last': 'Name',
-                                                'handle_str': 'firstnamename',
-
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                'handle_str': 'namelastname0',
                                             }
                                         ],
                                         } 
