@@ -114,15 +114,16 @@ Return Value:
                 'email': 
                 'name_first': 
                 'name_last': 
-                
+                'handle_str':
             }
         ],
         'all_members': [
             {
-                'u_id': 
+                'u_id':
                 'email': 
                 'name_first': 
                 'name_last': 
+                'handle_str':
                 
             }
         ],
@@ -177,10 +178,11 @@ def channel_details_v1(auth_user_id, channel_id):
                 'u_id':memberID,
                 'email': accData[memberID]['email'],
                 'name_first': accData[memberID]['name_first'],
-                'name_last': accData[memberID]['name_last']
+                'name_last': accData[memberID]['name_last'],
+                'handle_str': accData[memberID]['handle']
                 }
                 allMembers.append(new_member)
-            break
+            
             
     #loop to add owner details
     
@@ -191,10 +193,11 @@ def channel_details_v1(auth_user_id, channel_id):
                 'u_id':ownerID,
                 'email': accData[ownerID]['email'],
                 'name_first': accData[ownerID]['name_first'],
-                'name_last': accData[ownerID]['name_last']
+                'name_last': accData[ownerID]['name_last'],
+                'handle_str': accData[ownerID]['handle']
                 }
                 ownMembers.append(owner)
-            break
+            
             
     
     return {
