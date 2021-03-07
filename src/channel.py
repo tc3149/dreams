@@ -41,11 +41,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         raise AccessError("User is not in channel")
 
     # Check if user id is valid
-    if valid_userid is False:
+    if valid_userid(auth_user_id) is False:
         raise AccessError("Error: Invalid user id")
 
     # Check if channel id is valid
-    if valid_channelid is False:
+    if valid_channelid(channel_id) is False:
         raise AccessError("Error: Invalid channel")
 
     # Return Function
