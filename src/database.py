@@ -1,4 +1,2 @@
 accData = []
 channelList = []
-allMembers = []
-ownMembers = []
