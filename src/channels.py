@@ -3,7 +3,6 @@ from src.database import accData, channelList
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 
-
 def channels_list_v1(auth_user_id):
     id_status = False
     for user in accData:
@@ -21,10 +20,8 @@ def channels_list_v1(auth_user_id):
                 channelDict['channel_id'] = channel.get('id')
                 channelDict['name'] = channel.get('name')
                 newchannelList.append(channelDict)
-    
 
     return {'channels': newchannelList}
-
 
 def channels_listall_v1(auth_user_id):
     id_status = False
@@ -101,25 +98,9 @@ def channels_create_v1(auth_user_id, name, is_public):
     # Adding user data
     channelData['owner_ids'].append(auth_user_id)
     channelData['member_ids'].append(auth_user_id)
-
     channelList.append(channelData)
-
 
     return {
         'channel_id': channel_id,
     }
 
-
-'''
-if __name__ == "__main__":
-    user0 = auth_register_v1("email2@gmail.com", "password1", "1Name", "1Lastname")
-    user1 = auth_register_v1("email3@gmail.com", "password3", "3Name", "3Lastname")
-    user2 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    
-    for user in accData:
-        print(user.get("id"))
-
-    print(user2.get("auth_user_id"))
-    
-    print(channels_create_v1(user2.get("auth_user_id"), "Channel", True))
-'''
