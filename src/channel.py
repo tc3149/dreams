@@ -4,6 +4,28 @@ from src.database import accData, channelList
 from src.channels import channels_create_v1
 from src.auth import auth_register_v1
 
+'''
+channel_invite_v1 takes in an auth_user_id integer, a channel_id integer and u_id integer. 
+The function then checks if the channel_id is exists, if both users exists, if auth_user_id is already a member of the channel and if u_id is a member of the channel.
+If all requirements are met the function then adds u_id to the channel and returns {}, otherwise it raises InputError or AccessError.
+
+Arguments:
+    auth_user_id (integer)      - Id of user who owns the channel
+    channel_id (integer)        - Id of channel
+    u_id (integer)              - Id of user being added to the channel   
+    ...
+
+Exceptions:
+    InputError  - Occurs when given channel_id does not exist
+    InputError  - Occurs when given u_id does not exist
+    InputError  - Occurs when given auth_user_id does not exist
+    InputError  - Occurs when given u_id already a member of the channel they are being added to
+    ValueError  - Occurs when given auth_user_id is not a member of the channel
+
+Return Value:
+    Returns {}
+'''
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     #check if channel exists
     for channel in channelList:
@@ -68,6 +90,45 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     }
 
+'''
+channel_details_v1 takes in an auth_user_id integer and a channel_id integer. 
+The function then checks if the channel_id is exists, if auth_user_id exists and is already a member of the channel.
+If all requirements are met the function then returns the contents of the channel including the name, ownermembers and all members, otherwise it raises InputError or AccessError.
+
+Arguments:
+    auth_user_id (integer)      - Id of user who owns the channel
+    channel_id (integer)        - Id of channel 
+    ...
+
+Exceptions:
+    InputError  - Occurs when given channel_id does not exist
+    InputError  - Occurs when given auth_user_id does not exist
+    ValueError  - Occurs when given auth_user_id is not a member of the channel
+
+Return Value:
+    Returns {
+        'name': 'testchannel',
+        'owner_members': [
+            {
+                'u_id': 
+                'email': 
+                'name_first': 
+                'name_last': 
+                
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': 
+                'email': 
+                'name_first': 
+                'name_last': 
+                
+            }
+        ],
+    }
+'''
+
 def channel_details_v1(auth_user_id, channel_id):
 
     #check if channel exists
@@ -78,6 +139,7 @@ def channel_details_v1(auth_user_id, channel_id):
         else:
             #channel does not exist
             raise InputError ("Channel does not exis")
+
     #check if auth_user_id exists 
     auth_id_status = False
     for user in accData:
@@ -116,8 +178,9 @@ def channel_details_v1(auth_user_id, channel_id):
                 'email': accData[memberID]['email'],
                 'name_first': accData[memberID]['name_first'],
                 'name_last': accData[memberID]['name_last']
-            }
-            allMembers.append(new_member)
+                }
+                allMembers.append(new_member)
+            break
             
     #loop to add owner details
     
@@ -129,9 +192,10 @@ def channel_details_v1(auth_user_id, channel_id):
                 'email': accData[ownerID]['email'],
                 'name_first': accData[ownerID]['name_first'],
                 'name_last': accData[ownerID]['name_last']
-            }
-            ownMembers.append(owner)
+                }
+                ownMembers.append(owner)
             break
+            
     
     return {
         'name': channelList[channel_id]['name'],
