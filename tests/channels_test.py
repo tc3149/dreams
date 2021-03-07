@@ -3,8 +3,10 @@ from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v1
+from src.channel import channel_join_v1
 from src.channels import channels_create_v1
 from src.channels import channels_listall_v1
+from src.channels import channels_list_v1
 from src.database import accData, channelList
 
 # Channel Create Tests
@@ -65,26 +67,27 @@ def test_channels_create_private():
     user_id = user.get("auth_user_id")
     channel = channels_create_v1(user_id, "testChannel", False)
     assert channelList[0].get("is_public") == False
-'''
+
 #Channels_list
 def test_channels_list():
     
     clear_v1()
 
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
-    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
     channel2 = channels_create_v1(user2.get("auth_user_id"), "testChannel2", True)
-    result = channels_list_v1(user.get("auth_user_id")) 
+    channel_join_v1(user2.get("auth_user_id"), channel.get("channel_id"))
+    result = channels_list_v1(user2.get("auth_user_id")) 
 
-    assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}]}
+    assert result == {'channels': [{'channel_id': 0, 'name': 'testChannel'}, {'channel_id': 1, 'name': 'testChannel2'}]}
 
 def test_channels_list_empty():
     
     clear_v1()
 
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
-    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
     result = channels_list_v1(user2.get("auth_user_id")) 
 
@@ -95,7 +98,7 @@ def test_channels_list_invalid():
     clear_v1()
 
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
-    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
     result = channels_list_v1(user2.get("auth_user_id")) 
 
@@ -106,11 +109,10 @@ def test_channels_list_private():
     clear_v1()
 
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
-    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
-    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
+    user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
     channel2 = channels_create_v1(user2.get("auth_user_id"), "testChannel2", False)
-    result = channels_list_v1(user.get("auth_user_id")) 
-
+    result = channels_list_v1(user2.get("auth_user_id"))
     assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}]}
 
 def test_channels_list_private_public():
@@ -118,14 +120,15 @@ def test_channels_list_private_public():
     clear_v1()
 
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
-    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
     channel2 = channels_create_v1(user2.get("auth_user_id"), "testChannel2", False)
-    channel3 = channels_create_v1(user2.get("auth_user_id"), "testChannel3", True)
-    result = channels_list_v1(user.get("auth_user_id")) 
+    channel3 = channels_create_v1(user.get("auth_user_id"), "testChannel3", True)
+    channel_join_v1(user2.get("auth_user_id"), channel3.get("channel_id"))
+    result = channels_list_v1(user2.get("auth_user_id")) 
 
     assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}, {'channel_id': 2, 'name': 'testChannel3'}]}
-'''
+
 #Channels_listall
 
 def test_channels_listall():
