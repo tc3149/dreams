@@ -1,6 +1,6 @@
 import re
 from src.error import InputError, AccessError
-from src.database import accData, channelList, allMembers, ownMembers
+from src.database import accData, channelList
 from src.channels import channels_create_v1
 from src.auth import auth_register_v1
 
@@ -105,6 +105,9 @@ def channel_details_v1(auth_user_id, channel_id):
         raise AccessError ("User does not have access")
     
     #loop to add member details
+    
+    allMembers = []
+    ownMembers = []
     for memberID in channelList[channel_id]['member_ids']:
         for mem in accData:
             if memberID is mem['id']:
@@ -115,8 +118,10 @@ def channel_details_v1(auth_user_id, channel_id):
                 'name_last': accData[memberID]['name_last']
             }
             allMembers.append(new_member)
+            
     #loop to add owner details
-    for ownerID in channelList[channel_id]['owner_ids']:
+    
+    for ownerID in channelList[channel_id]['owner_ids']:       
         for own in accData:
             if ownerID is own['id']:
                 owner = {
@@ -125,7 +130,8 @@ def channel_details_v1(auth_user_id, channel_id):
                 'name_first': accData[ownerID]['name_first'],
                 'name_last': accData[ownerID]['name_last']
             }
-            ownMembers.append(new_member)
+            ownMembers.append(owner)
+            break
     
     return {
         'name': channelList[channel_id]['name'],
