@@ -2,7 +2,7 @@ import pytest
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
-from src.channel import channel_messages_v1
+from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1
 from src.channels import channels_create_v1
 from src.database import accData, channelList
 
@@ -100,21 +100,31 @@ def test_channel_create_private():
 
 #Channel_invite tests
 
-def test_channel_not_created():
-    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
 
-    with pytest.raises(InputError):
-        assert channel_invite_v1(0,0,1) == InputError
 
 def test_adding_user_not_created():
+    clear_v1()
+
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
     
     with pytest.raises(InputError):
         assert channel_invite_v1(0,0,1) == InputError
 
+def test_user_not_owner_member_of_channel():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
+    user3 = auth_register_v1("email3@gmail.com", "password3", "Fname", "Lname")
+    
+
+    assert channel_invite_v1(1,0,2) == AccessError
+
 def test_successful_invite():
+    clear_v1()
+
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
@@ -122,6 +132,8 @@ def test_successful_invite():
     assert channel_invite_v1(0,0,1) == ""
 
 def test_multi_add():
+    clear_v1()
+
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
     user3 = auth_register_v1("email3@gmail.com", "password3", "Fname", "Lname")
@@ -138,6 +150,8 @@ def test_multi_add():
 #channel_details tests
 
 def test_non_existing_channel ():
+    clear_v1()
+
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
 
@@ -145,13 +159,17 @@ def test_non_existing_channel ():
         assert channel_details_v1(0,123456789) == InputError
 
 def test_user_not_member_of_channel (): 
+    clear_v1()
+
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
     
     with pytest.raises(InputError):
-        assert channel_details_v1(2,0) == InputError
+        assert channel_details_v1(2,0) == AccessError
 
 def test_valid_input ():
+    clear_v1()
+
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
 
@@ -170,11 +188,13 @@ def test_valid_input ():
                                                 'u_id': 0,
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
-                                                'email': 'Lastname';
+                                                'email': 'Lastname'
                                             }
                                         ],
                                         } 
 def tets_empty():
+    clear_v1()
+
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
     
