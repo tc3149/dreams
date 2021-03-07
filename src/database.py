@@ -1,2 +1,4 @@
 accData = []
 channelList = []
+allMembers = []
+ownMembers = []
