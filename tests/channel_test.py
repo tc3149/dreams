@@ -4,7 +4,7 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1
 from src.channels import channels_create_v1
-from src.database import accData, channelList
+from src.database import accData, channelList, allMembers, ownMembers
 
 # Channel Create Tests
 
@@ -187,17 +187,19 @@ def test_valid_input ():
                                         'owner_members': [
                                             {
                                                 'u_id': 0,
+                                                'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
-                                                'email': 'email@gmail.com',
+                                                
                                             }
                                         ],
                                         'all_members': [
                                             {
                                                 'u_id': 0,
+                                                'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
-                                                'email': 'Lastname'
+                                                
                                             }
                                         ],
                                         } 
