@@ -1,8 +1,10 @@
 import pytest
 import re
+from src.database import accData
 from src.auth import auth_register_v1
 from src.auth import auth_login_v1
 from src.error import InputError
+from src.other import clear_v1
 
 
 def test_auth_register_v1():
@@ -67,4 +69,13 @@ def test_auth_login_v1_except():
     # Wrong password
     with pytest.raises(InputError):
         auth_login_v1("notregistered@hotmail.com", "wrongpassword")
+
+def test_auth_register_handle_over_limit():
+    clear_v1()
+
+    auth_register_v1("email@hotmail.com", "testpassword", "ReallyReallyReally", "LongName")
+    assert accData[0]["handle"] == "reallyreallyreallylo"
+    auth_register_v1("email2@hotmail.com", "testpassword", "ReallyReallyReally", "LongName")
+    assert accData[1]["handle"] == "reallyreallyreallylo0"
     
+

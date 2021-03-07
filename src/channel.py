@@ -28,13 +28,15 @@ Return Value:
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     #check if channel exists
+    channelExists = False
     for channel in channelList:
-        if channel_id <= len(channelList):
+        if channel_id is channel["id"]:
             #channel does exist
+            channelExists = True
             break
-        else:
-            #channel does not exist
-            raise InputError ("Channel does not exis")
+    if channelExists is False:
+        #channel does not exist
+        raise InputError ("Channel does not exist")
     
     #check if auth_user_id exists 
     auth_id_status = False
@@ -295,7 +297,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         '''
         messages_shown.append(messages[starting_index])
         msg_amt = msg_amt + 1
-    if len(messages) is 0 or msg_amt < 50:
+    if len(messages) == 0 or msg_amt < 50:
         end = -1
     return {
         'messages': messages_shown,
