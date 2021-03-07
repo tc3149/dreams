@@ -3,17 +3,16 @@ from src.error import InputError, AccessError
 from src.database import accData, channelList
 from src.channels import channels_create_v1
 from src.auth import auth_register_v1
-from src.error import InputError, AccessError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     #check if channel exists
-   
-    if channel_id <= len(channelList)
-        #channel does exist
-        break
-    else:
-        #channel does not exist
-        raise InputError ("Channel does not exis")
+    for channel in channelList:
+        if channel_id <= len(channelList):
+            #channel does exist
+            break
+        else:
+            #channel does not exist
+            raise InputError ("Channel does not exis")
     
     #check if auth_user_id exists
     for user in accData:
@@ -48,8 +47,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         
         if user2.get("id") is auth_user_id:
             #u_id is member of channel
-            raise InputError ("User already a member")
-            
+            raise InputError ("User already a member")    
         else:
             #u_id not a member
             break
@@ -65,7 +63,7 @@ def channel_details_v1(auth_user_id, channel_id):
 
     #check if channel exists
     for channel in channelList:
-        if channel_id <= len(channelList)
+        if channel_id <= len(channelList):
             #channel does exist
             break
         else:
