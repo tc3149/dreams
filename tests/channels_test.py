@@ -13,6 +13,8 @@ from src.database import accData, channelList
 
 def test_channels_create():
 
+    # Testing if a channel can be created
+    
     clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
@@ -20,12 +22,16 @@ def test_channels_create():
 
 def test_channels_create_invalid():
 
+    # Testing if an error is given for invalid user ids
+
     clear_v1()
     invalid_token = 0
     with pytest.raises(AccessError):
         assert channels_create_v1(invalid_token, "testchannel", True) == AccessError
 
 def test_channels_create_many():
+
+    # Testing if many channels can be created from a single user
 
     clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
@@ -44,6 +50,8 @@ def test_channels_create_many():
 
 def test_channels_create_longerthan20():
 
+    # Testing if channel names longer than 20 characters result in inputerror
+
     clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     user_id = user.get("auth_user_id")
@@ -51,7 +59,9 @@ def test_channels_create_longerthan20():
         assert channels_create_v1(user_id, "a" *21, True) == InputError
 
 def test_channels_create_noname():
-    
+
+    # Testing if channel names less than 1 character result in input error
+
     clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v1("email3@gmail.com", "password", "Name", "Lastname")
@@ -62,6 +72,8 @@ def test_channels_create_noname():
 
 def test_channels_create_private():
 
+    # Testing if channel can be created with private parameter
+
     clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
     user_id = user.get("auth_user_id")
@@ -70,44 +82,46 @@ def test_channels_create_private():
 
 #Channels_list
 def test_channels_list():
-    
-    clear_v1()
 
+    # Testing if channels list can be returned from function
+
+    clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
     channel2 = channels_create_v1(user2.get("auth_user_id"), "testChannel2", True)
     channel_join_v1(user2.get("auth_user_id"), channel.get("channel_id"))
     result = channels_list_v1(user2.get("auth_user_id")) 
-
     assert result == {'channels': [{'channel_id': 0, 'name': 'testChannel'}, {'channel_id': 1, 'name': 'testChannel2'}]}
 
 def test_channels_list_empty():
-    
-    clear_v1()
 
+    # Testing if no joined channels for a user results in an empty list
+
+    clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
     result = channels_list_v1(user2.get("auth_user_id")) 
-
     assert result == {'channels': []}
 
 def test_channels_list_invalid():
-    
+ 
+    # Testing if invalid user_id results in accesserror
+  
     clear_v1()
-
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
-    result = channels_list_v1(user2.get("auth_user_id")) 
-
-    assert result == {'channels': []}
+    invalid_id = 5
+    with pytest.raises(AccessError):
+        assert channels_list_v1(invalid_id) == AccessError
 
 def test_channels_list_private():
-    
-    clear_v1()
+ 
+    #Testing if channel list can show private channels
 
+    clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
@@ -116,9 +130,10 @@ def test_channels_list_private():
     assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}]}
 
 def test_channels_list_private_public():
-    
-    clear_v1()
 
+    #Testing if channel list can show both public and private channels
+
+    clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
@@ -126,56 +141,56 @@ def test_channels_list_private_public():
     channel3 = channels_create_v1(user.get("auth_user_id"), "testChannel3", True)
     channel_join_v1(user2.get("auth_user_id"), channel3.get("channel_id"))
     result = channels_list_v1(user2.get("auth_user_id")) 
-
     assert result == {'channels': [{'channel_id': 1, 'name': 'testChannel2'}, {'channel_id': 2, 'name': 'testChannel3'}]}
 
 #Channels_listall
 
 def test_channels_listall():
-    
+ 
+    # Testing if channels_listall can return a list of channels
+
     clear_v1()
-
-    invalid_user_id = 0
-
-    with pytest.raises(AccessError):
-        assert channels_listall_v1(invalid_user_id) == AccessError
+    user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testChannel", True)
+    channel2 = channels_create_v1(user.get("auth_user_id"), "testChannel2", True)
+    assert channels_listall_v1(user.get("auth_user_id")) == {'channels': [{'channel_id': 0, 'name': 'testChannel'}, {'channel_id': 1, 'name': 'testChannel2'}]}
 
 def test_channels_listall_invalid():
 
+    # Testing if an error is given from invalid user ids
+
     clear_v1()
-
     invalid_user_id = 0
-
     with pytest.raises(AccessError):
         assert channels_listall_v1(invalid_user_id) == AccessError
 
-def test_channels_listall_no_users():
-    
-    clear_v1()
+def test_channels_listall_no_channels():
 
+    # Testing if no channels results in an empty list
+
+    clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     result = channels_listall_v1(user.get("auth_user_id")) 
-
     assert result == {'channels': []}
 
 def test_channels_listall_private():
+ 
+    # Testing if private channels function with listall
 
     clear_v1()
-
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
     channel2 = channels_create_v1(user.get("auth_user_id"), "testChannel2", False)
     result = channels_listall_v1(user.get("auth_user_id"))
-
     assert result == {'channels': [{'channel_id': 0, 'name': 'testChannel'}, {'channel_id': 1, 'name': 'testChannel2'}]}
 
 def test_channels_listall_public_private():
 
-    clear_v1()
+    # Testing if both private and public channels function with listall
 
+    clear_v1()
     user = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     channel = channels_create_v1(user.get("auth_user_id"), "testChannel", False)
     channel2 = channels_create_v1(user.get("auth_user_id"), "testChannel2",True)
     result = channels_listall_v1(user.get("auth_user_id"))
-    
     assert result == {'channels': [{'channel_id': 0, 'name': 'testChannel'}, {'channel_id': 1, 'name': 'testChannel2'}]}
