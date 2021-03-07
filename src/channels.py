@@ -3,6 +3,18 @@ from src.database import accData, channelList
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 
+'''
+channels_list_v1 takes in a user_id string.
+The functions then checks if the user_id is valid.
+If the user_id is valid, the function then returns all the channels associated
+with the user_id in a list.
+Arguments:
+    auth_user_id (string) - ID of user
+Exceptions:
+    AccessError - Occurs when given id does not match accData
+Return Value:
+    Returns list | {'channels': newchannelList}
+'''
 def channels_list_v1(auth_user_id):
     id_status = False
     for user in accData:
@@ -23,6 +35,17 @@ def channels_list_v1(auth_user_id):
 
     return {'channels': newchannelList}
 
+'''
+channels_list_v1 takes in a user_id string.
+The functions then checks if the user_id is valid.
+If the user_id is valid, the function then returns all channels.
+Arguments:
+    auth_user_id (string) - ID of user
+Exceptions:
+    AccessError - Occurs when given id does not match accData
+Return Value:
+    Returns list | {'channels': newchannelList}
+'''
 def channels_listall_v1(auth_user_id):
     id_status = False
     for user in accData:

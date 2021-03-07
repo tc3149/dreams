@@ -123,6 +123,25 @@ def channel_leave_v1(auth_user_id, channel_id):
     return {
     }
 
+'''
+channel_join_v1 takes in the user's ID and the channel they wish to join.
+The function then checks whether the ID is valid, the channel is valid, if the channel is private or if the user is already in the channel.
+If so, it appends the user's ID into the channel's 'member ids' and returns nothing. If conditions are breached, it raises an InputError or AccessError
+
+Arguments:
+    auth_user_id (string) - User's ID
+    channel_id (string) - Channel's ID
+
+Exceptions:
+    InputError - when the user's ID is invalid
+    InputError - when the channel ID is invalid
+    AccessError - when user tries to join a private channel
+    AccessError - when user is already in the channel
+
+Return Value:
+    Returns nothing.
+'''
+
 def channel_join_v1(auth_user_id, channel_id):
 
     # check whether id is valid
