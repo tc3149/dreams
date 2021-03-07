@@ -4,7 +4,7 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1
 from src.channels import channels_create_v1
-from src.database import accData, channelList, allMembers, ownMembers
+from src.database import accData, channelList
 
 # Channel Create Tests
 
@@ -211,3 +211,39 @@ def tets_empty():
     
     with pytest.raises(InputError):
         assert channel_details_v1("") == InputError 
+
+def test_multiple_calls_for_details():
+    clear_v1()
+
+    user = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v1(user.get("auth_user_id"), "testchannel", True)
+    user2 = auth_register_v1("email2@gmail.com", "password2", "Firstname", "Name")
+    auth2 = channel_invite_v1(0,0,1)
+    assert channel_details_v1(0,0) == {
+                                        'name': 'testchannel',
+                                        'owner_members': [
+                                            {
+                                                'u_id': 0,
+                                                'email': 'email@gmail.com',
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                
+                                            }
+                                        ],
+                                        'all_members': [
+                                            {
+                                                'u_id': 0,
+                                                'email': 'email@gmail.com',
+                                                'name_first': 'Name',
+                                                'name_last': 'Lastname',
+                                                
+                                            },
+                                            {
+                                                'u_id': 1,
+                                                'email':'email2@gmail.com',
+                                                'name_first': 'Firstname',
+                                                'name_last': 'Name',
+
+                                            }
+                                        ],
+                                        } 
