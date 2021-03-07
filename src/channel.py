@@ -135,13 +135,16 @@ Return Value:
 def channel_details_v1(auth_user_id, channel_id):
 
     #check if channel exists
+    channelExists = False
     for channel in channelList:
-        if channel_id <= len(channelList):
+        if channel_id is channel["id"]:
             #channel does exist
+            channelExists = True
+            channelName = channel["name"]
             break
-        else:
-            #channel does not exist
-            raise InputError ("Channel does not exis")
+    if channelExists is False:
+        #channel does not exist
+        raise InputError ("Channel does not exist")
 
     #check if auth_user_id exists 
     auth_id_status = False
@@ -205,7 +208,7 @@ def channel_details_v1(auth_user_id, channel_id):
             
     
     return {
-        'name': channelList[channel_id]['name'],
+        'name': channelName,
         'owner_members':ownMembers,
         'all_members':allMembers
     
