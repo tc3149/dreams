@@ -190,6 +190,7 @@ def test_valid_input ():
                                                 'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',
                                                 
                                             }
                                         ],
@@ -199,6 +200,7 @@ def test_valid_input ():
                                                 'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',
                                                 
                                             }
                                         ],
@@ -227,6 +229,7 @@ def test_multiple_calls_for_details():
                                                 'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',
                                                 
                                             }
                                         ],
@@ -236,6 +239,7 @@ def test_multiple_calls_for_details():
                                                 'email': 'email@gmail.com',
                                                 'name_first': 'Name',
                                                 'name_last': 'Lastname',
+                                                'handle_str': 'namelastname',
                                                 
                                             },
                                             {
@@ -243,6 +247,7 @@ def test_multiple_calls_for_details():
                                                 'email':'email2@gmail.com',
                                                 'name_first': 'Firstname',
                                                 'name_last': 'Name',
+                                                'handle_str': 'firstnamename',
 
                                             }
                                         ],
