@@ -302,7 +302,7 @@ def test_identical_handles_details():
     channel1 = channels_create_v1(user1.get("auth_user_id"), "testchannel", True)
     user2 = auth_register_v1("email2@gmail.com", "password2", "Name", "Lastname")
     channel_invite_v1(user1["auth_user_id"], channel1["channel_id"], user2["auth_user_id"])
-    assert channel_details_v1(0,0) == {
+    assert channel_details_v1(user1["auth_user_id"], channel1["channel_id"]) == {
                                         'name': 'testchannel',
                                         'owner_members': [
                                             {
