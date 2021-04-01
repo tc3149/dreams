@@ -1,5 +1,6 @@
 import re
-from src.database import accData
+import jwt
+from src.database import accData, secretSauce
 from src.error import InputError
 
 
@@ -31,9 +32,12 @@ def auth_login_v1(email, password):
         if search_email(email):
             # User exists, now check if password is correct
             if verify_password(email, password):
-                # Password is correct, return user_id
+                # Create JWT
+                secret = jwt.encode({'auth_user_id': get_user_id(email),}, secretSauce, algorithm="HS256")
+                # Password is correct, return JWT & user_id
                 return {
-                    'auth_user_id': get_user_id(email),
+                    "token": secret,
+                    "auth_user_id": get_user_id(email),
                 }
             else:
                 # Password not found
@@ -72,7 +76,6 @@ Return Value:
     Returns user id | 'auth_user_id': userID
 '''
 def auth_register_v1(email, password, name_first, name_last):
-
     # Checking length of input variables | Error checking for inputs
     if len(name_first) < 1 or len(name_last) < 1:
         # Error
@@ -118,8 +121,12 @@ def auth_register_v1(email, password, name_first, name_last):
         # Error
         raise InputError("Error: Email is not valid")
 
+    # Create JWT
+    secret = jwt.encode({'auth_user_id': userID,}, secretSauce, algorithm="HS256")
+    # Return JWT string and the user id
     return {
-        'auth_user_id': userID,
+        "token": secret,
+        "auth_user_id": userID,
     }
 
 # Helper functions
