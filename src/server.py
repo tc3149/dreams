@@ -6,7 +6,7 @@ from src.error import InputError
 from src import config
 from src.database import data, secretSauce
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from utils import saveData
+from src.utils import saveData
 
 def defaultHandler(err):
     response = err.get_response()
