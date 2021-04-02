@@ -22,7 +22,7 @@ Exceptions:
 Return Value:
     Returns user id | 'auth_user_id': get_user_id(email)
 '''
-sessionId = 0
+sessionIdVar = 0
 
 def auth_login_v2(email, password):
 
@@ -135,9 +135,10 @@ def auth_register_v2(email, password, name_first, name_last):
     }
 
 def auth_logout_v1(token):
+    sessionId = jwt.decode(token, secretSauce, algorithms="HS256")
     for user in data["accData"]:
         for session in user["sessions"]:
-            if session == token:
+            if session == sessionId["sessionId"]:
                 user["sessions"].remove(token)
                 return True
     return False
@@ -188,15 +189,15 @@ def create_handle(first, last):
     return createUserHandle
 
 def new_session_id():
-    global sessionId
-    sessionId += 1
-    return sessionId
+    global sessionIdVar
+    sessionIdVar += 1
+    return sessionIdVar
 
-def create_session_token(sessionID):
-    sessionToken = jwt.encode({"sessionId": sessionID}, secretSauce, algorithm="HS256")
+def create_session_token(sessionId):
+    sessionToken = jwt.encode({"sessionId": sessionId}, secretSauce, algorithm="HS256")
     return sessionToken
 
-def email_search_append_sessiontoken(email, sessionID):
+def email_search_append_sessiontoken(email, sessionId):
     for items in data["accData"]:
         if items["email"] == email:
-            items["sessions"].append(sessionID)
+            items["sessions"].append(sessionId)
