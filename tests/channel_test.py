@@ -331,3 +331,49 @@ def test_identical_handles_details():
                                         ],
                                         } 
 # ------------------------------------------------------------------------------------------------------
+#channel_leave_v1
+def test_channel_leave():
+
+    #Testing main implementation
+
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    channel_leave_v1(user1.get("auth_user_id"), channel1.get("channel_id"))
+    result = channels_listall_v1(user1.get("auth_user_id"))
+    assert result == {'channels': []}
+
+def test_channel_leave_channel_valid():
+
+    #Testing Input Error
+
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    with pytest.raises(InputError):
+        assert channel_leave_v1(user1.get("auth_user_id"), " ") == InputError
+
+def test_channel_leave_user_valid():
+
+    #Testing Access Error
+
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    user2 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    with pytest.raises(AccessError):
+        assert channel_leave_v1(user2.get("auth_user_id"), channel1.get("channel_id")) == AccessError
+
+# ------------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------------
+#channel_removeowner_v1
+
+# ------------------------------------------------------------------------------------------------------
+def test_channel_removeowner():
+
+    #
+
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
