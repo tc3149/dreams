@@ -1,5 +1,6 @@
 import re
-from src.database import accData
+import jwt
+from src.database import data, secretSauce
 from src.error import InputError
 
 
@@ -21,7 +22,9 @@ Exceptions:
 Return Value:
     Returns user id | 'auth_user_id': get_user_id(email)
 '''
-def auth_login_v1(email, password):
+sessionIdVar = 0
+
+def auth_login_v2(email, password):
 
     # Check if email is valid
     isValidEmail = bool(re.match("^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$", email))
@@ -31,9 +34,13 @@ def auth_login_v1(email, password):
         if search_email(email):
             # User exists, now check if password is correct
             if verify_password(email, password):
-                # Password is correct, return user_id
+                # Create JWT
+                sessionToken = create_session_token(new_session_id())
+                email_search_append_sessiontoken(email, sessionToken)
+                # Password is correct, return JWT & user_id
                 return {
-                    'auth_user_id': get_user_id(email),
+                    "token": sessionToken,
+                    "auth_user_id": get_user_id(email),
                 }
             else:
                 # Password not found
@@ -71,8 +78,7 @@ Exceptions:
 Return Value:
     Returns user id | 'auth_user_id': userID
 '''
-def auth_register_v1(email, password, name_first, name_last):
-
+def auth_register_v2(email, password, name_first, name_last):
     # Checking length of input variables | Error checking for inputs
     if len(name_first) < 1 or len(name_last) < 1:
         # Error
@@ -104,7 +110,7 @@ def auth_register_v1(email, password, name_first, name_last):
             if search_handle(userHandle):
                 # Same handle exists, appending latest handle according to spec
                 userHandle = append_handle(userHandle)
-            userID = len(accData)
+            userID = len(data["accData"])
             userData = {
                 "name_first": name_first,
                 "name_last": name_last,
@@ -112,25 +118,40 @@ def auth_register_v1(email, password, name_first, name_last):
                 "password": password,
                 "id": userID,
                 "handle": userHandle, 
+                "sessions": [],
             }
-            accData.append(userData)
+            newSessionId = new_session_id()
+            sessionToken = create_session_token(newSessionId)
+            userData["sessions"].append(newSessionId)
+            data["accData"].append(userData)
     else:
         # Error
         raise InputError("Error: Email is not valid")
 
+    # Return JWT string and the user id
     return {
-        'auth_user_id': userID,
+        "token": sessionToken,
+        "auth_user_id": userID,
     }
+
+def auth_logout_v1(token):
+    sessionId = jwt.decode(token, secretSauce, algorithms="HS256")
+    for user in data["accData"]:
+        for session in user["sessions"]:
+            if session == sessionId["sessionId"]:
+                user["sessions"].remove(token)
+                return True
+    return False
 
 # Helper functions
 def search_email(email):
-    for items in accData:
+    for items in data["accData"]:
         if items["email"] == email:
             return True
     return False
 
 def verify_password(email, password):
-    for items in accData:
+    for items in data["accData"]:
         if items["email"] == email:
             if items["password"] == password:
                 return True
@@ -138,13 +159,13 @@ def verify_password(email, password):
                 return False
 
 def search_handle(currUserHandle):
-    for items in accData:
+    for items in data["accData"]:
         if items["handle"] == currUserHandle:
             return True
     return False
 
 def get_user_id(email):
-    for items in accData:
+    for items in data["accData"]:
         if items["email"] == email:
             userID = items["id"]
             return userID
@@ -166,3 +187,17 @@ def create_handle(first, last):
     createUserHandle = createUserHandle.lower()
     createUserHandle = createUserHandle.replace("@", "")
     return createUserHandle
+
+def new_session_id():
+    global sessionIdVar
+    sessionIdVar += 1
+    return sessionIdVar
+
+def create_session_token(sessionId):
+    sessionToken = jwt.encode({"sessionId": sessionId}, secretSauce, algorithm="HS256")
+    return sessionToken
+
+def email_search_append_sessiontoken(email, sessionId):
+    for items in data["accData"]:
+        if items["email"] == email:
+            items["sessions"].append(sessionId)
