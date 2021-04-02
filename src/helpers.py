@@ -1,5 +1,6 @@
 from src.database import data, secretSauce
 from src.error import InputError, AccessError
+from json import dumps
 import jwt
 
 
@@ -120,3 +121,8 @@ def get_user_id_from_token(token):
                 return user["id"]
     
     raise InputError("Token does not exist")
+
+# Save to data file
+def saveData():
+    with open("serverDatabase.json", "w") as dataFile:
+        dataFile.write(dumps(data))
