@@ -4,7 +4,6 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1
 from src.channels import channels_create_v1
-from src.database import accData, channelList
 from src.channel import channel_join_v1
 
 # ------------------------------------------------------------------------------------------------------
@@ -77,11 +76,11 @@ def test_join_correct():
     user3 = auth_register_v1("email3@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v1(user1["auth_user_id"], "testchannel", True)
 
-    inner = channelList[0]
-    channel_join_v1(user2["auth_user_id"], channel["channel_id"])
-    channel_join_v1(user3["auth_user_id"], channel["channel_id"])
+    #inner = channelList[0]
+    assert channel_join_v1(user2["auth_user_id"], channel["channel_id"]) == {}
+    assert channel_join_v1(user3["auth_user_id"], channel["channel_id"]) == {}
 
-    assert inner["member_ids"] == [user1["auth_user_id"], user2["auth_user_id"], user3["auth_user_id"]]
+    #assert inner["member_ids"] == [user1["auth_user_id"], user2["auth_user_id"], user3["auth_user_id"]]
 
     
 # FAIL CASES
