@@ -1,10 +1,6 @@
 import re
 from src.database import data
-<<<<<<< HEAD
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-=======
-from src.auth import auth_register_v1, auth_login_v1
->>>>>>> fixMaster
 from src.error import InputError, AccessError
 
 '''

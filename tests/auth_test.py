@@ -1,15 +1,8 @@
 import jwt
 import pytest
 import re
-<<<<<<< HEAD
 from src.database import data, secretSauce
-from src.auth import auth_register_v2
-from src.auth import auth_login_v2
-from src.auth import auth_logout_v1
-=======
-from src.auth import auth_register_v1
-from src.auth import auth_login_v1
->>>>>>> fixMaster
+from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError
 from src.other import clear_v1
 from src.channel import channel_details_v1, channel_join_v1
