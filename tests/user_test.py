@@ -17,15 +17,16 @@ def test_user_profile_v1_working():
     clear_v1()
     
     user1 = auth_register_v1("testemail@hotmail.com", "password1", "firstName", "lastName")
-    assert user_profile_v1(user1["auth_user_id"], user1["auth_user_id"]) == {
-                                                                    "user": {
-                                                                        'u_id': user1["auth_user_id"],
-                                                                        'email': "testemail@hotmail.com",
-                                                                        'name_first': "firstName",
-                                                                        'name_last': "lastName",
-                                                                        'handle_str': "firstnamelastname",
-                                                                        }
-                                                                    }
+    dummyData = {
+        "user": {
+            'u_id': user1["auth_user_id"],
+            'email': "testemail@hotmail.com",
+            'name_first': "firstName",
+            'name_last': "lastName",
+            'handle_str': "firstnamelastname",
+        }
+    }
+    assert user_profile_v1(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
 
 def test_user_profile_v1_invalid_u_id():
     clear_v1()
