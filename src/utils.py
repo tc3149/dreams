@@ -115,6 +115,13 @@ def detoken(token):
 
 def get_user_id_from_token(token):
     sessionId = jwt.decode(token, secretSauce, algorithms="HS256")
+    if not isinstance(sessionId, dict):
+        raise InputError("Token does not exist")
+
+    checkKey = sessionId.keys()
+    if checkKey[0] != "sessionId":
+        raise InputError("Token does not exist")
+        
     for user in data["accData"]:
         for session in user["sessions"]:
             if sessionId["sessionId"] == session:
