@@ -7,7 +7,6 @@ from src.channel import channel_join_v1
 from src.channels import channels_create_v1
 from src.channels import channels_listall_v1
 from src.channels import channels_list_v1
-from src.database import accData, channelList
 
 # ------------------------------------------------------------------------------------------------------
 # Channel Create Tests
@@ -75,8 +74,9 @@ def test_channels_create_private():
 
     clear_v1()
     user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    channels_create_v1(user1["auth_user_id"], "testChannel", False)
-    assert channelList[0]["is_public"] == False
+    channel1 = channels_create_v1(user1["auth_user_id"], "testChannel", False)
+    assert channel1 == {"channel_id": channel1["channel_id"]}
+    #assert channelList[0]["is_public"] == False
 # ------------------------------------------------------------------------------------------------------
 
 

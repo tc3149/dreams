@@ -11,7 +11,10 @@ def clear_v1():
     '''
     data["accData"].clear() 
     data["channelList"].clear() 
+<<<<<<< HEAD
 
+=======
+>>>>>>> fixMaster
 
 def search_v1(auth_user_id, query_str):
     return {

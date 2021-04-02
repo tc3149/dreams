@@ -9,9 +9,17 @@ userData = {
 }
 accData is list of userData of above format
 '''
+<<<<<<< HEAD
 data = {
     "accData": [],
     "channelList": [],
 }
 
 secretSauce = "placeholder"
+=======
+
+data = {
+    "accData": [],
+    "channelList": [],
+}
+>>>>>>> fixMaster
