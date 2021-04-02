@@ -386,7 +386,7 @@ def test_channel_leave_user_valid():
     clear_v1()
     user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     user2 = auth_register_v1("email2@gmail.com", "password", "name", "Lastname")
-    channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
     with pytest.raises(AccessError):
         assert channel_leave_v1(user2.get("auth_user_id"), channel1.get("channel_id")) == AccessError
 
@@ -396,6 +396,3 @@ def test_channel_leave_user_valid():
 #channel_removeowner_v1
 
 # ------------------------------------------------------------------------------------------------------
-def test_channel_removeowner():
-
-    #
