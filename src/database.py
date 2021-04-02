@@ -9,6 +9,9 @@ userData = {
 }
 accData is list of userData of above format
 '''
-accData = []
-channelList = []
+data = {
+    "accData": [],
+    "channelData": [],
+}
+
 secretSauce = "placeholder"
