@@ -5,7 +5,7 @@ from src.error import InputError, AccessError
 from src.channel import channel_messages_v1
 from src.channels import channels_create_v1
 from src.database import accData, channelList
-from src.channel import channel_join_v1
+from src.channel import channel_join_v1, channel_addowner_v1
 
 
 # Channel Messages Tests
@@ -131,3 +131,67 @@ def test_private_channel():
         channel_join_v1(user2["auth_user_id"], new["channel_id"])
 
 
+
+
+# ADD OWNER TESTING
+
+# invalid user ID
+def test_addowner_invalid_uID():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user1_token = user1.get("token")
+
+    new = channels_create_v1(user1_token, "channel1", False)
+    
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    user2_id = user2.get("auth_user_id")
+
+    with pytest.raises(InputError):
+        channel_addowner_v1(user1_token, new.get("channel_id"), "invalid_id")
+
+
+# invalid channel ID
+
+def test_addowner_invalid_cID():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user1_token = user1.get("token")
+
+    new = channels_create_v1(user1_token, "channel1", False)
+    
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    user2_id = user2.get("auth_user_id")
+
+    with pytest.raises(InputError):
+        channel_addowner_v1(user1_token, "invalid_channel", user2_id)
+
+
+# owner is already owner 
+
+def test_addowner_already():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user1_token = user1.get("token")
+    user1_id = user1.get("auth_user_id")
+
+    new = channels_create_v1(user1_token, "channel1", False)
+    
+    with pytest.raises(InputError):
+        channel_addowner_v1(user1_token, new.get("channel_id"), user1_id)
+
+
+# user not authorised to be added
+
+def test_not_authoriseduser():
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    user1_token = user1.get("token")
+
+    user2 = auth_register_v1("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v1("email3@gmail.com", "password", "Name", "Lastname")
+    new = channels_create_v1(user1_token, "channel1", False)
+
+    with pytest.raises(AccessError):
+        channel_addowner_v1(user2.get("token"), new.get("channel_id"), user3.get("token"))
+
+        
