@@ -11,7 +11,7 @@ accData is list of userData of above format
 '''
 data = {
     "accData": [],
-    "channelData": [],
+    "channelList": [],
 }
 
 secretSauce = "placeholder"

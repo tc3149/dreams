@@ -26,7 +26,7 @@ def channels_list_v1(auth_user_id):
         raise AccessError("Error: Invalid user id")
 
     newchannelList = []
-    for channel in data["channelData"]:
+    for channel in data["channelList"]:
         if auth_user_id in channel.get('member_ids'):
                 channelDict = {}
                 channelDict['channel_id'] = channel.get('id')
@@ -57,7 +57,7 @@ def channels_listall_v1(auth_user_id):
         raise AccessError("Error: Invalid user id")
 
     newchannelList = []
-    for channel in data["channelData"]:
+    for channel in data["channelList"]:
         channelDict = {}
         channelDict['channel_id'] = channel.get('id')
         channelDict['name'] = channel.get('name')
@@ -107,7 +107,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     if id_status is False:
         raise AccessError("Error: Invalid user id")
     
-    channel_id = len(data["channelData"])
+    channel_id = len(data["channelList"])
 
     channelData = {
         'name': name,
@@ -121,7 +121,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     # Adding user data
     channelData['owner_ids'].append(auth_user_id)
     channelData['member_ids'].append(auth_user_id)
-    data["channelData"].append(channelData)
+    data["channelList"].append(channelData)
 
     return {
         'channel_id': channel_id,

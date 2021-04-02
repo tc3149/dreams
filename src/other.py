@@ -10,7 +10,7 @@ def clear_v1():
     Reset Everything to default state
     '''
     data["accData"].clear() 
-    data["channelData"].clear() 
+    data["channelList"].clear() 
 
 
 def search_v1(auth_user_id, query_str):
