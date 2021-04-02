@@ -339,9 +339,35 @@ def test_channel_leave():
     clear_v1()
     user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
     channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    channel2 = channels_create_v1(user1.get("auth_user_id"), "testChannel2", True)
     channel_leave_v1(user1.get("auth_user_id"), channel1.get("channel_id"))
-    result = channels_listall_v1(user1.get("auth_user_id"))
+    result = channels_list_v1(user1.get("auth_user_id"))
+    assert result == {'channels': [{'channel_id': channel2.get("channel_id"), 'name': 'testChannel2'}]}
+
+def test_channel_leave_empty():
+
+    #Testing main implementation
+
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    channel_leave_v1(user1.get("auth_user_id"), channel1.get("channel_id"))
+    result = channels_list_v1(user1.get("auth_user_id"))
     assert result == {'channels': []}
+
+def test_channel_leave_multiple():
+
+    #Testing main implementation
+
+    clear_v1()
+    user1 = auth_register_v1("email@gmail.com", "password", "name", "Lastname")
+    channel1 = channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    channel2 = channels_create_v1(user1.get("auth_user_id"), "testChannel2", True)
+    channel3 = channels_create_v1(user1.get("auth_user_id"), "testChannel3", True)
+    channel_leave_v1(user1.get("auth_user_id"), channel1.get("channel_id"))
+    channel_leave_v1(user1.get("auth_user_id"), channel2.get("channel_id"))
+    result = channels_list_v1(user1.get("auth_user_id"))
+    assert result == {'channels': [{'channel_id': channel3.get("channel_id"), 'name': 'testChannel3'}]}
 
 def test_channel_leave_channel_valid():
 
