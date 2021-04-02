@@ -1,6 +1,7 @@
+import jwt
 import pytest
 import re
-from src.database import accData
+from src.database import accData, secretSauce
 from src.auth import auth_register_v1
 from src.auth import auth_login_v1
 from src.error import InputError
@@ -17,13 +18,18 @@ def test_auth_register_v1():
     user1 = auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe")
     user2 = auth_register_v1("newemail@google.co", "Newpassword", "Jane", "Doe")
     user3 = auth_register_v1("testemail@hotmail.com", "testpassword", "First", "Last")
-    assert user1 == {'auth_user_id': user1["auth_user_id"]}
-    assert user2 == {'auth_user_id': user2["auth_user_id"]}
-    assert user3 == {'auth_user_id': user3["auth_user_id"]}
+    user1JWT = jwt.encode({'auth_user_id': user1["auth_user_id"]}, secretSauce, algorithm="HS256")
+    user2JWT = jwt.encode({'auth_user_id': user2["auth_user_id"]}, secretSauce, algorithm="HS256")
+    user3JWT = jwt.encode({'auth_user_id': user3["auth_user_id"]}, secretSauce, algorithm="HS256")
+
+    assert user1 == {'token': user1JWT, "auth_user_id": user1["auth_user_id"]}
+    assert user2 == {'token': user2JWT, "auth_user_id": user2["auth_user_id"]}
+    assert user3 == {'token': user3JWT, "auth_user_id": user3["auth_user_id"]}
 
 
 
-def test_auth_register_v1_except():
+
+def test_auth_register_v1_invalid_email():
     # Testing cases where register should not work
     clear_v1()
 
@@ -31,25 +37,43 @@ def test_auth_register_v1_except():
     with pytest.raises(InputError):
         assert auth_register_v1("error@becauseofau.com.au", "testPassword", "John", "Doe") == InputError
     
+def test_auth_register_v1_short_password():
+    clear_v1()
+
     # Password < 6 characters
     with pytest.raises(InputError):
         assert auth_register_v1("testemail@institute.com", "error", "John", "Doe") == InputError
+
+def test_auth_register_v1_long_first():
+    clear_v1()
 
     # First name > 50 characters
     with pytest.raises(InputError):
         assert auth_register_v1("testemail@institute.com", "testPassword", "Error"*11, "Doe") == InputError
 
+def test_auth_register_v1_long_last():
+    clear_v1()
+
     # Last name > 50 characters
     with pytest.raises(InputError):
         assert auth_register_v1("testemail@institute.com", "testPassword", "John", "Error"*11) == InputError
+
+def test_auth_register_v1_short_first():
+    clear_v1()
 
     # First name < 1 character
     with pytest.raises(InputError):
         assert auth_register_v1("testemail@institute.com", "testPassword", "", "Doe") == InputError
 
+def test_auth_register_v1_short_last():
+    clear_v1()
+
     # Last name < 1 character
     with pytest.raises(InputError):
         assert auth_register_v1("testemail@institute.com", "testPassword", "John", "") == InputError
+
+def test_auth_register_v1_email_taken():
+    clear_v1()
 
     # Email already registered
     auth_register_v1("taken@email.com", "testPassword", "John", "Doe")
@@ -80,35 +104,53 @@ def test_auth_login_v1():
     user1 = auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe")
     user2 = auth_register_v1("newemail@google.co", "Newpassword", "Jane", "Doe")
 
+    dummy1 = jwt.encode({'auth_user_id': user1["auth_user_id"]}, secretSauce, algorithm="HS256")
+    dummy2 = jwt.encode({'auth_user_id': user2["auth_user_id"]}, secretSauce, algorithm="HS256")
     # Should work
-    assert auth_login_v1("testemail@institute.com", "testPassword") == {'auth_user_id': user1["auth_user_id"]}
-    assert auth_login_v1("newemail@google.co", "Newpassword") == {'auth_user_id': user2["auth_user_id"]}
+    assert auth_login_v1("testemail@institute.com", "testPassword") == {"token": dummy1,
+                                                                        'auth_user_id': user1["auth_user_id"]}
+    assert auth_login_v1("newemail@google.co", "Newpassword") == {"token": dummy2,
+                                                                  'auth_user_id': user2["auth_user_id"]}
 
 def test_auth_login_v1_except():
     # Testing cases where login that should not work
     clear_v1()
 
     auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe")
-    auth_register_v1("newemail@google.co", "Newpassword", "Jane", "Doe")
     auth_register_v1("testemail@hotmail.com", "testpassword", "First", "Last")
 
     # Wrong password, using another registered password
     with pytest.raises(InputError):
         auth_login_v1("testemail@institute.com", "testpassword")
 
+def test_auth_login_v1_not_registered():
+    clear_v1()
+
     # Not registered
     with pytest.raises(InputError):
         auth_login_v1("notregistered@hotmail.com", "newpassword")
     
+def test_auth_login_v1_unregistered_email():
+    clear_v1()
+
+    auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe")
     # Typo in email
     with pytest.raises(InputError):
-        auth_login_v1("testmail@institute.com", "testpassword")
+        auth_login_v1("testmails@institute.com", "testPassword")
     
+def test_auth_login_v1_invalid_email():
+    clear_v1()
+
+    auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe")
     # Invalid email
     with pytest.raises(InputError):
-        auth_login_v1("testmail@hotmail.com.au", "testpassword")
+        auth_login_v1("testmail@hotmail.com.au", "testPassword")
     
+def test_auth_login_v1_invalid_password():
+    clear_v1()
+
+    auth_register_v1("testemail@institute.com", "testPassword", "John", "Doe")
     # Wrong password
     with pytest.raises(InputError):
-        auth_login_v1("notregistered@hotmail.com", "wrongpassword")
+        auth_login_v1("testemail@institute.com", "wrongpassword")
 # ------------------------------------------------------------------------------------------------------
