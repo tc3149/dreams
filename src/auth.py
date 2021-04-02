@@ -2,6 +2,7 @@ import re
 import jwt
 from src.database import data, secretSauce
 from src.error import InputError
+from hashlib import sha256
 
 
 '''
@@ -115,7 +116,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "name_first": name_first,
                 "name_last": name_last,
                 "email": email,
-                "password": password,
+                "password": sha256(password.encode()).hexdigest(),
                 "id": userID,
                 "handle": userHandle, 
                 "sessions": [],
