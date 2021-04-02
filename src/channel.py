@@ -309,6 +309,26 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_leave_v1(auth_user_id, channel_id):
+    #Checking if channel is valid
+    channel_status = False
+    for channel in channelList:
+        if channel.get("id") is channel_id:
+            channel_status = True
+    #If channel is invalid
+    if channel_status is False:
+        raise InputError("Error: Channel ID is not a valid channel")
+    #Checking if user is in the channel and removing the user
+    id_status = False
+    for channel in channelList:
+        if channel.get("id") is channel_id:
+            for member in channel["member_ids"]:
+                if auth_user_id is member:
+                    id_status = True
+                    channel["member_ids"].remove(member)
+    #If the user is invalid
+    if id_status is False:
+        raise AccessError("Error: Authorised user is not a member of channel with channel_id")
+    #Removing user
     return {
     }
 
