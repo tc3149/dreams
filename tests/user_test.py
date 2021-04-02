@@ -1,10 +1,10 @@
 import pytest
 from src.auth import auth_register_v2
 from src.auth import auth_login_v2
-from src.user import user_profile_v1
-from src.user import user_profile_setname_v1
+from src.user import user_profile_v2
+from src.user import user_profile_setname_v2
 from src.user import user_profile_sethandle_v1
-from src.user import user_profile_setemail_v1
+from src.user import user_profile_setemail_v2
 from src.user import users_all_v1
 from src.other import clear_v1
 from src.error import InputError
@@ -12,8 +12,8 @@ from src.error import AccessError
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////        
-# user_profile_v1 TESTS
-def test_user_profile_v1_working():
+# user_profile_v2 TESTS
+def test_user_profile_v2_working():
     clear_v1()
     
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
@@ -26,22 +26,22 @@ def test_user_profile_v1_working():
             'handle_str': "firstnamelastname",
         }
     }
-    assert user_profile_v1(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
 
-def test_user_profile_v1_invalid_u_id():
+def test_user_profile_v2_invalid_u_id():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     with pytest.raises(InputError):
-        assert user_profile_v1(user1, 999) == InputError
+        assert user_profile_v2(user1, 999) == InputError
 
 # /////////////////////////////////////////////////////////////////////////////////////////////        
-# user_profile_setname_v1 TESTS
-def test_user_profile_setname_v1_working():
+# user_profile_setname_v2 TESTS
+def test_user_profile_setname_v2_working():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
-    user_profile_setname_v1(user1["auth_user_id"], "newFirst", "newLast")
+    user_profile_setname_v2(user1["auth_user_id"], "newFirst", "newLast")
     dummyData = {
                     "user": {
                         'u_id': user1["auth_user_id"],
@@ -51,49 +51,49 @@ def test_user_profile_setname_v1_working():
                         'handle_str': "firstnamelastname",
                     }
                 }
-    assert user_profile_v1(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
 
-def test_user_profile_setname_v1_first_long():
+def test_user_profile_setname_v2_first_long():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     with pytest.raises(InputError):
-        user_profile_setname_v1(user1["auth_user_id"], "newFirst" * 11, "newLast")
+        user_profile_setname_v2(user1["auth_user_id"], "newFirst" * 11, "newLast")
 
-def test_user_profile_setname_v1_last_long():
+def test_user_profile_setname_v2_last_long():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     with pytest.raises(InputError):
-        user_profile_setname_v1(user1["auth_user_id"], "newFirst", "newLast" * 11)
+        user_profile_setname_v2(user1["auth_user_id"], "newFirst", "newLast" * 11)
 
-def test_user_profile_setname_v1_first_short():
+def test_user_profile_setname_v2_first_short():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     with pytest.raises(InputError):
-        user_profile_setname_v1(user1["auth_user_id"], "", "newLast")
+        user_profile_setname_v2(user1["auth_user_id"], "", "newLast")
 
-def test_user_profile_setname_v1_last_short():
+def test_user_profile_setname_v2_last_short():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     with pytest.raises(InputError):
-        user_profile_setname_v1(user1["auth_user_id"], "newFirst", "")
+        user_profile_setname_v2(user1["auth_user_id"], "newFirst", "")
 
-def test_user_profile_setname_v1_both_long():
+def test_user_profile_setname_v2_both_long():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     with pytest.raises(InputError):
-        user_profile_setname_v1(user1["auth_user_id"], "newFirst" * 11, "newLast" * 11)
+        user_profile_setname_v2(user1["auth_user_id"], "newFirst" * 11, "newLast" * 11)
 
-def test_user_profile_setname_v1_both_short():
+def test_user_profile_setname_v2_both_short():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     with pytest.raises(InputError):
-        user_profile_setname_v1(user1["auth_user_id"], "", "")
+        user_profile_setname_v2(user1["auth_user_id"], "", "")
 
 # /////////////////////////////////////////////////////////////////////////////////////////////        
 # user_profile_sethandle_v1 TESTS
@@ -112,7 +112,7 @@ def test_user_profile_sethandle_v1_working():
                         'handle_str': "newHandle",
                     }
                 }
-    assert user_profile_v1(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
 
 
 def test_user_profile_sethandle_v1_handle_taken():
@@ -131,7 +131,7 @@ def test_user_profile_sethandle_v1_handle_taken():
                         'handle_str': "newHandle",
                     }
                 }
-    assert user_profile_v1(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
 
     with pytest.raises(InputError):
         user_profile_sethandle_v1(user2["auth_user_id"], "newHandle")
@@ -153,14 +153,14 @@ def test_user_profile_sethandle_v1_handle_long():
         user_profile_sethandle_v1(user1["auth_user_id"], "aaa" * 10)
 
 # /////////////////////////////////////////////////////////////////////////////////////////////        
-# user_profile_setemail_v1 TESTS
-def test_user_profile_setemail_v1_working():
+# user_profile_setemail_v2 TESTS
+def test_user_profile_setemail_v2_working():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     _ = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
-    user_profile_setemail_v1(user1["auth_user_id"], "newEmail@hotmail.com")
+    user_profile_setemail_v2(user1["auth_user_id"], "newEmail@hotmail.com")
 
     dummyData = {
                     "user": {
@@ -171,26 +171,26 @@ def test_user_profile_setemail_v1_working():
                         'handle_str': "firstnamelastname",
                     }
                 }
-    assert user_profile_v1(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
 
 
-def test_user_profile_setemail_v1_invalid_email():
+def test_user_profile_setemail_v2_invalid_email():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     _ = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
     with pytest.raises(InputError):
-        user_profile_setemail_v1(user1["auth_user_id"], "newEmail@hotmail.com.au")
+        user_profile_setemail_v2(user1["auth_user_id"], "newEmail@hotmail.com.au")
 
-def test_user_profile_setemail_v1_email_taken():
+def test_user_profile_setemail_v2_email_taken():
     clear_v1()
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     _ = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
     with pytest.raises(InputError):
-        user_profile_setemail_v1(user1["auth_user_id"], "testemail2@hotmail.com")
+        user_profile_setemail_v2(user1["auth_user_id"], "testemail2@hotmail.com")
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////  
