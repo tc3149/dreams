@@ -2,7 +2,7 @@ import re
 from src.error import InputError, AccessError
 from src.database import data
 from src.channels import channels_create_v1
-from src.auth import auth_register_v1
+from src.auth import auth_register_v2
 
 '''
 channel_invite_v1 takes in an auth_user_id integer, a channel_id integer and u_id integer. 
