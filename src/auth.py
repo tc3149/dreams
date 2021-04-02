@@ -122,7 +122,7 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError("Error: Email is not valid")
 
     # Create JWT
-    secret = jwt.encode({'auth_user_id': userID,}, secretSauce, algorithm="HS256")
+    secret = jwt.encode({'auth_user_id': userID}, secretSauce, algorithm="HS256")
     # Return JWT string and the user id
     return {
         "token": secret,
