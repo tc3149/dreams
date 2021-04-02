@@ -1,5 +1,5 @@
 import re
-from src.database import accData
+from src.database import data
 from src.error import InputError
 
 
@@ -104,7 +104,7 @@ def auth_register_v1(email, password, name_first, name_last):
             if search_handle(userHandle):
                 # Same handle exists, appending latest handle according to spec
                 userHandle = append_handle(userHandle)
-            userID = len(accData)
+            userID = len(data["accData"])
             userData = {
                 "name_first": name_first,
                 "name_last": name_last,
@@ -113,7 +113,7 @@ def auth_register_v1(email, password, name_first, name_last):
                 "id": userID,
                 "handle": userHandle, 
             }
-            accData.append(userData)
+            data["accData"].append(userData)
     else:
         # Error
         raise InputError("Error: Email is not valid")
@@ -124,13 +124,13 @@ def auth_register_v1(email, password, name_first, name_last):
 
 # Helper functions
 def search_email(email):
-    for items in accData:
+    for items in data["accData"]:
         if items["email"] == email:
             return True
     return False
 
 def verify_password(email, password):
-    for items in accData:
+    for items in data["accData"]:
         if items["email"] == email:
             if items["password"] == password:
                 return True
@@ -138,13 +138,13 @@ def verify_password(email, password):
                 return False
 
 def search_handle(currUserHandle):
-    for items in accData:
+    for items in data["accData"]:
         if items["handle"] == currUserHandle:
             return True
     return False
 
 def get_user_id(email):
-    for items in accData:
+    for items in data["accData"]:
         if items["email"] == email:
             userID = items["id"]
             return userID

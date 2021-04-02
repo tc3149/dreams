@@ -1,6 +1,5 @@
 import pytest
 import re
-from src.database import accData
 from src.auth import auth_register_v1
 from src.auth import auth_login_v1
 from src.error import InputError
