@@ -1,8 +1,10 @@
 import re
 import jwt
 from src.database import data, secretSauce
+from src.utils import is_valid_token_return_data
 from src.error import InputError
 from hashlib import sha256
+from json import loads
 
 
 '''
@@ -26,7 +28,7 @@ Return Value:
 sessionIdVar = 0
 
 def auth_login_v2(email, password):
-
+    hashedPass = sha256(password.encode()).hexdigest()
     # Check if email is valid
     isValidEmail = bool(re.match("^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$", email))
     if isValidEmail:
@@ -34,10 +36,11 @@ def auth_login_v2(email, password):
         # Check if user exists for that email
         if search_email(email):
             # User exists, now check if password is correct
-            if verify_password(email, password):
+            if verify_password(email, hashedPass):
                 # Create JWT
-                sessionToken = create_session_token(new_session_id())
-                email_search_append_sessiontoken(email, sessionToken)
+                newSessionId = new_session_id()
+                sessionToken = create_session_token(newSessionId)
+                email_search_append_sessiontoken(email, newSessionId)
                 # Password is correct, return JWT & user_id
                 return {
                     "token": sessionToken,
@@ -45,13 +48,13 @@ def auth_login_v2(email, password):
                 }
             else:
                 # Password not found
-                raise InputError("Wrong password")
+                raise InputError(description="Wrong password")
         else:
             # User does not exist
-            raise InputError("A registered user does not exist with given email")
+            raise InputError(description="A registered user does not exist with given email")
     else:
         # Email is not valid
-        raise InputError("Email given is not a valid email")
+        raise InputError(description="Email given is not a valid email")
 
 
 '''
@@ -83,15 +86,15 @@ def auth_register_v2(email, password, name_first, name_last):
     # Checking length of input variables | Error checking for inputs
     if len(name_first) < 1 or len(name_last) < 1:
         # Error
-        raise InputError("Error: First and/or last name is less than 1 character")
+        raise InputError(description="Error: First and/or last name is less than 1 character")
 
     if len(password) < 6:
         # Error
-        raise InputError("Error: Password is less than 6 characters")
+        raise InputError(description="Error: Password is less than 6 characters")
 
     if len(name_first) > 50 or len(name_last) > 50:
         # Error
-        raise InputError("Error: First and/or last name is more than 50 characters")
+        raise InputError(description="Error: First and/or last name is more than 50 characters")
     
     # Check if email is valid
     isValidEmail = bool(re.match("^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$", email))
@@ -99,7 +102,7 @@ def auth_register_v2(email, password, name_first, name_last):
         # Valid 
         if search_email(email):
             # Error, email already exists in database
-            raise InputError("Error: Email already registered")
+            raise InputError(description="Error: Email already registered")
         else:
             # Valid input, generate handle & register user by inputing given details into database
             userHandle = create_handle(name_first, name_last)
@@ -127,7 +130,7 @@ def auth_register_v2(email, password, name_first, name_last):
             data["accData"].append(userData)
     else:
         # Error
-        raise InputError("Error: Email is not valid")
+        raise InputError(description="Error: Email is not valid")
 
     # Return JWT string and the user id
     return {
@@ -136,13 +139,23 @@ def auth_register_v2(email, password, name_first, name_last):
     }
 
 def auth_logout_v1(token):
-    sessionId = jwt.decode(token, secretSauce, algorithms="HS256")
+    sessionId = is_valid_token_return_data(token)
     for user in data["accData"]:
         for session in user["sessions"]:
             if session == sessionId["sessionId"]:
-                user["sessions"].remove(token)
-                return True
-    return False
+                user["sessions"].remove(sessionId["sessionId"])
+                print(f"Local: {data}")
+                with open("serverDatabase.json", "r") as f:
+                    print(f"Remote: {loads(f.read())}")
+                return {
+                    "is_success": True,
+                }
+    print(f"Local: {data}")
+    with open("serverDatabase.json", "r") as f:
+        print(f"Remote: {loads(f.read())}")
+    return {
+        "is_success": False
+    }
 
 # Helper functions
 def search_email(email):

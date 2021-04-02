@@ -114,22 +114,28 @@ def detoken(token):
     return u_id["auth_user_id"]
 
 def get_user_id_from_token(token):
-    sessionId = jwt.decode(token, secretSauce, algorithms="HS256")
-    if not isinstance(sessionId, dict):
-        raise InputError("Token does not exist")
-
-    checkKey = sessionId.keys()
-    if checkKey[0] != "sessionId":
-        raise InputError("Token does not exist")
-        
+    sessionId = is_valid_token_return_data(token)
     for user in data["accData"]:
         for session in user["sessions"]:
             if sessionId["sessionId"] == session:
                 return user["id"]
     
-    raise InputError("Token does not exist")
+    raise AccessError(description="Token does not exist")
+
+def is_valid_token_return_data(token):
+    tokenData = jwt.decode(token, secretSauce, algorithms="HS256")
+    if not isinstance(tokenData, dict):
+        raise AccessError(description="Token does not exist")
+
+    checkKey = tokenData.keys()
+    for key in checkKey:
+        if key == "sessionId":
+            return tokenData
+    raise AccessError(description="Token does not exist")
+
 
 # Save to data file
 def saveData():
     with open("serverDatabase.json", "w") as dataFile:
+        global data
         dataFile.write(dumps(data))
