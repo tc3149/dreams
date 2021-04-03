@@ -63,14 +63,14 @@ def message_remove_v1(token, message_id):
             if message_info.get("message_id") is message_id:
                 if checkOwner(u_id, channel_id):
                     if message_info['message_sent'] is None:
-                        raise error.InputError("Message already removed")
+                        raise InputError("Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
                         break
                 
                 elif message_info.get("user_id") is u_id:
                     if message_info['message_sent'] is None:
-                        raise error.InputError("Message already removed")
+                        raise InputError("Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
                         break   
