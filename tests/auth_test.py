@@ -177,10 +177,9 @@ def test_auth_logout_v1_inactive_token():
 
     inactiveToken = jwt.encode({"sessionId": 1}, secretSauce, algorithm="HS256")
     _ = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
-    testOutput = auth_logout_v1(inactiveToken)
-    expectedOutput = {
-        "is_success": False
-    }
-    assert testOutput == expectedOutput
+
+    with pytest.raises(AccessError):
+        auth_logout_v1(inactiveToken)
+
 # ------------------------------------------------------------------------------------------------------
 
