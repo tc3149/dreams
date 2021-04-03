@@ -302,7 +302,7 @@ def test_http_logout_invalid_token_type():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode(10, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"invalidKey": 9999}, secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
