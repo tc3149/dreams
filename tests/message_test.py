@@ -62,7 +62,7 @@ def testsend_if_valid():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
-    lol = message_send_v2(user1["token"], channel["channel_id"], "lol")  
+    message_send_v2(user1["token"], channel["channel_id"], "lol")  
     messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
     for msg in messages1["messages"]:
