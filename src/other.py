@@ -11,6 +11,7 @@ def clear_v1():
     '''
     data["accData"].clear() 
     data["channelList"].clear() 
+    data["message_ids"].clear()
 
 def search_v1(auth_user_id, query_str):
     return {
