@@ -40,7 +40,7 @@ def testsend_invalid_auth_id():
 def testsend_invalid_channel_id():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v2(user["token"], "testchannel", True)
+    channels_create_v2(user["token"], "testchannel", True)
 
     with pytest.raises(InputError):
         message_send_v2(user["token"], "wrong_id", "This is a messsage from Thomas Chen")    
@@ -57,12 +57,8 @@ def testsend_message_not_in_channel():
 
 
 # a valid test, a work in progress *************************  COLIN LOOK HERE
-def testsend_if_valid():
-    clear_v1()
-    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v2(user["token"], "testchannel", True)
-    message_info = message_send_v2(user["token"], channel["channel_id"], "lol")   
-    m_id = message_info.get("message_id")
+# def testsend_if_valid():
+
 
 
 
@@ -102,7 +98,6 @@ def testedit_invalid_message_id():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
     message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
-    m_id = message1.get('message_id')
 
     with pytest.raises(InputError):
         message_edit_v2(user["token"], "wrong_id", 'Jonathan Chen')
@@ -165,7 +160,7 @@ def testremove_invalid_message_id():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
     message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
-    m_id = message1.get('message_id')
+
 
     with pytest.raises(InputError):
         message_remove_v1(user["token"], "wrong_id")

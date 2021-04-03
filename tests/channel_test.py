@@ -409,7 +409,7 @@ def test_addowner_invalid_cID():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
 
-    new = channels_create_v2(user1_token, "channel1", False)
+    channels_create_v2(user1_token, "channel1", False)
     
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
