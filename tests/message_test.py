@@ -7,6 +7,7 @@ from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
 from src.database import data, secretSauce
 from src.channel import channel_join_v2
+from src.channel import channel_messages_v2
 from src.message import message_send_v2
 from src.message import message_edit_v2
 from src.message import message_remove_v1
@@ -56,9 +57,18 @@ def testsend_message_not_in_channel():
         message_send_v2(user2["token"], channel["channel_id"], "This is a messsage from Thomas Chen")   
 
 
-# a valid test, a work in progress *************************  COLIN LOOK HERE
-# def testsend_if_valid():
+# a valid test, a work in progress
+def testsend_if_valid():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    lol = message_send_v2(user1["token"], channel["channel_id"], "lol")  
+    messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'lol'
+        assert msg["u_id"] == user1["auth_user_id"]
 
 
 
@@ -133,9 +143,20 @@ def testedit_notedited_by_owner():
 
 
 # a valid test, a work in progress *************************  COLIN LOOK HERE
+def testedit_valid_case():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    message_info = message_send_v2(user1["token"], channel["channel_id"], "lol")  
+    m_id = message_info.get("message_id")
+    message_edit_v2(user1["token"], m_id, "lmfao")
+    messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'lmfao'
+        assert msg["u_id"] == user1["auth_user_id"]
 
-# test whether the owner can edit other people's messages
 
 
 
@@ -186,4 +207,20 @@ def testremove_not_authorised():
 
     with pytest.raises(AccessError):
         message_remove_v1(user2["token"], m_id)
+
+# valid test of removing
+def testremove_valid_case():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    message_info = message_send_v2(user1["token"], channel["channel_id"], "lol")  
+    m_id = message_info.get("message_id")
+    message_remove_v1(user1["token"], m_id)
+    messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == ''
+        assert msg["u_id"] == user1["auth_user_id"]
+
         
