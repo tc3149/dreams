@@ -97,7 +97,7 @@ def testedit_invalid_message_id():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
-    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
 
     with pytest.raises(InputError):
         message_edit_v2(user["token"], "wrong_id", 'Jonathan Chen')
@@ -159,7 +159,7 @@ def testremove_invalid_message_id():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
-    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
 
 
     with pytest.raises(InputError):
