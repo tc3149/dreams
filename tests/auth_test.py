@@ -5,8 +5,8 @@ from src.database import data, secretSauce
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError
 from src.other import clear_v1
-from src.channel import channel_details_v1, channel_join_v1
-from src.channels import channels_create_v1
+from src.channel import channel_details_v2, channel_join_v2
+from src.channels import channels_create_v2
 
 # ------------------------------------------------------------------------------------------------------
 # auth_register_v2 tests
@@ -82,9 +82,9 @@ def test_auth_register_handle_limit():
 
     user1 = auth_register_v2("email@hotmail.com", "testpassword", "ReallyReallyReally", "LongName")
     user2 = auth_register_v2("email2@hotmail.com", "testpassword", "ReallyReally", "LongName")
-    channel1 = channels_create_v1(user1["token"], "testchannel", True)
-    channel_join_v1(user2["token"], channel1["channel_id"])
-    channelDetailsHandle = channel_details_v1(user1["token"], channel1["channel_id"])
+    channel1 = channels_create_v2(user1["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel1["channel_id"])
+    channelDetailsHandle = channel_details_v2(user1["token"], channel1["channel_id"])
     
     assert channelDetailsHandle["all_members"][0]["handle_str"] == "reallyreallyreallylo"
     assert channelDetailsHandle["all_members"][1]["handle_str"] == "reallyreallylongname"
