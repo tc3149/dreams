@@ -34,7 +34,7 @@ def test_http_user_profile_working():
         "u_id": u_id
     }
     qData = urllib.parse.urlencode(inputData)
-    rawResponseData = requests.get(f"{config.url}{funcURL}?{qData}")
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
         'user': {
@@ -67,12 +67,13 @@ def test_http_user_profile_v2_nonexistant_user():
     funcURL = "user/profile/v2"
     inputData = {
         "token": jwtToken,
-        "u_id": 9999
+        "u_id": 999
     }
-    rawResponseData = requests.get(f"{config.url}{funcURL}", params=inputData)
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
 
-    assert respD["code"] == 403
+    assert respD["code"] == 400
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -112,7 +113,8 @@ def test_user_profile_setname_working():
         "token": jwtToken,
         "u_id": u_id
     }
-    rawResponseData = requests.get(f"{config.url}{funcURL}", params=inputData)
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
         'user': {
@@ -282,7 +284,8 @@ def test_http_user_profile_setemail_working():
         "token": jwtToken,
         "u_id": u_id
     }
-    rawResponseData = requests.get(f"{config.url}{funcURL}", params=inputData)
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
         'user': {
@@ -391,13 +394,14 @@ def test_http_user_profile_sethandle_working():
     # ----------------------------
 
     # Set handle -----------------
-    funcURL = "user/profile/sethandle/v2"
+    funcURL = "user/profile/sethandle/v1"
     inputData = {
         "token": jwtToken,
-        "handle": "newHandle",
+        "handle_str": "newHandle",
     }
     rawResponseData = requests.put(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
+    assert respD == {}
     # ----------------------------
 
     # Profile --------------------
@@ -406,7 +410,8 @@ def test_http_user_profile_sethandle_working():
         "token": jwtToken,
         "u_id": u_id
     }
-    rawResponseData = requests.get(f"{config.url}{funcURL}", params=inputData)
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
         'user': {
@@ -439,10 +444,10 @@ def test_http_user_profile_sethandle_short_handle():
     # ----------------------------
 
     # Set handle -----------------
-    funcURL = "user/profile/sethandle/v2"
+    funcURL = "user/profile/sethandle/v1"
     inputData = {
         "token": jwtToken,
-        "handle": "",
+        "handle_str": "",
     }
     rawResponseData = requests.put(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
@@ -468,10 +473,10 @@ def test_http_user_profile_sethandle_long_handle():
     # ----------------------------
 
     # Set handle -----------------
-    funcURL = "user/profile/sethandle/v2"
+    funcURL = "user/profile/sethandle/v1"
     inputData = {
         "token": jwtToken,
-        "handle": "reallylonghandle" * 5,
+        "handle_str": "reallylonghandle" * 5,
     }
     rawResponseData = requests.put(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
@@ -496,10 +501,10 @@ def test_http_user_profile_sethandle_handle_taken():
     # Register--------------------
     funcURL = "auth/register/v2"
     inputData = {
-        "email": "test@hotmail.com",
-        "password": "password1",
-        "name_first": "nameFirst",
-        "name_last": "nameLast",
+        "email": "test2@hotmail.com",
+        "password": "password2",
+        "name_first": "name2First",
+        "name_last": "name2Last",
     }
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
@@ -508,10 +513,10 @@ def test_http_user_profile_sethandle_handle_taken():
     # ----------------------------
 
     # Set handle -----------------
-    funcURL = "user/profile/sethandle/v2"
+    funcURL = "user/profile/sethandle/v1"
     inputData = {
         "token": jwtToken,
-        "handle": "namefirstnamelast",
+        "handle_str": "namefirstnamelast",
     }
     rawResponseData = requests.put(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
@@ -534,7 +539,7 @@ def test_http_users_all_working():
     }
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
-    u_id1 = respD["u_id"]
+    u_id1 = respD["auth_user_id"]
     # ----------------------------
 
     # Register--------------------
@@ -549,15 +554,15 @@ def test_http_users_all_working():
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
     _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
-    u_id2 = respD["u_id"]
+    u_id2 = respD["auth_user_id"]
     # ----------------------------
 
-    funcURL = "users/all/v2"
+    funcURL = "users/all/v1"
     inputData = {
         "token": jwtToken,
     }
-    queryString = urllib.parse.urlencode(inputData)
-    rawResponseData = requests.get(config.url + funcURL + "?" + queryString)
+    qToken = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qToken)
     respD = json.loads(rawResponseData.text)
     expectedOutput = [
         {
@@ -579,6 +584,3 @@ def test_http_users_all_working():
     assert respD == expectedOutput
  
 # ------------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    test_http_user_profile_working()
