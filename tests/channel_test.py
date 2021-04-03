@@ -123,7 +123,7 @@ def test_joining_user_alrady_joined():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    channel1 = channels_create_v1(user1["auth_user_id"], "testchannel", True)
+    channel1 = channels_create_v2(user1["auth_user_id"], "testchannel", True)
     channel_join_v1(user2["auth_user_id"], channel1["channel_id"])
     with pytest.raises(AccessError):
         channel_join_v1(user2["auth_user_id"], channel1["channel_id"])
