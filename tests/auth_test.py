@@ -3,7 +3,7 @@ import pytest
 import re
 from src.database import data, secretSauce
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from src.error import InputError
+from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.channel import channel_details_v2, channel_join_v2
 from src.channels import channels_create_v2
@@ -21,9 +21,6 @@ def test_auth_register_v2():
     assert user1 == {'token': user1["token"], "auth_user_id": user1["auth_user_id"]}
     assert user2 == {'token': user2["token"], "auth_user_id": user2["auth_user_id"]}
     assert user3 == {'token': user3["token"], "auth_user_id": user3["auth_user_id"]}
-
-
-
 
 def test_auth_register_v2_invalid_email():
     # Testing cases where register should not work
@@ -154,3 +151,35 @@ def test_auth_login_v2_invalid_password():
     # Wrong password
     with pytest.raises(InputError):
         auth_login_v2("testemail@institute.com", "wrongpassword")
+# ------------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------------
+# auth_logout_v1
+def test_auth_logout_v1_working():
+    clear_v1()
+
+    user1 = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    expectedOutput = {
+        "is_success": True
+    }
+    testOutput = auth_logout_v1(user1["token"])
+    assert testOutput == expectedOutput
+
+def test_auth_logout_v1_invalid_token():
+    clear_v1()
+
+    invalidToken = jwt.encode({"invalidKey": 0}, secretSauce, algorithm="HS256")
+    with pytest.raises(AccessError):
+        auth_logout_v1(invalidToken)
+
+def test_auth_logout_v1_inactive_token():
+    clear_v1()
+
+    inactiveToken = jwt.encode({"sessionId": 1}, secretSauce, algorithm="HS256")
+    _ = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+
+    with pytest.raises(AccessError):
+        auth_logout_v1(inactiveToken)
+
+# ------------------------------------------------------------------------------------------------------
+
