@@ -114,22 +114,21 @@ def get_user_id_from_token(token):
             if sessionId["sessionId"] == session:
                 return user["id"]
     
-    raise AccessError(description="Token does not exist")
+    raise AccessError(description="User does not exist")
 
 def is_valid_token_return_data(token):
     tokenData = jwt.decode(token, secretSauce, algorithms="HS256")
     if not isinstance(tokenData, dict):
-        raise AccessError(description="Token does not exist")
+        raise AccessError(description="Invalid type")
 
     checkKey = tokenData.keys()
     for key in checkKey:
-        if key == "sessionId":
+        if key == "sessionId" and isinstance(key["sessionId"], int):
             return tokenData
-    raise AccessError(description="Token does not exist")
+    raise AccessError(description="Invalid key or value")
 
 
 # Save to data file
 def saveData():
     with open("serverDatabase.json", "w") as dataFile:
-        global data
         dataFile.write(dumps(data))

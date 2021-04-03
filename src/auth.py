@@ -148,7 +148,7 @@ def auth_logout_v1(token):
                 return {
                     "is_success": True,
                 }
-    raise AccessError(description="Token does not exist")
+    raise AccessError(description="Session doesn't exist")
 
 
  # utils
