@@ -11,9 +11,6 @@ from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.utils import saveData
 from src.other import clear_v1
 
-from src.utils import get_user_id_from_token
-
-
 def defaultHandler(err):
     response = err.get_response()
     print('response', err, err.get_response())
