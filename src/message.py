@@ -4,8 +4,6 @@ from src.database import data
 from datetime import datetime
 
 
-total_ids = []
-
 def message_send_v2(token, channel_id, message):
     
     length = int(len(message))
@@ -27,13 +25,13 @@ def message_send_v2(token, channel_id, message):
     remove_temp = temp.replace(microsecond = 0)
     final_time = remove_temp.timestamp()
     
-    length_of_total = len(total_ids)
+    length_of_total = len(data["message_ids"])
     new_message_id = length_of_total + 1
 
     message_final = {
-        'message_sent': message,
+        'message': message,
         'message_id': new_message_id,
-        'user_id': u_id,
+        'u_id': u_id,
         'time_created': final_time
     }
 
@@ -45,7 +43,7 @@ def message_send_v2(token, channel_id, message):
         'message_id': new_message_id,
     }
 
-    total_ids.append(message_id)
+    data["message_ids"].append(message_id)
 
     return message_id
 
@@ -62,14 +60,14 @@ def message_remove_v1(token, message_id):
         for message_info in channels1.get('messages'):
             if message_info.get("message_id") is message_id:
                 if checkOwner(u_id, channel_id):
-                    if message_info['message_sent'] is None:
+                    if message_info['message'] is None:
                         raise InputError("Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
                         break
                 
-                elif message_info.get("user_id") is u_id:
-                    if message_info['message_sent'] is None:
+                elif message_info.get("u_id") is u_id:
+                    if message_info['message'] is None:
                         raise InputError("Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
@@ -97,11 +95,11 @@ def message_edit_v2(token, message_id, message):
         for message_info in channels1.get('messages'):
             if message_info.get("message_id") is message_id:
                 if checkOwner(u_id, channel_id):
-                    message_info["message_sent"] = message
+                    message_info["message"] = message
                     break
                 
-                elif message_info.get("user_id") is u_id:
-                    message_info["message_sent"] = message
+                elif message_info.get("u_id") is u_id:
+                    message_info["message"] = message
                     break
                 
                 else:
