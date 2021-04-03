@@ -56,8 +56,8 @@ def getchannelID(message_id):
 def checkOwner(auth_user_id, channel_id):
 
     for channel in data["channelList"]:
-        if channel.get["channel_id"] is channel_id:
-            for users in channel.get("owner_ids"):
+        if channel["id"] is channel_id:
+            for users in channel["owner_ids"]:
                 if users is auth_user_id:
                     return True
 
@@ -106,12 +106,6 @@ def create_handle(first, last):
     createUserHandle = createUserHandle.lower()
     createUserHandle = createUserHandle.replace("@", "")
     return createUserHandle
-
-
-def detoken(token):
-    u_id = jwt.decode(token, secretSauce, algorithm="HS256")
-
-    return u_id["auth_user_id"]
 
 def get_user_id_from_token(token):
     sessionId = is_valid_token_return_data(token)

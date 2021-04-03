@@ -7,6 +7,7 @@ from hashlib import sha256
 from json import loads
 
 
+
 '''
 auth_login_v1 takes in an email string and password string. 
 The function then checks if the email is valid, if a user exists for that email and if the password is correct.
@@ -149,7 +150,8 @@ def auth_logout_v1(token):
                 }
     raise AccessError(description="Token does not exist")
 
-# Helper functions
+
+ # utils
 def search_email(email):
     for items in data["accData"]:
         if items["email"] == email:
