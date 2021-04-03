@@ -121,10 +121,9 @@ def is_valid_token_return_data(token):
     if not isinstance(tokenData, dict):
         raise AccessError(description="Invalid type")
 
-    checkKey = tokenData.keys()
-    for key in checkKey:
-        if key == "sessionId" and isinstance(key["sessionId"], int):
-            return tokenData
+    checkKey = list(tokenData.keys())[0]
+    if checkKey == "sessionId" and isinstance(tokenData["sessionId"], int):
+        return tokenData
     raise AccessError(description="Invalid key or value")
 
 
