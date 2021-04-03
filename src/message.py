@@ -1,5 +1,5 @@
 from src.error import InputError, AccessError
-from src.helper import valid_userid, valid_channelid, check_useralreadyinchannel, check_messageid, get_user_id_from_token, getchannelID, checkOwner
+from src.utils import valid_userid, valid_channelid, check_useralreadyinchannel, check_messageid, get_user_id_from_token, getchannelID, checkOwner
 from src.database import data
 from datetime import datetime
 
