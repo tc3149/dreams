@@ -4,6 +4,7 @@ from src.database import data, secretSauce
 from src.error import InputError
 
 
+
 '''
 auth_login_v1 takes in an email string and password string. 
 The function then checks if the email is valid, if a user exists for that email and if the password is correct.
@@ -143,7 +144,8 @@ def auth_logout_v1(token):
                 return True
     return False
 
-# Helper functions
+
+ # utils
 def search_email(email):
     for items in data["accData"]:
         if items["email"] == email:

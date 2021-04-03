@@ -56,8 +56,8 @@ def getchannelID(message_id):
 def checkOwner(auth_user_id, channel_id):
 
     for channel in data["channelList"]:
-        if channel.get["channel_id"] is channel_id:
-            for users in channel.get("owner_ids"):
+        if channel["id"] is channel_id:
+            for users in channel["owner_ids"]:
                 if users is auth_user_id:
                     return True
 
@@ -107,29 +107,29 @@ def create_handle(first, last):
     createUserHandle = createUserHandle.replace("@", "")
     return createUserHandle
 
-
-def detoken(token):
-    u_id = jwt.decode(token, secretSauce, algorithm="HS256")
-
-    return u_id["auth_user_id"]
-
 def get_user_id_from_token(token):
-    sessionId = jwt.decode(token, secretSauce, algorithms="HS256")
-    if not isinstance(sessionId, dict):
-        raise InputError("Token does not exist")
-
-    checkKey = sessionId.keys()
-    if checkKey[0] != "sessionId":
-        raise InputError("Token does not exist")
-        
+    sessionId = is_valid_token_return_data(token)
     for user in data["accData"]:
         for session in user["sessions"]:
             if sessionId["sessionId"] == session:
                 return user["id"]
     
-    raise InputError("Token does not exist")
+    raise AccessError(description="Token does not exist")
+
+def is_valid_token_return_data(token):
+    tokenData = jwt.decode(token, secretSauce, algorithms="HS256")
+    if not isinstance(tokenData, dict):
+        raise AccessError(description="Token does not exist")
+
+    checkKey = tokenData.keys()
+    for key in checkKey:
+        if key == "sessionId":
+            return tokenData
+    raise AccessError(description="Token does not exist")
+
 
 # Save to data file
 def saveData():
     with open("serverDatabase.json", "w") as dataFile:
+        global data
         dataFile.write(dumps(data))

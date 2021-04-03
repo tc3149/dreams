@@ -1,11 +1,12 @@
 import re
 from src.error import InputError, AccessError
 from src.database import data
-from src.channels import channels_create_v1
+from src.channels import channels_create_v2
 from src.auth import auth_register_v2
+from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner
 
 '''
-channel_invite_v1 takes in an auth_user_id integer, a channel_id integer and u_id integer. 
+channel_invite_v2 takes in an auth_user_id integer, a channel_id integer and u_id integer. 
 The function then checks if the channel_id is exists, if both users exists, if auth_user_id is already a member of the channel and if u_id is a member of the channel.
 If all requirements are met the function then adds u_id to the channel and returns {}, otherwise it raises InputError or AccessError.
 
@@ -26,7 +27,9 @@ Return Value:
     Returns {}
 '''
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v2(token, channel_id, u_id):
+    auth_user_id = get_user_id_from_token(token)
+
     #check if channel exists
     channelExists = False
     for channel in data["channelList"]:
@@ -77,7 +80,6 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     
     #check if u_id already member of the channel
     for user2 in data["channelList"][channel_id]['member_ids']:
-        
         if u_id in data["channelList"][channel_id]['member_ids']:
             #u_id is member of channel
             raise InputError ("User already a member")    
@@ -93,7 +95,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     }
 
 '''
-channel_details_v1 takes in an auth_user_id integer and a channel_id integer. 
+channel_details_v2 takes in an auth_user_id integer and a channel_id integer. 
 The function then checks if the channel_id is exists, if auth_user_id exists and is already a member of the channel.
 If all requirements are met the function then returns the contents of the channel including the name, ownermembers and all members, otherwise it raises InputError or AccessError.
 
@@ -132,8 +134,8 @@ Return Value:
     }
 '''
 
-def channel_details_v1(auth_user_id, channel_id):
-
+def channel_details_v2(token, channel_id):
+    auth_user_id = get_user_id_from_token(token)
     #check if channel exists
     channelExists = False
     for channel in data["channelList"]:
@@ -244,7 +246,45 @@ Return Value:
 
 '''
 
-def channel_messages_v1(auth_user_id, channel_id, start):
+'''
+channel_messages_v2 takes in a user id, a specific channel id, and a 'start' to
+determine after what amount of messages to show, e.g. recent 5 messages have 
+already been seen, thus start would equal 5 to see later messages.
+The function first does security checks, then reverses the messages list, so
+that the most recent messages are at the head of the list, then appends to a new
+list for return.
+
+Arguments:
+    auth_user_id (integer) - Unique user id created by auth_register_v1
+    channel_id (integer) - Unique channel id created by channels_create_v2
+    start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
+    indexes relating to recent messages
+
+Exceptions:
+    AccessError - Occurs when auth_user_id is not valid (i.e. not created)
+
+Return Value:
+    Most cases Returns:
+        'messages': messages_shown,
+        'start': start,
+        'end': end,
+    If there are less than 50 messages in the list, or no 'later' messages
+    returns: 
+        'messages': messages_shown,
+        'start': start,
+        'end': -1,
+
+'''
+
+def channel_messages_v2(token, channel_id, start):
+    auth_user_id = get_user_id_from_token(token)
+    # Check if user id is valid
+    if valid_userid(auth_user_id) is False:
+        raise AccessError("Error: Invalid user id")
+
+    # Check if channel id is valid
+    if valid_channelid(channel_id) is False:
+        raise AccessError("Error: Invalid channel")
 
     # Check if user id is valid
     if valid_userid(auth_user_id) is False:
@@ -308,12 +348,27 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': end,
     }
 
-def channel_leave_v1(auth_user_id, channel_id):
+def channel_leave_v1(token, channel_id):
+    auth_user_id = get_user_id_from_token(token)
+    #Checking if channel is valid
+    if valid_channelid(channel_id) is False:
+        raise InputError("Error: Channel ID is not a valid channel")
+    #Checking if user is in the channel and removing the user
+    id_status = False
+    for channel in data["channelList"]:
+        if channel.get("id") is channel_id:
+            for member in channel["member_ids"]:
+                if auth_user_id is member:
+                    id_status = True
+                    channel["member_ids"].remove(member)
+    #If the user is invalid
+    if id_status is False:
+        raise AccessError("Error: Authorised user is not a member of channel with channel_id")
     return {
     }
 
 '''
-channel_join_v1 takes in the user's ID and the channel they wish to join.
+channel_join_v2 takes in the user's ID and the channel they wish to join.
 The function then checks whether the ID is valid, the channel is valid, if the channel is private or if the user is already in the channel.
 If so, it appends the user's ID into the channel's 'member ids' and returns nothing. If conditions are breached, it raises an InputError or AccessError
 
@@ -331,8 +386,8 @@ Return Value:
     Returns nothing.
 '''
 
-def channel_join_v1(auth_user_id, channel_id):
-
+def channel_join_v2(token, channel_id):
+    auth_user_id = get_user_id_from_token(token)
     # check whether id is valid
     if valid_userid(auth_user_id) is False:
         raise InputError("Error: Invalid user id")
@@ -356,45 +411,34 @@ def channel_join_v1(auth_user_id, channel_id):
     return {
     }
 
-def channel_addowner_v1(auth_user_id, channel_id, u_id):
+def channel_addowner_v1(token, channel_id, u_id):
+
+    auth_user_id = get_user_id_from_token(token)
+    
+    # If u_id is valid
+    if valid_userid(u_id) is False:
+        raise InputError("Error: Invalid user id")
+    
+    # If channel_id is valid
+    if valid_channelid(channel_id) is False:
+        raise InputError("Error: Invalid channel ID")
+
+    # If the u_id is already an owner
+    if checkOwner(u_id, channel_id) is True:
+        raise InputError("Error: Already Owner")
+
+    # If the token is not an owner
+    if checkOwner(auth_user_id, channel_id) is False:
+        raise AccessError("Error: Not an owner")
+    
+    for counter in data["channelList"]:
+        if counter["id"] is channel_id:
+            counter["owner_ids"].append(u_id)
+            break
+
     return {
     }
 
 def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     return {
     }
-
-# Helper Functions
-
-def valid_userid(auth_user_id):
-    # Check if user id is valid
-    for user in data["accData"]:
-        if user.get("id") is auth_user_id:
-            return True
-    return False
-
-def valid_channelid(channel_id):
-    # Check if channel id is valid
-    for channel in data["channelList"]:
-        if channel.get("id") is channel_id:
-            return True
-    return False
-
-
-def check_channelprivate(channel_id):
-
-    for channel in data["channelList"]:
-        if channel.get("id") is channel_id:
-            if channel.get("is_public") is True:
-                return False
-    return True
-
-def check_useralreadyinchannel(auth_user_id, channel_id):
-
-    for channel in data["channelList"]:
-        if channel.get("id") is channel_id:
-            for member in channel["member_ids"]:
-                if auth_user_id is member:
-                    return True
-    return False
-    

@@ -1,10 +1,12 @@
 import re
 from src.database import data
+
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError, AccessError
+from src.utils import get_user_id_from_token
 
 '''
-channels_list_v1 takes in a user_id string.
+channels_list_v2 takes in a user_id string.
 The functions then checks if the user_id is valid.
 If the user_id is valid, the function then returns all the channels associated
 with the user_id in a list.
@@ -15,7 +17,8 @@ Exceptions:
 Return Value:
     Returns list | {'channels': newchannelList}
 '''
-def channels_list_v1(auth_user_id):
+def channels_list_v2(token):
+    auth_user_id = get_user_id_from_token(token)
     id_status = False
     for user in data["accData"]:
         if user.get("id") is auth_user_id:
@@ -36,7 +39,7 @@ def channels_list_v1(auth_user_id):
     return {'channels': newchannelList}
 
 '''
-channels_list_v1 takes in a user_id string.
+channels_list_v2 takes in a user_id string.
 The functions then checks if the user_id is valid.
 If the user_id is valid, the function then returns all channels.
 Arguments:
@@ -46,7 +49,8 @@ Exceptions:
 Return Value:
     Returns list | {'channels': newchannelList}
 '''
-def channels_listall_v1(auth_user_id):
+def channels_listall_v1(token):
+    auth_user_id = get_user_id_from_token(token)
     id_status = False
     for user in data["accData"]:
         if user.get("id") is auth_user_id:
@@ -66,7 +70,7 @@ def channels_listall_v1(auth_user_id):
     return {'channels': newchannelList}
 
 '''
-channels_create_v1 takes in a user id, a specified channel name, and a boolean for 
+channels_create_v2 takes in a user id, a specified channel name, and a boolean for 
 whether or not the channel is intended to be public. This function creates an empty channel dictionary 
 and appends the user id as an owner and member of the channel, then returns the newly created
 channel id.
@@ -86,7 +90,9 @@ Return Value:
 
 '''
 
-def channels_create_v1(auth_user_id, name, is_public):
+def channels_create_v2(token, name, is_public):
+    auth_user_id = get_user_id_from_token(token)
+
     '''
     Creates a new channel with that name that is either a public or private channel
     '''
@@ -127,3 +133,18 @@ def channels_create_v1(auth_user_id, name, is_public):
         'channel_id': channel_id,
     }
 
+
+
+'''
+if __name__ == "__main__":
+    user0 = auth_register_v1("email2@gmail.com", "password1", "1Name", "1Lastname")
+    user1 = auth_register_v1("email3@gmail.com", "password3", "3Name", "3Lastname")
+    user2 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
+    
+    for user in accData:
+        print(user.get("id"))
+
+    print(user2.get("auth_user_id"))
+    
+    print(channels_create_v2(user2.get("auth_user_id"), "Channel", True))
+'''
