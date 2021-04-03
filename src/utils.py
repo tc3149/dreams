@@ -114,7 +114,7 @@ def get_user_id_from_token(token):
             if sessionId["sessionId"] == session:
                 return user["id"]
     
-    raise AccessError(description="User does not exist")
+    raise AccessError(description="Token does not exist")
 
 def is_valid_token_return_data(token):
     tokenData = jwt.decode(token, secretSauce, algorithms="HS256")

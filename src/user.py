@@ -1,8 +1,8 @@
 from src.error import InputError, AccessError
 from src.database import data
 from src.utils import get_user_id_from_token
+from json import loads
 import re
-
 
 def user_profile_v2(token, u_id):
     _ = get_user_id_from_token(token)
@@ -18,7 +18,6 @@ def user_profile_v2(token, u_id):
             },
         }
     else:
-        print(u_id)
         raise InputError("User not found")
 
 def user_profile_setname_v2(token, name_first, name_last):
