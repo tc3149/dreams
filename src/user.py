@@ -60,7 +60,9 @@ def user_profile_sethandle_v1(token, handle_str):
         raise InputError("Handle is not allowed to be shorter than 3 characters")
 
     if not search_handle(handle_str):
-        data["accData"][userId]["handle"] = handle_str
+        for item in data["accData"]:
+            if item["id"] == userId:                
+                item["handle"] = handle_str
     else:
         raise InputError("Handle is taken by another user")
 

@@ -65,7 +65,7 @@ def authLogout():
 @APP.route("/user/profile/v2", methods=["GET"])
 def userProfile():
     inputToken = request.args.get("token")
-    inputId = request.args.get("u_id")
+    inputId = int(request.args.get("u_id"))
     returnData = user_profile_v2(inputToken, inputId)
     saveData()
     return dumps(returnData)
