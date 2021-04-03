@@ -37,7 +37,7 @@ def testsend_invalid_auth_id():
 
 
 # invalid channel id
-def testsend_invalid_auth_id():
+def testsend_invalid_channel_id():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)

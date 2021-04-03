@@ -110,15 +110,8 @@ def test_joining_invalid_channel():
     with pytest.raises(InputError):
         channel_join_v2(user2.get("token"), temp)
 
-def test_joining_user_alrady_joined():
-    clear_v1()
-    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    channel1 = channels_create_v2(user1["token"], "testchannel", True)
-    channel_join_v2(user2["token"], channel1["channel_id"])
-    with pytest.raises(AccessError):
-        channel_join_v2(user2["token"], channel1["channel_id"])
 
+# user already joined
 def test_joining_user_alrady_joined():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
@@ -403,9 +396,6 @@ def test_addowner_invalid_uID():
 
     new = channels_create_v2(user1_token, "channel1", False)
     
-    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    user2_id = user2.get("auth_user_id")
-
     temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")   
     
     with pytest.raises(InputError):
