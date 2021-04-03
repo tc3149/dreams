@@ -65,13 +65,6 @@ def testsend_if_valid():
     m_id = message_info.get("message_id")
 
 
-    for channel2 in data["channelList"]:
-        for message_info in channel2.get("messages"):
-            assert message_info.get("message_id") == m_id
-            assert message_info.get("message") == "lol"
-    
-
-
 
 # MESSAGE EDIT TESTING
 
