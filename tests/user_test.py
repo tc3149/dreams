@@ -17,7 +17,7 @@ def test_user_profile_v2_working():
     clear_v1()
     
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
-    dummyData = {
+    expectedOutput = {
         "user": {
             'u_id': user1["auth_user_id"],
             'email': "testemail@hotmail.com",
@@ -26,7 +26,7 @@ def test_user_profile_v2_working():
             'handle_str': "firstnamelastname",
         }
     }
-    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == expectedOutput
 
 def test_user_profile_v2_invalid_u_id():
     clear_v1()
@@ -42,7 +42,7 @@ def test_user_profile_setname_v2_working():
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     user_profile_setname_v2(user1["auth_user_id"], "newFirst", "newLast")
-    dummyData = {
+    expectedOutput = {
                     "user": {
                         'u_id': user1["auth_user_id"],
                         'email': "testemail@hotmail.com",
@@ -51,7 +51,7 @@ def test_user_profile_setname_v2_working():
                         'handle_str': "firstnamelastname",
                     }
                 }
-    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == expectedOutput
 
 def test_user_profile_setname_v2_first_long():
     clear_v1()
@@ -103,7 +103,7 @@ def test_user_profile_sethandle_v1_working():
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
 
     user_profile_sethandle_v1(user1["auth_user_id"], "newHandle")
-    dummyData = {
+    expectedOutput = {
                     "user": {
                         'u_id': user1["auth_user_id"],
                         'email': "testemail@hotmail.com",
@@ -112,7 +112,7 @@ def test_user_profile_sethandle_v1_working():
                         'handle_str': "newHandle",
                     }
                 }
-    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == expectedOutput
 
 
 def test_user_profile_sethandle_v1_handle_taken():
@@ -122,7 +122,7 @@ def test_user_profile_sethandle_v1_handle_taken():
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
     user_profile_sethandle_v1(user1["auth_user_id"], "newHandle")
-    dummyData = {
+    expectedOutput = {
                     "user": {
                         'u_id': user1["auth_user_id"],
                         'email': "testemail@hotmail.com",
@@ -131,7 +131,7 @@ def test_user_profile_sethandle_v1_handle_taken():
                         'handle_str': "newHandle",
                     }
                 }
-    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == expectedOutput
 
     with pytest.raises(InputError):
         user_profile_sethandle_v1(user2["auth_user_id"], "newHandle")
@@ -162,7 +162,7 @@ def test_user_profile_setemail_v2_working():
 
     user_profile_setemail_v2(user1["auth_user_id"], "newEmail@hotmail.com")
 
-    dummyData = {
+    expectedOutput = {
                     "user": {
                         'u_id': user1["auth_user_id"],
                         'email': "newEmail@hotmail.com",
@@ -171,7 +171,7 @@ def test_user_profile_setemail_v2_working():
                         'handle_str': "firstnamelastname",
                     }
                 }
-    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == dummyData
+    assert user_profile_v2(user1["auth_user_id"], user1["auth_user_id"]) == expectedOutput
 
 
 def test_user_profile_setemail_v2_invalid_email():
@@ -201,7 +201,7 @@ def test_users_all_v1_working():
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
-    dummyData = [
+    expectedOutput = [
         {
             'u_id': user1["auth_user_id"],
             'email': "testemail@hotmail.com",
@@ -217,7 +217,7 @@ def test_users_all_v1_working():
             'handle_str': "firstname2lastname2",
         }
     ]
-    assert users_all_v1(user1["auth_user_id"]) == dummyData
+    assert users_all_v1(user1["auth_user_id"]) == expectedOutput
 
 def test_users_all_v1_invalid_token():
     clear_v1()
