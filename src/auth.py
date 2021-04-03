@@ -144,15 +144,9 @@ def auth_logout_v1(token):
         for session in user["sessions"]:
             if session == sessionId["sessionId"]:
                 user["sessions"].remove(sessionId["sessionId"])
-                print(f"Local: {data}")
-                with open("serverDatabase.json", "r") as f:
-                    print(f"Remote: {loads(f.read())}")
                 return {
                     "is_success": True,
                 }
-    print(f"Local: {data}")
-    with open("serverDatabase.json", "r") as f:
-        print(f"Remote: {loads(f.read())}")
     return {
         "is_success": False
     }

@@ -7,6 +7,7 @@ from src import config
 from src.database import data, secretSauce
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.utils import saveData
+from src.other import clear_v1
 
 def defaultHandler(err):
     response = err.get_response()
@@ -66,6 +67,11 @@ def authLogout():
     saveData()
     return dumps(returnData)
 # ##############################################################################
+
+@APP.route("/clear/v1", methods=["DELETE"])
+def clearAll():
+    clear_v1()
+    return {}
 
 # Example
 @APP.route("/echo", methods=['GET'])
