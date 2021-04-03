@@ -6,8 +6,13 @@ from src.error import InputError, AccessError
 from src import config
 from src.database import data, secretSauce
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.user import user_profile_setemail_v2, users_all_v1
+from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.utils import saveData
 from src.other import clear_v1
+
+from src.utils import get_user_id_from_token
+
 
 def defaultHandler(err):
     response = err.get_response()
@@ -59,6 +64,47 @@ def authLogout():
     saveData()
     return dumps(returnData)
 # ##############################################################################
+# USER FUNCTIONS
+@APP.route("/user/profile/v2", methods=["GET"])
+def userProfile():
+    inputToken = request.args.get("token")
+    inputId = request.args.get("u_id")
+    returnData = user_profile_v2(inputToken, inputId)
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/user/profile/setname/v2", methods=["PUT"])
+def userSetName():
+    inputData = request.get_json()
+    returnData = user_profile_setname_v2(
+            inputData["token"], inputData["name_first"], inputData["name_last"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/user/profile/setemail/v2", methods=["PUT"])
+def userSetEmail():
+    inputData = request.get_json()
+    returnData = user_profile_setemail_v2(inputData["token"], inputData["email"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/user/profile/sethandle/v1", methods=["PUT"])
+def userSetHandle():
+    inputData = request.get_json()
+    returnData = user_profile_sethandle_v1(inputData["token"], inputData["handle_str"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/users/all/v1", methods=["GET"])
+def usersAll():
+    inputToken = request.args.get("token")
+    returnData = users_all_v1(inputToken)
+    saveData()
+    return dumps(returnData)
+
+
+
+# ##############################################################################
 
 @APP.route("/clear/v1", methods=["DELETE"])
 def clearAll():
@@ -77,3 +123,27 @@ def echo():
 
 if __name__ == "__main__":
     APP.run(port=config.port) # Do not edit this port
+
+
+def user_profile_v2(token, u_id):
+    _ = get_user_id_from_token(token)
+
+    if searchUser(u_id) == True:
+        return {
+            'user': {
+                'u_id': u_id,
+                'email': data["accData"][u_id]["email"],
+                'name_first': data["accData"][u_id]["name_first"],
+                'name_last': data["accData"][u_id]["name_last"],
+                'handle_str': data["accData"][u_id]["handle"],
+            },
+        }
+    else:
+        print(u_id)
+        raise InputError("User not found")
+
+def searchUser(user):
+    for items in data["accData"]:
+        if items["id"] == user:
+            return True
+    return False

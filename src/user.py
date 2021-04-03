@@ -7,8 +7,7 @@ import re
 def user_profile_v2(token, u_id):
     _ = get_user_id_from_token(token)
 
-
-    if (searchUser(u_id)):
+    if searchUser(u_id) == True:
         return {
             'user': {
                 'u_id': u_id,
@@ -19,6 +18,7 @@ def user_profile_v2(token, u_id):
             },
         }
     else:
+        print(u_id)
         raise InputError("User not found")
 
 def user_profile_setname_v2(token, name_first, name_last):
