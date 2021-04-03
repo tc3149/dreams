@@ -107,6 +107,12 @@ def create_handle(first, last):
     createUserHandle = createUserHandle.replace("@", "")
     return createUserHandle
 
+def search_user(user):
+    for items in data["accData"]:
+        if items["id"] == user:
+            return True
+    return False
+
 def get_user_id_from_token(token):
     sessionId = is_valid_token_return_data(token)
     for user in data["accData"]:

@@ -1,13 +1,14 @@
 from src.error import InputError, AccessError
 from src.database import data
-from src.utils import get_user_id_from_token
+from src.utils import get_user_id_from_token, search_email
+from src.utils import search_handle, search_user
 from json import loads
 import re
 
 def user_profile_v2(token, u_id):
     _ = get_user_id_from_token(token)
 
-    if searchUser(u_id) == True:
+    if search_user(u_id) == True:
         return {
             'user': {
                 'u_id': u_id,
@@ -80,22 +81,3 @@ def users_all_v1(token):
         usersList.append(userData)
     
     return usersList
-
-# Helpers
-def searchUser(user):
-    for items in data["accData"]:
-        if items["id"] == user:
-            return True
-    return False
-
-def search_email(email):
-    for items in data["accData"]:
-        if items["email"] == email:
-            return True
-    return False
-
-def search_handle(currUserHandle):
-    for items in data["accData"]:
-        if items["handle"] == currUserHandle:
-            return True
-    return False
