@@ -3,6 +3,7 @@ from src.error import InputError, AccessError
 from src.database import data
 from src.channels import channels_create_v1
 from src.auth import auth_register_v2
+from src.helper import detoken, valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner
 
 '''
 channel_invite_v1 takes in an auth_user_id integer, a channel_id integer and u_id integer. 
@@ -26,7 +27,8 @@ Return Value:
     Returns {}
 '''
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v1(token, channel_id, u_id):
+    auth_user_id = get_user_id_from_token(token)
     #check if channel exists
     channelExists = False
     for channel in data["channelList"]:
@@ -77,7 +79,6 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     
     #check if u_id already member of the channel
     for user2 in data["channelList"][channel_id]['member_ids']:
-        
         if u_id in data["channelList"][channel_id]['member_ids']:
             #u_id is member of channel
             raise InputError ("User already a member")    
@@ -132,8 +133,8 @@ Return Value:
     }
 '''
 
-def channel_details_v1(auth_user_id, channel_id):
-
+def channel_details_v1(token, channel_id):
+    auth_user_id = get_user_id_from_token(token)
     #check if channel exists
     channelExists = False
     for channel in data["channelList"]:
@@ -244,8 +245,8 @@ Return Value:
 
 '''
 
-def channel_messages_v1(auth_user_id, channel_id, start):
-
+def channel_messages_v1(token, channel_id, start):
+    auth_user_id = get_user_id_from_token(token)
     # Check if user id is valid
     if valid_userid(auth_user_id) is False:
         raise AccessError("Error: Invalid user id")
@@ -308,14 +309,21 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': end,
     }
 
-def channel_leave_v1(auth_user_id, channel_id):
+def channel_leave_v1(token, channel_id):
+    auth_user_id = get_user_id_from_token(token)
     #Checking if channel is valid
     if valid_channelid(channel_id) is False:
         raise InputError("Error: Channel ID is not a valid channel")
     #Checking if user is in the channel and removing the user
-    if check_useralreadyinchannel(auth_user_id, channel_id) is True:
-        channel["member_ids"].remove(member)
-    else:
+    id_status = False
+    for channel in data["channelList"]:
+        if channel.get("id") is channel_id:
+            for member in channel["member_ids"]:
+                if auth_user_id is member:
+                    id_status = True
+                    channel["member_ids"].remove(member)
+    #If the user is invalid
+    if id_status is False:
         raise AccessError("Error: Authorised user is not a member of channel with channel_id")
     return {
     }
@@ -339,8 +347,8 @@ Return Value:
     Returns nothing.
 '''
 
-def channel_join_v1(auth_user_id, channel_id):
-
+def channel_join_v1(token, channel_id):
+    auth_user_id = get_user_id_from_token(token)
     # check whether id is valid
     if valid_userid(auth_user_id) is False:
         raise InputError("Error: Invalid user id")
@@ -364,45 +372,33 @@ def channel_join_v1(auth_user_id, channel_id):
     return {
     }
 
-def channel_addowner_v1(auth_user_id, channel_id, u_id):
+def channel_addowner_v1(token, channel_id, u_id):
+
+    auth_user_id = get_user_id_from_token(token)
+
+    if valid_userid(auth_user_id) is False:
+        raise InputError("Error: Invalid user ID")
+    
+    if valid_userid(u_id) is False:
+        raise InputError("Error: Invalid user ID")
+    
+    if valid_channelid(channel_id) is False:
+        raise InputError("Error: Invalid channel ID")
+
+    if checkOwner(u_id, channel_id) is True:
+        raise InputError("Error: Already Owner")
+
+    if checkOwner(auth_user_id, channel_id) is False:
+        raise AccessError("Error: Un-authorised users")
+    
+    for counter in data[channelList]:
+        if counter["channel_id"] is channel_id:
+            counter.get("owner_ids").append(u_id)
+            break
+
     return {
     }
 
 def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     return {
     }
-
-# Helper Functions
-
-def valid_userid(auth_user_id):
-    # Check if user id is valid
-    for user in data["accData"]:
-        if user.get("id") is auth_user_id:
-            return True
-    return False
-
-def valid_channelid(channel_id):
-    # Check if channel id is valid
-    for channel in data["channelList"]:
-        if channel.get("id") is channel_id:
-            return True
-    return False
-
-
-def check_channelprivate(channel_id):
-
-    for channel in data["channelList"]:
-        if channel.get("id") is channel_id:
-            if channel.get("is_public") is True:
-                return False
-    return True
-
-def check_useralreadyinchannel(auth_user_id, channel_id):
-
-    for channel in data["channelList"]:
-        if channel.get("id") is channel_id:
-            for member in channel["member_ids"]:
-                if auth_user_id is member:
-                    return True
-    return False
-    

@@ -55,7 +55,7 @@ def getchannelID(message_id):
 def checkOwner(auth_user_id, channel_id):
 
     for channel in data["channelList"]:
-        if channel.get["channel_id"] is channel_id:
+        if channel.get("channel_id") is channel_id:
             for users in channel.get("owner_ids"):
                 if users is auth_user_id:
                     return True

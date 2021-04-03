@@ -82,9 +82,9 @@ def test_auth_register_handle_limit():
 
     user1 = auth_register_v2("email@hotmail.com", "testpassword", "ReallyReallyReally", "LongName")
     user2 = auth_register_v2("email2@hotmail.com", "testpassword", "ReallyReally", "LongName")
-    channel1 = channels_create_v1(user1["auth_user_id"], "testchannel", True)
-    channel_join_v1(user2["auth_user_id"], channel1["channel_id"])
-    channelDetailsHandle = channel_details_v1(user1["auth_user_id"], channel1["channel_id"])
+    channel1 = channels_create_v1(user1["token"], "testchannel", True)
+    channel_join_v1(user2["token"], channel1["channel_id"])
+    channelDetailsHandle = channel_details_v1(user1["token"], channel1["channel_id"])
     
     assert channelDetailsHandle["all_members"][0]["handle_str"] == "reallyreallyreallylo"
     assert channelDetailsHandle["all_members"][1]["handle_str"] == "reallyreallylongname"

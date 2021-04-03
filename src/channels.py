@@ -2,6 +2,7 @@ import re
 from src.database import data
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError, AccessError
+from src.helper import get_user_id_from_token
 
 '''
 channels_list_v1 takes in a user_id string.
@@ -15,7 +16,8 @@ Exceptions:
 Return Value:
     Returns list | {'channels': newchannelList}
 '''
-def channels_list_v1(auth_user_id):
+def channels_list_v1(token):
+    auth_user_id = get_user_id_from_token(token)
     id_status = False
     for user in data["accData"]:
         if user.get("id") is auth_user_id:
@@ -46,7 +48,8 @@ Exceptions:
 Return Value:
     Returns list | {'channels': newchannelList}
 '''
-def channels_listall_v1(auth_user_id):
+def channels_listall_v1(token):
+    auth_user_id = get_user_id_from_token(token)
     id_status = False
     for user in data["accData"]:
         if user.get("id") is auth_user_id:
@@ -86,7 +89,8 @@ Return Value:
 
 '''
 
-def channels_create_v1(auth_user_id, name, is_public):
+def channels_create_v1(token, name, is_public):
+    auth_user_id = get_user_id_from_token(token)
     '''
     Creates a new channel with that name that is either a public or private channel
     '''
