@@ -2,7 +2,7 @@ import re
 import jwt
 from src.database import data, secretSauce
 from src.utils import is_valid_token_return_data
-from src.error import InputError
+from src.error import InputError, AccessError
 from hashlib import sha256
 from json import loads
 
@@ -147,9 +147,7 @@ def auth_logout_v1(token):
                 return {
                     "is_success": True,
                 }
-    return {
-        "is_success": False
-    }
+    raise AccessError(description="Token does not exist")
 
 # Helper functions
 def search_email(email):
