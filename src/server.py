@@ -6,7 +6,7 @@ from src.error import InputError, AccessError
 from src import config
 from src.database import data, secretSauce
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from src.user import user_profile_setemail_v2, users_all_v1
+from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1
 from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.utils import saveData
 from src.other import clear_v1
@@ -123,27 +123,3 @@ def echo():
 
 if __name__ == "__main__":
     APP.run(port=config.port) # Do not edit this port
-
-
-def user_profile_v2(token, u_id):
-    _ = get_user_id_from_token(token)
-
-    if searchUser(u_id) == True:
-        return {
-            'user': {
-                'u_id': u_id,
-                'email': data["accData"][u_id]["email"],
-                'name_first': data["accData"][u_id]["name_first"],
-                'name_last': data["accData"][u_id]["name_last"],
-                'handle_str': data["accData"][u_id]["handle"],
-            },
-        }
-    else:
-        print(u_id)
-        raise InputError("User not found")
-
-def searchUser(user):
-    for items in data["accData"]:
-        if items["id"] == user:
-            return True
-    return False
