@@ -216,35 +216,6 @@ def channel_details_v2(token, channel_id):
     
     }
 
-'''
-channel_messages_v1 takes in a user id, a specific channel id, and a 'start' to
-determine after what amount of messages to show, e.g. recent 5 messages have 
-already been seen, thus start would equal 5 to see later messages.
-The function first does security checks, then reverses the messages list, so
-that the most recent messages are at the head of the list, then appends to a new
-list for return.
-
-Arguments:
-    auth_user_id (integer) - Unique user id created by auth_register_v1
-    channel_id (integer) - Unique channel id created by channels_create_v1
-    start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
-    indexes relating to recent messages
-
-Exceptions:
-    AccessError - Occurs when auth_user_id is not valid (i.e. not created)
-
-Return Value:
-    Most cases Returns:
-        'messages': messages_shown,
-        'start': start,
-        'end': end,
-    If there are less than 50 messages in the list, or no 'later' messages
-    returns: 
-        'messages': messages_shown,
-        'start': start,
-        'end': -1,
-
-'''
 
 '''
 channel_messages_v2 takes in a user id, a specific channel id, and a 'start' to
@@ -328,16 +299,7 @@ def channel_messages_v2(token, channel_id, start):
         starting_index = start + msg_amt
         if starting_index >= end or starting_index >= len(messages):
             break
-        # TO-do/fix once iteration 2 is released
-        '''
-        msg = {
-            'message_id': messages[starting_index]["message_id"], 
-            'u_id': messages[starting_index]["u_id"],
-            'message': messages[starting_index]["message"],
-            'time_created': messages[starting_index]["time_created"],
-        }
-        messages_shown.append(msg)
-        '''
+
         messages_shown.append(messages[starting_index])
         msg_amt = msg_amt + 1
     if len(messages) == 0 or msg_amt < 50:
