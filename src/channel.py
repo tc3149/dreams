@@ -217,6 +217,36 @@ def channel_details_v2(token, channel_id):
     }
 
 '''
+channel_messages_v1 takes in a user id, a specific channel id, and a 'start' to
+determine after what amount of messages to show, e.g. recent 5 messages have 
+already been seen, thus start would equal 5 to see later messages.
+The function first does security checks, then reverses the messages list, so
+that the most recent messages are at the head of the list, then appends to a new
+list for return.
+
+Arguments:
+    auth_user_id (integer) - Unique user id created by auth_register_v1
+    channel_id (integer) - Unique channel id created by channels_create_v1
+    start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
+    indexes relating to recent messages
+
+Exceptions:
+    AccessError - Occurs when auth_user_id is not valid (i.e. not created)
+
+Return Value:
+    Most cases Returns:
+        'messages': messages_shown,
+        'start': start,
+        'end': end,
+    If there are less than 50 messages in the list, or no 'later' messages
+    returns: 
+        'messages': messages_shown,
+        'start': start,
+        'end': -1,
+
+'''
+
+'''
 channel_messages_v2 takes in a user id, a specific channel id, and a 'start' to
 determine after what amount of messages to show, e.g. recent 5 messages have 
 already been seen, thus start would equal 5 to see later messages.
@@ -248,6 +278,14 @@ Return Value:
 
 def channel_messages_v2(token, channel_id, start):
     auth_user_id = get_user_id_from_token(token)
+    # Check if user id is valid
+    if valid_userid(auth_user_id) is False:
+        raise AccessError("Error: Invalid user id")
+
+    # Check if channel id is valid
+    if valid_channelid(channel_id) is False:
+        raise AccessError("Error: Invalid channel")
+
     # Check if user id is valid
     if valid_userid(auth_user_id) is False:
         raise AccessError("Error: Invalid user id")

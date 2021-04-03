@@ -1,5 +1,6 @@
 from src.database import data, secretSauce
 from src.error import InputError, AccessError
+from json import dumps
 import jwt
 
 
@@ -62,9 +63,65 @@ def checkOwner(auth_user_id, channel_id):
 
     return False
 
+def search_email(email):
+    for items in data["accData"]:
+        if items["email"] == email:
+            return True
+    return False
+
+def verify_password(email, password):
+    for items in data["accData"]:
+        if items["email"] == email:
+            if items["password"] == password:
+                return True
+            else:
+                return False
+
+def search_handle(currUserHandle):
+    for items in data["accData"]:
+        if items["handle"] == currUserHandle:
+            return True
+    return False
+
+def get_user_id(email):
+    for items in data["accData"]:
+        if items["email"] == email:
+            userID = items["id"]
+            return userID
+
+def append_handle(currUserHandle):
+    # Check number of users with same handle
+    availableNumber = 0
+    while True:
+        testModCurrUserHandle = currUserHandle + str(availableNumber)
+        if search_handle(testModCurrUserHandle):
+            # Handle isnt avaiable, increment availableNumber
+            availableNumber += 1
+        else:
+            # Handle is available, return number
+            return testModCurrUserHandle
+
+def create_handle(first, last):
+    createUserHandle = first + last
+    createUserHandle = createUserHandle.lower()
+    createUserHandle = createUserHandle.replace("@", "")
+    return createUserHandle
+
+
+def detoken(token):
+    u_id = jwt.decode(token, secretSauce, algorithm="HS256")
+
+    return u_id["auth_user_id"]
 
 def get_user_id_from_token(token):
     sessionId = jwt.decode(token, secretSauce, algorithms="HS256")
+    if not isinstance(sessionId, dict):
+        raise InputError("Token does not exist")
+
+    checkKey = sessionId.keys()
+    if checkKey[0] != "sessionId":
+        raise InputError("Token does not exist")
+        
     for user in data["accData"]:
         for session in user["sessions"]:
             if sessionId["sessionId"] == session:

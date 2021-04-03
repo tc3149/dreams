@@ -118,6 +118,18 @@ def test_channels_list_invalid():
     with pytest.raises(AccessError):
         assert channels_list_v2(invalid_id) == AccessError
 
+def test_channels_list_invalid():
+ 
+    # Testing if invalid user_id results in accesserror
+  
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "name", "Lastname")
+    auth_register_v2("email2@gmail.com", "password", "name", "Lastname")
+    channels_create_v1(user1.get("auth_user_id"), "testChannel", True)
+    invalid_id = 5
+    with pytest.raises(AccessError):
+        assert channels_list_v1(invalid_id) == AccessError
+
 def test_channels_list_private():
  
     #Testing if channel list can show private channels
