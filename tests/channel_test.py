@@ -7,6 +7,7 @@ from src.channel import channel_messages_v2, channel_invite_v2, channel_details_
 from src.channels import channels_create_v2, channels_list_v2
 from src.database import data, secretSauce
 from src.channel import channel_join_v2
+from src.utils import check_useralreadyinchannel
 
 # ------------------------------------------------------------------------------------------------------
 # Channel Messages Tests
@@ -71,8 +72,19 @@ def test_channel_messages_endnegativeone():
 
 # VALID CASES
 
-#def test_join_correct():
+def test_join_correct():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password3", "Fname", "Lname")
+    channel_info = channels_create_v2(user1.get("token"), "channel1", True)
+    c_id = channel_info["channel_id"]
+    
+    channel_join_v2(user2["token"], c_id)
+    channel_join_v2(user3["token"], c_id)
 
+    assert check_useralreadyinchannel(user2["auth_user_id"], c_id) == True
+    assert check_useralreadyinchannel(user3["auth_user_id"], c_id) == True
 
     
 # FAIL CASES

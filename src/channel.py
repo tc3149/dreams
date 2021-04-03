@@ -299,16 +299,7 @@ def channel_messages_v2(token, channel_id, start):
         starting_index = start + msg_amt
         if starting_index >= end or starting_index >= len(messages):
             break
-        # TO-do/fix once iteration 2 is released
-        '''
-        msg = {
-            'message_id': messages[starting_index]["message_id"], 
-            'u_id': messages[starting_index]["u_id"],
-            'message': messages[starting_index]["message"],
-            'time_created': messages[starting_index]["time_created"],
-        }
-        messages_shown.append(msg)
-        '''
+
         messages_shown.append(messages[starting_index])
         msg_amt = msg_amt + 1
     if len(messages) == 0 or msg_amt < 50:
