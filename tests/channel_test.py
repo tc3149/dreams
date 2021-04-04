@@ -3,10 +3,11 @@ import jwt
 from src.other import clear_v1
 from src.auth import auth_register_v2
 from src.error import InputError, AccessError
-from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
+from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.database import data, secretSauce
 from src.channel import channel_join_v1
+from src.helper import checkOwner
 
 # ------------------------------------------------------------------------------------------------------
 # Channel Messages Tests
@@ -384,7 +385,7 @@ def test_channel_leave_user_valid():
 # ------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------------------------------
-# ADD OWNER TESTING
+# channel_addowner tests
 
 # invalid user ID
 def test_addowner_invalid_uID():
@@ -450,9 +451,24 @@ def test_not_authoriseduser():
 # ------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------------------------------
-#channel_removeowner_v1
+#channel_removeowner_v1 tests
 
     #Testing main implementation
+def test_removeowner():
 
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel1 = channels_create_v1(user1["token"], "channel1", False)
+
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user2_id = user2.get("auth_user_id")
+
+    channel_addowner_v1(user1["token"], channel1.get("channel_id"), user2_id)
+
+    assert checkOwner(user2_id, channel1.get("channel_id")) == True
+
+    channel_removeowner_v1(user1["token"], channel1.get("channel_id"), user2_id)
+
+    assert checkOwner(user2_id, channel1.get("channel_id")) == AccessError
 
 # ------------------------------------------------------------------------------------------------------
