@@ -28,10 +28,15 @@ def user_profile_setname_v2(token, name_first, name_last):
     if len(name_first) > 50 or len(name_last) > 50:
         # Error
         raise InputError("Error: First and/or last name is more than 50 characters")
-    data["accData"][userId]["name_first"] = name_first
-    data["accData"][userId]["name_last"] = name_last
-    data["userProfiles"][userId]["name_first"] = name_first
-    data["userProfiles"][userId]["name_last"] = name_last
+    
+    for user in data["accData"]:
+        if user["id"] == userId:
+            user["name_first"] = name_first
+            user["name_last"] = name_last
+    for user in data["userProfiles"]:
+        if user["u_id"] == userId:
+            user["name_first"] = name_first
+            user["name_last"] = name_last
 
     return {}
 
@@ -42,8 +47,12 @@ def user_profile_setemail_v2(token, email):
     isValidEmail = bool(re.match("^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$", email))
     if isValidEmail:
         if not search_email(email):
-            data["accData"][userId]["email"] = email
-            data["userProfiles"][userId]["email"] = email
+            for user in data["accData"]:
+                if user["id"] == userId:
+                    user["email"] = email
+            for user in data["userProfiles"]:
+                if user["u_id"] == userId:
+                    user["email"] = email
         else:
             raise InputError("Email already in use")
     else:
@@ -61,8 +70,12 @@ def user_profile_sethandle_v1(token, handle_str):
         raise InputError("Handle is not allowed to be shorter than 3 characters")
 
     if not search_handle(handle_str):
-        data["accData"][userId]["handle"] = handle_str
-        data["userProfiles"][userId]["handle_str"] = handle_str
+        for user in data["accData"]:
+            if user["id"] == userId:
+                user["handle"] = handle_str
+        for user in data["userProfiles"]:
+            if user["u_id"] == userId:
+                user["handle_str"] = handle_str
     else:
         raise InputError("Handle is taken by another user")
 

@@ -132,7 +132,6 @@ def is_valid_token_return_data(token):
         return tokenData
     raise AccessError(description="Invalid key or value")
 
-
 # Save to data file
 def saveData():
     with open("serverDatabase.json", "w") as dataFile:
