@@ -52,3 +52,9 @@
     - Assumes an invalid (does not exist in database) auth_user_id will raise an InputError
     - Assumes a private channel will always return an AccessError as global owner has not been implemented yet
 
+
+**dm.py**
+
+- dm_leave_v1
+    - Assumes the owner cannot leave
+    - Assumes that the name is deleted from data in dm_name 

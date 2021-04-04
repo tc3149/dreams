@@ -18,6 +18,13 @@ def valid_channelid(channel_id):
             return True
     return False
 
+def valid_dmid(dm_id):
+    # Check if dm id is valid
+    for dm in data["dmList"]:
+        if dm.get("id") is dm_id:
+            return True
+    return False
+
 
 def check_channelprivate(channel_id):
 
@@ -35,6 +42,16 @@ def check_useralreadyinchannel(auth_user_id, channel_id):
                 if auth_user_id is member:
                     return True
     return False
+
+def check_useralreadyindm(auth_user_id, dm_id):
+    for dms in data["dmList"]:
+        if dms.get("id") is dm_id:
+            for member in dms["member_ids"]:
+                if auth_user_id is member:
+                    return True
+    return False
+
+
 
 def check_messageid(message_id):
 
@@ -132,7 +149,16 @@ def is_valid_token_return_data(token):
         return tokenData
     raise AccessError(description="Invalid key or value")
 
+def make_dm_name(u_ids):
+    handle_list = []
+    for user in data["accData"]:
+        if user["id"] in u_ids:
+            handle_list.append(user["handle"])
+    sortedHandle = sorted(handle_list)
+    return ",".join(sortedHandle)
+
+
 # Save to data file
 def saveData():
-    with open("serverDatabase.json", "w") as dataFile:
-        dataFile.write(dumps(data))
+    with open("serverDatabase.json", "w") as file:
+        file.write(dumps(data))
