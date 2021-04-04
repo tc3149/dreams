@@ -58,8 +58,7 @@ def test_dm_list_once():
     id_list = []
     id_list.append(user.get("auth_user_id"))
     id_list.append(user2.get("auth_user_id"))
-    id_list2 = [user1.get("auth_user_id")]
-    test = dm_create_v1(user1["token"], id_list)
+    dm_create_v1(user1["token"], id_list)
     list1 = dm_list_v1(user["token"])
     assert list1 == {'dms': [{'dm_id': 0, 'dm_name': 'awolastname,namelastname,onelastname'}]}
    
@@ -74,10 +73,10 @@ def test_dm_list_multiple():
     id_list.append(user.get("auth_user_id"))
     id_list.append(user2.get("auth_user_id"))
     id_list2 = [user1.get("auth_user_id")]
-    test = dm_create_v1(user1["token"], id_list)
+    dm_create_v1(user1["token"], id_list)
     list1 = dm_list_v1(user["token"])
     assert list1 == {'dms': [{'dm_id': 0, 'dm_name': 'awolastname,namelastname,onelastname'}]}
-    dm = dm_create_v1(user["token"], id_list2)
+    dm_create_v1(user["token"], id_list2)
     list2 = dm_list_v1(user["token"])
     assert list2 == {'dms': [{'dm_id': 0, 'dm_name': 'awolastname,namelastname,onelastname'}, {'dm_id': 1, 'dm_name': 'namelastname,onelastname'}]}
 
@@ -98,7 +97,7 @@ def test_dm_invite_one():
     user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
     user2 = auth_register_v2("two@gmail.com", "password", "awo", "Lastname")
     id_list = [user1.get("auth_user_id")]
-    dm = dm_create_v1(user["token"], id_list)
+    dm_create_v1(user["token"], id_list)
     assert data["dmList"][0]["member_ids"] == [0, 1]
 
     dm_invite_v1(user["token"], 0, user2.get("auth_user_id"))
@@ -111,7 +110,7 @@ def test_dm_invite_multiple():
     user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
     user2 = auth_register_v2("two@gmail.com", "password", "awo", "Lastname")
     id_list = [user1.get("auth_user_id")]
-    dm = dm_create_v1(user["token"], id_list)
+    dm_create_v1(user["token"], id_list)
     assert data["dmList"][0]["member_ids"] == [0, 1]
 
     dm_invite_v1(user["token"], 0, user2.get("auth_user_id"))
@@ -143,7 +142,7 @@ def test_dm_invite_invalid_uid():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
     id_list = [user1.get("auth_user_id")]
-    dm = dm_create_v1(user["token"], id_list)
+    dm_create_v1(user["token"], id_list)
 
     invalid_id = 8
     with pytest.raises(InputError):
@@ -158,7 +157,7 @@ def test_dm_inviter_not_in_dm():
     user3 = auth_register_v2("three@gmail.com", "password", "Three", "Lastname")
     user3_id = user3.get("auth_user_id")
     id_list = [user1.get("auth_user_id")]
-    dm = dm_create_v1(user["token"], id_list)
+    dm_create_v1(user["token"], id_list)
 
     with pytest.raises(AccessError):
         assert dm_invite_v1(user2["token"], 0, user3_id) == AccessError
