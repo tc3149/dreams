@@ -32,8 +32,10 @@ APP.register_error_handler(Exception, defaultHandler)
 # DATABASE FUNCTIONS
 
 # Load database
+
 with open("serverDatabase.json", "r") as dataFile:
     data = loads(dataFile.read())
+
 
 # ##############################################################################
 # AUTH FUNCTIONS
