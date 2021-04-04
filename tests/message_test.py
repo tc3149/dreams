@@ -235,7 +235,7 @@ def testsenddm_long_message():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    dm = dm_create_v1(user["token"], user2["auth_user_id"])
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
 
     temp = 'x' * 2000
 
@@ -247,7 +247,7 @@ def testsenddm_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    dm = dm_create_v1(user["token"], user2["auth_user_id"])
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
 
     invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
 
@@ -260,7 +260,7 @@ def testsenddm_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    dm_create_v1(user["token"], user2["auth_user_id"])
+    dm_create_v1(user["token"], [user2["auth_user_id"]])
 
     with pytest.raises(InputError):
         message_senddm_v1(user["token"], "invalid_dmID", "Thomas Chen")
@@ -271,12 +271,12 @@ def testsenddm_user_notin_dm():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    dm = dm_create_v1(user["token"], user2["auth_user_id"])  
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])  
 
     user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
 
     with pytest.raises(AccessError):
-        message_senddm_v1(user3,["token"], dm["dm_id"], "Jonathan Qiu")
+        message_senddm_v1(user3["token"], dm["dm_id"], "Jonathan Qiu")
 
 
 # valid testing
