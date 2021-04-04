@@ -433,6 +433,5 @@ def channel_removeowner_v1(token, channel_id, u_id):
             for owner in channel["owner_ids"]:
                 if u_id is owner:
                     channel["owner_ids"].remove(u_id)
-    
     return {
     }
