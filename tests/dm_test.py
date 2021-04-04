@@ -88,7 +88,7 @@ def test_dm_messages_invalid_dmid():
     id_list = []
     id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
-    dm = dm_create_v1(user["token"], id_list)
+    dm_create_v1(user["token"], id_list)
     
     with pytest.raises(InputError):
         dm_messages_v1(user["token"], "invalid_dm_id", 0)
@@ -286,7 +286,7 @@ def test_dm_remove_invalid_dm():
     id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
-    dm = dm_create_v1(user["token"], id_list)
+    dm_create_v1(user["token"], id_list)
 
     with pytest.raises(InputError):
          dm_remove_v1(user2["token"], "invalid_dm_id")
@@ -308,6 +308,6 @@ def test_dm_remove_invalid_token():
     temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
 
     with pytest.raises(AccessError):
-         dm_remove_v1(temp, "invalid_dm_id")
+         dm_remove_v1(temp, dm["dm_id"])
 
 # ------------------------------------------------------------------------------------------------------
