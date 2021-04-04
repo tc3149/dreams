@@ -27,7 +27,6 @@ def test_http_auth_register_working():
         "auth_user_id": respD["auth_user_id"]
     }
 
-'''
 def test_http_auth_register_already_registered_email():
     funcURL = "auth/register/v2"
     inputData = {
@@ -327,4 +326,3 @@ def test_http_logout_nonexistant_user():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
-'''

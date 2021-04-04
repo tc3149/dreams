@@ -124,11 +124,22 @@ def auth_register_v2(email, password, name_first, name_last):
                 "id": userID,
                 "handle": userHandle, 
                 "sessions": [],
+                "permission": (1 if userID == 0 else 2),
             }
             newSessionId = new_session_id()
             sessionToken = create_session_token(newSessionId)
             userData["sessions"].append(newSessionId)
             data["accData"].append(userData)
+
+            # Create profile
+            userProfile = {
+                "u_id": userID,
+                "email": email,
+                "name_first": name_first,
+                "name_last": name_last,
+                "handle_str": userHandle,
+            }
+            data["userProfiles"].append(userProfile)
     else:
         # Error
         raise InputError(description="Error: Email is not valid")

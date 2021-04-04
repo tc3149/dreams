@@ -14,6 +14,7 @@ data = {
     "channelList": [],
     "message_ids": [],
     "dmList": [],
+    "userProfiles": [],
 }
 
 secretSauce = "placeholder"
