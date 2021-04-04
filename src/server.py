@@ -35,7 +35,6 @@ APP.register_error_handler(Exception, defaultHandler)
 
 with open("serverDatabase.json", "r") as dataFile:
     data = loads(dataFile.read())
-    print(data)
 
 
 # ##############################################################################
