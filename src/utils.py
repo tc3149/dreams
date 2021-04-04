@@ -132,8 +132,15 @@ def is_valid_token_return_data(token):
         return tokenData
     raise AccessError(description="Invalid key or value")
 
-
+def make_dm_name(u_ids):
+    handle_list = []
+    for user in data["accData"]:
+        if user["id"] in u_ids:
+            handle_list.append(user["handle"])
+    sortedHandle = sorted(handle_list)
+    return ",".join(sortedHandle)
+   
 # Save to data file
 def saveData():
-    with open("serverDatabase.json", "w") as dataFile:
-        dataFile.write(dumps(data))
+    with open("serverDatabase.json", "w") as file:
+        file.write(dumps(data))

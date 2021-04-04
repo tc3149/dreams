@@ -33,8 +33,9 @@ APP.register_error_handler(Exception, defaultHandler)
 
 # Load database
 
-with open("serverDatabase.json", "r") as dataFile:
-    data = loads(dataFile.read())
+with open("serverDatabase.json", "r") as file:
+    data = loads(file.read())
+print("server: ", data)
 
 
 # ##############################################################################
@@ -46,7 +47,7 @@ def authRegister():
     returnData = auth_register_v2(
             inputData["email"], inputData["password"], inputData["name_first"], inputData["name_last"])
     saveData()
-
+    print(data)
     return dumps(returnData)
 
 @APP.route("/auth/login/v2", methods=["POST"])
