@@ -391,6 +391,37 @@ def channel_addowner_v1(token, channel_id, u_id):
     return {
     }
 
-def channel_removeowner_v1(auth_user_id, channel_id, u_id):
+def channel_removeowner_v1(token, channel_id, u_id):
+
+    auth_user_id = get_user_id_from_token(token)
+
+    # If u_id is valid
+    if valid_userid(u_id) is False:
+        raise InputError("Error: Invalid user id")
+
+    # If channel_id is valid
+    if valid_channelid(channel_id) is False:
+        raise InputError("Error: Invalid channel ID")
+
+    # If the u_id is the only owner
+    for channel in data["channelList"]:
+        if channel_id == channel["id"]:
+            if len(channel["owner_ids"]) is 1:
+                raise InputError("Error: Only one owner")
+
+    # If the u_id is not an owner
+    if checkOwner(u_id, channel_id) is False:
+        raise InputError("Error: Not An Owner")
+
+    # If the token is not an owner
+    if checkOwner(auth_user_id, channel_id) is False:
+        raise InputError("Error: Token is Not Owner")
+
+    # Main Implemenation
+    for channel in data["channelList"]:
+        if channel_id == channel["id"]:
+            for owner in channel["owner_ids"]:
+                if u_id is owner:
+                    channel["owner_ids"].remove(u_id)
     return {
     }

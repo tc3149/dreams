@@ -18,6 +18,13 @@ def valid_channelid(channel_id):
             return True
     return False
 
+def valid_dmid(dm_id):
+    # Check if dm id is valid
+    for dm in data["dmList"]:
+        if dm.get("id") is dm_id:
+            return True
+    return False
+
 
 def check_channelprivate(channel_id):
 
@@ -139,7 +146,8 @@ def make_dm_name(u_ids):
             handle_list.append(user["handle"])
     sortedHandle = sorted(handle_list)
     return ",".join(sortedHandle)
-   
+
+
 # Save to data file
 def saveData():
     with open("serverDatabase.json", "w") as file:
