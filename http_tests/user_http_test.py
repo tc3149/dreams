@@ -37,13 +37,11 @@ def test_http_user_profile_working():
     rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
-        'user': {
-            'u_id': u_id,
-            'email': "test@hotmail.com",
-            'name_first': "nameFirst",
-            'name_last': "nameLast",
-            'handle_str': "namefirstnamelast",
-        },
+        'u_id': u_id,
+        'email': "test@hotmail.com",
+        'name_first': "nameFirst",
+        'name_last': "nameLast",
+        'handle_str': "namefirstnamelast",
     }
     assert respD == expectedOutput
 
@@ -117,13 +115,11 @@ def test_user_profile_setname_working():
     rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
-        'user': {
-            'u_id': u_id,
-            'email': "test@hotmail.com",
-            'name_first': "newFirst",
-            'name_last': "newLast",
-            'handle_str': "namefirstnamelast",
-        },
+        'u_id': u_id,
+        'email': "test@hotmail.com",
+        'name_first': "newFirst",
+        'name_last': "newLast",
+        'handle_str': "namefirstnamelast",
     }
 
     assert respD == expectedOutput
@@ -288,13 +284,11 @@ def test_http_user_profile_setemail_working():
     rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
-        'user': {
-            'u_id': u_id,
-            'email': "newEmail@hotmail.com",
-            'name_first': "nameFirst",
-            'name_last': "nameLast",
-            'handle_str': "namefirstnamelast",
-        },
+        'u_id': u_id,
+        'email': "newEmail@hotmail.com",
+        'name_first': "nameFirst",
+        'name_last': "nameLast",
+        'handle_str': "namefirstnamelast",
     }
     # ----------------------------
 
@@ -414,13 +408,11 @@ def test_http_user_profile_sethandle_working():
     rawResponseData = requests.get(config.url + funcURL + "?" + qData)
     respD = json.loads(rawResponseData.text)
     expectedOutput = {
-        'user': {
-            'u_id': u_id,
-            'email': "test@hotmail.com",
-            'name_first': "nameFirst",
-            'name_last': "nameLast",
-            'handle_str': "newHandle",
-        },
+        'u_id': u_id,
+        'email': "test@hotmail.com",
+        'name_first': "nameFirst",
+        'name_last': "nameLast",
+        'handle_str': "newHandle",
     }
     # ----------------------------
 

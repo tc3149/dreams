@@ -3,9 +3,11 @@ userData = {
     "name_first": name_first,
     "name_last": name_last,
     "email": email,
-    "password": password,
+    "password": sha256(password.encode()).hexdigest(),
     "id": userID,
     "handle": userHandle, 
+    "sessions": [],
+    "permission": (1 if userID == 0 else 2),
 }
 accData is list of userData of above format
 '''
@@ -14,6 +16,7 @@ data = {
     "channelList": [],
     "message_ids": [],
     "dmList": [],
+    "userProfiles": [],
 }
 
 secretSauce = "placeholder"

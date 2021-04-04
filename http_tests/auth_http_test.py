@@ -20,7 +20,7 @@ def test_http_auth_register_working():
         "name_last": "nameLast",
     }
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
-    respD = json.loads(rawResponseData.text)
+    respD = json.loads(rawResponseData.text) 
 
     assert respD == {
         "token": respD["token"], 
