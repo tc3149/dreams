@@ -15,6 +15,7 @@ def clear_v1():
     data["accData"].clear() 
     data["channelList"].clear() 
     data["message_ids"].clear()
+    data["dmList"].clear()
     with open("serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(data))
 
