@@ -120,7 +120,47 @@ def test_dm_invite_multiple():
     dm_invite_v1(user1["token"], 0, user3.get("auth_user_id"))
     assert data["dmList"][0]["member_ids"] == [0, 1, 2, 3]
 
-# def test_dm_invalid_token():
+    user4 = auth_register_v2("four@gmail.com", "password", "four", "Lastname")
+    user5 = auth_register_v2("five@gmail.com", "password", "five", "Lastname")
+    dm_invite_v1(user3["token"], 0, user5.get("auth_user_id"))
+    dm_invite_v1(user3["token"], 0, user4.get("auth_user_id"))
+    assert data["dmList"][0]["member_ids"] == [0, 1, 2, 3, 5, 4]
+
+def test_dm_invite_invalid_dm():
+
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
+    user1_id = user1.get("auth_user_id")
+    invalid_dm_id = 4
+    with pytest.raises(InputError):
+        assert dm_invite_v1(user["token"], invalid_dm_id, user1_id) == InputError
+
+def test_dm_invite_invalid_uid():
+
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
+    id_list = [user1.get("auth_user_id")]
+    dm_create_v1(user["token"], id_list)
+
+    invalid_id = 8
+    with pytest.raises(InputError):
+        assert dm_invite_v1(user["token"], 0, invalid_id) == InputError
+  
+def test_dm_inviter_not_in_dm():
+
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
+    user2 = auth_register_v2("two@gmail.com", "password", "Two", "Lastname")
+    user3 = auth_register_v2("three@gmail.com", "password", "Three", "Lastname")
+    user3_id = user3.get("auth_user_id")
+    id_list = [user1.get("auth_user_id")]
+    dm_create_v1(user["token"], id_list)
+
+    with pytest.raises(AccessError):
+        assert dm_invite_v1(user2["token"], 0, user3_id) == AccessError
 # ------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------------------------------
