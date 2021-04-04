@@ -13,6 +13,7 @@ data = {
     "accData": [],
     "channelList": [],
     "message_ids": [],
+    "dmList": [],
 }
 
 secretSauce = "placeholder"
