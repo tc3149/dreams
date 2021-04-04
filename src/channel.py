@@ -257,14 +257,6 @@ def channel_messages_v2(token, channel_id, start):
     if valid_channelid(channel_id) is False:
         raise AccessError("Error: Invalid channel")
 
-    # Check if user id is valid
-    if valid_userid(auth_user_id) is False:
-        raise AccessError("Error: Invalid user id")
-
-    # Check if channel id is valid
-    if valid_channelid(channel_id) is False:
-        raise AccessError("Error: Invalid channel")
-
     #Check if user is authorised to be in the channel
     authorisation = False
     for channel in data["channelList"]:
