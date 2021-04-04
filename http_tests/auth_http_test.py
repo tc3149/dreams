@@ -5,7 +5,6 @@ import jwt
 from src.database import data, secretSauce
 from src import config
 from src.other import clear_v1
-from src.auth import auth_logout_v1
 
 # ------------------------------------------------------------------------------
 # REGISTER TEST FUNCTIONS
@@ -85,6 +84,7 @@ def test_http_auth_register_short_last():
     respD = json.loads(rawResponseData.text)
 
     assert respD["code"] == 400 
+
 def test_http_auth_register_long_first():
     requests.delete(config.url + "clear/v1")
 
@@ -122,7 +122,17 @@ def test_http_auth_register_long_last():
 
 def test_http_auth_login_working():
     requests.delete(config.url + "clear/v1")
-    test_http_auth_register_working()
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # ----------------------------
 
     funcURL = "auth/login/v2"
     inputData = {
@@ -139,7 +149,17 @@ def test_http_auth_login_working():
 
 def test_http_auth_login_invalid_email():
     requests.delete(config.url + "clear/v1")
-    test_http_auth_register_working()
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # ----------------------------
 
     funcURL = "auth/login/v2"
     inputData = {
@@ -153,7 +173,17 @@ def test_http_auth_login_invalid_email():
 
 def test_http_auth_login_unregistered_email():
     requests.delete(config.url + "clear/v1")
-    test_http_auth_register_working()
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # ----------------------------
 
     funcURL = "auth/login/v2"
     inputData = {
@@ -167,7 +197,17 @@ def test_http_auth_login_unregistered_email():
 
 def test_http_auth_login_incorrect_password():
     requests.delete(config.url + "clear/v1")
-    test_http_auth_register_working()
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # ----------------------------
 
     funcURL = "auth/login/v2"
     inputData = {
@@ -207,7 +247,7 @@ def test_http_logout_working():
         "is_success": True
     }
 
-def test_http_logout_invalid_token_format():
+def test_http_logout_invalid_token_key():
     requests.delete(config.url + "clear/v1")
 
     # Register--------------------
@@ -222,12 +262,12 @@ def test_http_logout_invalid_token_format():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"invalidKey": "notAnInt"}, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"invalidKey": 6}, secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
 
-def test_http_logout_nonexistant_token():
+def test_http_logout_invalid_token_value():
     requests.delete(config.url + "clear/v1")
 
     # Register--------------------
@@ -242,7 +282,47 @@ def test_http_logout_nonexistant_token():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"invalidKey": "notAnInt"}, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"sessionId": "notAnInt"}, secretSauce, algorithm="HS256")
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD["code"] == 403
+
+def test_http_logout_invalid_token_type():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # ----------------------------
+
+    funcURL = "auth/logout/v1"
+    inputData = jwt.encode({"invalidKey": 9999}, secretSauce, algorithm="HS256")
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD["code"] == 403
+
+def test_http_logout_nonexistant_user():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # ----------------------------
+
+    funcURL = "auth/logout/v1"
+    inputData = jwt.encode({"sessionId": -99999}, secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403

@@ -12,12 +12,9 @@ def clear_v1():
     '''
     Reset Everything to default state
     '''
-    
-    global data
     data["accData"].clear() 
     data["channelList"].clear() 
     data["message_ids"].clear()
-
     with open("serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(data))
 

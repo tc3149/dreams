@@ -107,6 +107,12 @@ def create_handle(first, last):
     createUserHandle = createUserHandle.replace("@", "")
     return createUserHandle
 
+def search_user(user):
+    for items in data["accData"]:
+        if items["id"] == user:
+            return True
+    return False
+
 def get_user_id_from_token(token):
     sessionId = is_valid_token_return_data(token)
     for user in data["accData"]:
@@ -119,17 +125,15 @@ def get_user_id_from_token(token):
 def is_valid_token_return_data(token):
     tokenData = jwt.decode(token, secretSauce, algorithms="HS256")
     if not isinstance(tokenData, dict):
-        raise AccessError(description="Token does not exist")
+        raise AccessError(description="Invalid type")
 
-    checkKey = tokenData.keys()
-    for key in checkKey:
-        if key == "sessionId":
-            return tokenData
-    raise AccessError(description="Token does not exist")
+    checkKey = list(tokenData.keys())[0]
+    if checkKey == "sessionId" and isinstance(tokenData["sessionId"], int):
+        return tokenData
+    raise AccessError(description="Invalid key or value")
 
 
 # Save to data file
 def saveData():
     with open("serverDatabase.json", "w") as dataFile:
-        global data
         dataFile.write(dumps(data))
