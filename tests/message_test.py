@@ -12,7 +12,7 @@ from src.message import message_send_v2
 from src.message import message_edit_v2
 from src.message import message_remove_v1
 from src.message import message_senddm_v1
-from src.dm import dm_create_v1
+from src.dm import dm_create_v1, dm_messages_v1
 
 # MESSAGE SEND TESTING
 
@@ -280,3 +280,18 @@ def testsenddm_user_notin_dm():
 
 
 # valid testing
+def testsenddm_valid():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+    message = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
+
+    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'Jonathan'
+        assert msg["u_id"] == user2["auth_user_id"]
+
+
