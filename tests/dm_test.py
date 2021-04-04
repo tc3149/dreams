@@ -6,7 +6,7 @@ from src.error import InputError, AccessError
 from src.channel import channel_messages_v2, channel_invite_v2, channel_details_v2, channel_leave_v1, channel_addowner_v1, checkOwner
 from src.channels import channels_create_v2, channels_list_v2
 from src.database import data, secretSauce
-from src.dm import make_dm_name, dm_create_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_messages_v1
+from src.dm import make_dm_name, dm_create_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_messages_v1, dm_invite_v1
 
 # ------------------------------------------------------------------------------------------------------
 #dm create tests

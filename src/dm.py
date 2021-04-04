@@ -1,7 +1,7 @@
 import re
 from src.error import InputError, AccessError
 from src.database import data
-from src.utils import get_user_id_from_token, make_dm_name, valid_userid
+from src.utils import get_user_id_from_token, make_dm_name, valid_userid, valid_dmid
 
 '''
 Direct Messages
@@ -52,8 +52,6 @@ def dm_list_v1(token):
     
     return {'dms': newdmList}
 
-
-'''
 def dm_invite_v1(token, dm_id, u_id):
     # Obtain user id from token
     #
@@ -92,10 +90,6 @@ def dm_invite_v1(token, dm_id, u_id):
             dm["member_ids"].append(u_id)
 
     return {}
-    
-
-
-
 
 def dm_messages_v1(token, dm_id, start):
 
