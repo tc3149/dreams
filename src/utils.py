@@ -18,6 +18,13 @@ def valid_channelid(channel_id):
             return True
     return False
 
+def valid_dmid(dm_id):
+    # Check if dm id is valid
+    for dm in data["dmList"]:
+        if dm.get("id") is dm_id:
+            return True
+    return False
+
 
 def check_channelprivate(channel_id):
 
@@ -131,6 +138,14 @@ def is_valid_token_return_data(token):
     if checkKey == "sessionId" and isinstance(tokenData["sessionId"], int):
         return tokenData
     raise AccessError(description="Invalid key or value")
+
+def make_dm_name(u_ids):
+    handle_list = []
+    for user in data["accData"]:
+        if user["id"] in u_ids:
+            handle_list.append(user["handle"])
+    sortedHandle = sorted(handle_list)
+    return ",".join(sortedHandle)
 
 
 # Save to data file

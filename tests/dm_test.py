@@ -6,7 +6,7 @@ from src.error import InputError, AccessError
 from src.channel import channel_messages_v2, channel_invite_v2, channel_details_v2, channel_leave_v1, channel_addowner_v1, checkOwner
 from src.channels import channels_create_v2, channels_list_v2
 from src.database import data, secretSauce
-from src.dm import make_dm_name, dm_create_v1, dm_leave_v1, dm_list_v1
+from src.dm import make_dm_name, dm_create_v1, dm_leave_v1, dm_list_v1, dm_remove_v1
 
 # ------------------------------------------------------------------------------------------------------
 #dm create tests
@@ -136,13 +136,48 @@ def test_dm_leave_invalid_dm():
     with pytest.raises(AccessError):
         dm_leave_v1(temp, dm["dm_id"])
 
- 
-    # Owner Cannot Leave
 # ------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------------------------------
 # dm_remove_v1 tests:
     # Main Implementation
-#def test_dm_remove():
+    
+def test_dm_remove():
+    clear_v1()
+
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
+    id_list = []
+    id_list.append(user["auth_user_id"])
+    id_list.append(user2["auth_user_id"])
+
+    dm = dm_create_v1(user["token"], id_list)
+
+    dm_remove_v1(user["token"], dm["dm_id"])
+
+    assert dm_list_v1(user["token"]) == {'dms': []}
+    assert dm_list_v1(user2["token"]) == {'dms': []}
+
+    # Muyltiple main Implementations
+def test_dm_remove_multiple():
+    clear_v1()
+
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
+    id_list = []
+    id_list.append(user["auth_user_id"])
+    id_list.append(user2["auth_user_id"])
+
+    dm = dm_create_v1(user["token"], id_list)
+
+    dm2 = dm_create_v1(user2["token"], id_list)
+
+    dm_remove_v1(user["token"], dm["dm_id"])
+    dm_remove_v1(user2["token"], dm2["dm_id"])
+
+    assert dm_list_v1(user["token"]) == {'dms': []}
+    assert dm_list_v1(user2["token"]) == {'dms': []}
 
 # ------------------------------------------------------------------------------------------------------
