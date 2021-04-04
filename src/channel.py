@@ -268,8 +268,6 @@ def channel_messages_v2(token, channel_id, start):
     if authorisation is False:
         raise AccessError("User is not in channel")
 
-
-
     # Return Function
     for channel in data["channelList"]:
         if channel["id"] is channel_id:

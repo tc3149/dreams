@@ -150,5 +150,5 @@ def make_dm_name(u_ids):
 
 # Save to data file
 def saveData():
-    with open("serverDatabase.json", "w") as dataFile:
-        dataFile.write(dumps(data))
+    with open("serverDatabase.json", "w") as file:
+        file.write(dumps(data))

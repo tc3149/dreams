@@ -1,7 +1,7 @@
 import re
-from src.database import data
 from src.error import InputError, AccessError
-from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid
+from src.database import data
+from src.utils import get_user_id_from_token, make_dm_name, valid_userid
 
 '''
 Direct Messages
@@ -53,10 +53,49 @@ def dm_list_v1(token):
     return {'dms': newdmList}
 
 
-
 '''
 def dm_invite_v1(token, dm_id, u_id):
-'''
+    # Obtain user id from token
+    #
+    auth_user_id = get_user_id_from_token(token)
+
+    # Check if dm_id exists
+    dmExists = False
+    for dm in data["dmList"]:
+        if dm_id is dm["id"]:
+            # Dm exists
+            dmExists = True
+            break
+    if dmExists is False:
+        # Dm doesnt exist
+        raise InputError("DM does not exist")
+
+    # Check if u_id refers to a valid user
+    if valid_userid(u_id) is False:
+        raise InputError("User ID does not exist")
+
+    # Check if the inviter is part of the dm
+    authorised = False
+    for dm in data["dmList"]:
+        if dm.get("id") is dm_id:
+            if auth_user_id in dm.get("member_ids"):
+                authorised = True
+                break
+    if authorised is False:
+        raise AccessError("User is not a part of the DM to be able to invite")
+
+    # Security measures complete
+    # assumption they will not be in the dm already?
+    # Add user id into the list of member ids
+    for dm in data["dmList"]:
+        if dm.get("id") is dm_id:
+            dm["member_ids"].append(u_id)
+
+    return {}
+    
+
+
+
 
 def dm_messages_v1(token, dm_id, start):
 
