@@ -256,7 +256,7 @@ def testsenddm_invalid_token():
 
 
 # invalid dm_ID
-def testsenddm_invalid_token():
+def testsenddm_invalid_dm_ID():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -285,7 +285,7 @@ def testsenddm_valid():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
-    message = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
+    message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
 
     message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
 
@@ -293,5 +293,14 @@ def testsenddm_valid():
         assert msg["message_id"] == 1
         assert msg["message"] == 'Jonathan'
         assert msg["u_id"] == user2["auth_user_id"]
+
+    message_senddm_v1(user["token"], dm["dm_id"], "Thomas")
+    
+    message_info2 = dm_messages_v1(user["token"], dm["dm_id"], 0)
+
+    for second in message_info2["messages"]:
+        if second["u_id"] is user["auth_user_id"]:
+            assert second["message_id"] == 2
+            assert second["message"] == 'Thomas'
 
 
