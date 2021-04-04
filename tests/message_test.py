@@ -11,6 +11,8 @@ from src.channel import channel_messages_v2
 from src.message import message_send_v2
 from src.message import message_edit_v2
 from src.message import message_remove_v1
+from src.message import message_senddm_v1
+from src.dm import dm_create_v1, dm_messages_v1
 
 # MESSAGE SEND TESTING
 
@@ -26,8 +28,8 @@ def testsend_long_message():
         message_send_v2(user["token"], channel["channel_id"], temp)
 
 
-# invalid auth id
-def testsend_invalid_auth_id():
+# invalid  token ID
+def testsend_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
@@ -88,9 +90,9 @@ def testedit_long_message():
         message_edit_v2(user["token"], m_id, long_message)
 
 
-# invalid auth id
+# invalid token ID
 
-def testedit_invalid_auth_id():
+def testedit_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
@@ -162,8 +164,8 @@ def testedit_valid_case():
 
 # MESSAGE REMOVE TESTING
 
-# invalid auth id
-def testremove_invalid_auth_id():
+# invalid token ID
+def testremove_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
@@ -223,4 +225,82 @@ def testremove_valid_case():
         assert msg["message"] == ''
         assert msg["u_id"] == user1["auth_user_id"]
 
-        
+
+
+
+# MESSAGE SENDDM TESTING
+
+# too long of a message, exceeds 1k words
+def testsenddm_long_message():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    temp = 'x' * 2000
+
+    with pytest.raises(InputError):
+        message_senddm_v1(user["token"], dm["dm_id"], temp)
+
+# invalid token ID
+def testsenddm_invalid_token():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+
+    with pytest.raises(AccessError):
+        message_senddm_v1(invalid_token, dm["dm_id"], "Thomas Chen")
+
+
+# invalid dm_ID
+def testsenddm_invalid_dm_ID():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    with pytest.raises(InputError):
+        message_senddm_v1(user["token"], "invalid_dmID", "Thomas Chen")
+
+
+# user not in DM
+def testsenddm_user_notin_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])  
+
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+
+    with pytest.raises(AccessError):
+        message_senddm_v1(user3["token"], dm["dm_id"], "Jonathan Qiu")
+
+
+# valid testing
+def testsenddm_valid():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+    message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
+
+    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'Jonathan'
+        assert msg["u_id"] == user2["auth_user_id"]
+
+    message_senddm_v1(user["token"], dm["dm_id"], "Thomas")
+    
+    message_info2 = dm_messages_v1(user["token"], dm["dm_id"], 0)
+
+    for second in message_info2["messages"]:
+        if second["u_id"] is user["auth_user_id"]:
+            assert second["message_id"] == 2
+            assert second["message"] == 'Thomas'
+
+
