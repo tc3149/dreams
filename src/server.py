@@ -102,6 +102,48 @@ def usersAll():
     return dumps(returnData)
 
 
+# #############################################################################
+#                                                                             #
+#                           MESSAGE FUNCTIONS                                 #
+#                                                                             #
+# #############################################################################
+
+@APP.route("/message/send/v2", methods=["POST"])
+def messageSend():
+    inputData = request.get_json()
+    returnData = message_send_v2(inputData["token"], inputData["channel_id"], inputData["message"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/message/edit/v2", methods=["PUT"])
+def messageEdit():
+    inputData = request.get_json()
+    returnData = message_edit_v2(inputData["token"], inputData["message_id"], inputData["message"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/message/remove/v1", methods=["DELETE"])
+def messageRemove():
+    inputData = request.get_json()
+    returnData = message_remove_v1(inputdata["token"], inputData["message_id"])
+    saveData()
+    return dumps(returnData)
+    
+
+
+
+# #############################################################################
+#                                                                             #
+#                           CHANNEL FUNCTIONS                                 #
+#                                                                             #
+# #############################################################################
+
+@APP.route("/channel/addowner/v1", methods=["POST"])
+def channelAddowner():
+    inputData = request.get_json()
+    returnData = channel_addowner_v1(inputData["token"], inputData["channel_id"], inputData["u_id"])
+    saveData()
+    return dumps(returnData)
 
 # ##############################################################################
 
