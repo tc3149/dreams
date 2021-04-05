@@ -256,7 +256,7 @@ def channel_messages_v2(token, channel_id, start):
 
     # Check if channel id is valid
     if valid_channelid(channel_id) is False:
-        raise AccessError("Error: Invalid channel")
+        raise InputError("Error: Invalid channel")
 
     #Check if user is authorised to be in the channel
     authorisation = False
@@ -272,7 +272,7 @@ def channel_messages_v2(token, channel_id, start):
     # Return Function
     for channel in database.data["channelList"]:
         if channel["id"] is channel_id:
-            messages = channel["messages"]
+            messages = channel["messages"].copy()
 
     if start > len(messages):
         raise InputError("Start is greater than total number of messages")
