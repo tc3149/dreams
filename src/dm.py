@@ -335,7 +335,7 @@ def dm_details_v1 (token, dm_id):
             break 
     if not dmExists:
         #dm does not exist
-        raise InputError("Dm does not exist")
+        raise InputError(description="Dm does not exist")
 
     # check if user is a part of the dm
     dm_member = False 
@@ -345,7 +345,7 @@ def dm_details_v1 (token, dm_id):
                 if member == user_id:
                     dm_member = True
             if not dm_member:
-                raise AccessError("User is not a member of this DM")
+                raise AccessError(description="User is not a member of this DM")
 
     allMembers = []
     for dm in database.data["dmList"]:

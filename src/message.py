@@ -33,18 +33,18 @@ def message_send_v2(token, channel_id, message):
     length = int(len(message))
 
     if length > 1000:
-        raise InputError("Error: Message is more than 1000 characters")
+        raise InputError(description="Error: Message is more than 1000 characters")
 
     u_id = get_user_id_from_token(token)
 
     if not message:
-        raise InputError("Error: Empty Message")
+        raise InputError(description="Error: Empty Message")
 
     if valid_channelid(channel_id) is False:
-        raise InputError("Error: Invalid channel")
+        raise InputError(description="Error: Invalid channel")
 
     if check_useralreadyinchannel(u_id, channel_id) is False:
-        raise AccessError("Error: User not in channel")
+        raise AccessError(description="Error: User not in channel")
         
 
     # setting the time and date
@@ -102,7 +102,7 @@ def message_remove_v1(token, message_id):
     u_id = get_user_id_from_token(token)
 
     if check_messageid(message_id) is True:
-        raise InputError("Error: Invalid message ID")
+        raise InputError(description="Error: Invalid message ID")
 
     channel_id = getchannelID(message_id)
 
@@ -111,19 +111,19 @@ def message_remove_v1(token, message_id):
             if message_info.get("message_id") is message_id:
                 if checkOwner(u_id, channel_id):
                     if message_info['message'] is None:
-                        raise InputError("Message already removed")
+                        raise InputError(description="Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
                         break
                 
                 elif message_info.get("u_id") is u_id:
                     if message_info['message'] is None:
-                        raise InputError("Message already removed")
+                        raise InputError(description="Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
                         break   
                 else:
-                    raise AccessError("Erorr: Remover not an owner nor original poster")
+                    raise AccessError(description="Error: Remover not an owner nor original poster")
             
             
     return {}
@@ -158,15 +158,15 @@ def message_edit_v2(token, message_id, message):
     length = int(len(message))
 
     if length > 1000:
-        raise InputError("Message is more than 1000 characters")
+        raise InputError(description="Message is more than 1000 characters")
 
     u_id = get_user_id_from_token(token)
 
     if not message:
-        raise InputError("Error: Empty Message")
+        raise InputError(description="Error: Empty Message")
 
     if check_messageid(message_id) is True:
-        raise InputError("Error: Invalid message ID")
+        raise InputError(description="Error: Invalid message ID")
 
     channel_id = getchannelID(message_id)
 
@@ -182,7 +182,7 @@ def message_edit_v2(token, message_id, message):
                     break
                 
                 else:
-                    raise AccessError("Error: Editor not an owner nor original poster")
+                    raise AccessError(description="Error: Editor not an owner nor original poster")
 
     return {}
 
@@ -216,18 +216,18 @@ def message_senddm_v1(token, dm_id, message):
     length = int(len(message))
 
     if length > 1000:
-        raise InputError("Message is more than 1000 characters")
+        raise InputError(description="Message is more than 1000 characters")
 
     u_id = get_user_id_from_token(token)
 
     if not message:
-        raise InputError("Error: Empty Message")
+        raise InputError(description="Error: Empty Message")
 
     if valid_dmid(dm_id) is False:
-        raise InputError("Error: Invalid dm ID")
+        raise InputError(description="Error: Invalid dm ID")
 
     if check_useralreadyindm(u_id, dm_id) is False:
-        raise AccessError("Error: User not in dm")
+        raise AccessError(description="Error: User not in dm")
 
     temp = datetime.now()
     remove_temp = temp.replace(microsecond = 0)
@@ -281,7 +281,7 @@ Return Value:
 '''
 def message_share_v1(token,og_message_id,message,channel_id,dm_id):
     if channel_id == -1 and dm_id == -1:
-        raise InputError("No channel or dm id specified")
+        raise InputError(description="No channel or dm id specified")
 
     user_id = get_user_id_from_token(token)
     # Set og_message to False
@@ -304,10 +304,10 @@ def message_share_v1(token,og_message_id,message,channel_id,dm_id):
                         if dmMessages["message_id"] == og_message_id:
                             og_message = dmMessages["message"]
             if not og_message:
-                raise InputError("Message does not exist")
+                raise InputError(description="Message does not exist")
             final_message = message + '\n\n"""\n' + og_message + '\n"""'
             if len(final_message) > 1000 or len(final_message) == 0:
-                raise InputError("Messages must be between 0 and 1000 characters")
+                raise InputError(description="Messages must be between 0 and 1000 characters")
             shared_message_id = message_senddm_v1(token,dm_id,final_message)        
         else:
             raise AccessError ('User not member of target dm')

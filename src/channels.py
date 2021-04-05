@@ -26,7 +26,7 @@ def channels_list_v2(token):
             break
     
     if id_status is False:
-        raise AccessError("Error: Invalid user id")
+        raise AccessError(description="Error: Invalid user id")
 
     newchannelList = []
     for channel in database.data["channelList"]:
@@ -58,7 +58,7 @@ def channels_listall_v2(token):
             break
     
     if id_status is False:
-        raise AccessError("Error: Invalid user id")
+        raise AccessError(description="Error: Invalid user id")
 
     newchannelList = []
     for channel in database.data["channelList"]:
@@ -98,10 +98,10 @@ def channels_create_v2(token, name, is_public):
     '''
     # Check if length of name is valid
     if len(name) > 20:
-        raise InputError("Error: Name is greater than 20 characters")
+        raise InputError(description="Error: Name is greater than 20 characters")
 
     if len(name) < 1:
-        raise InputError("Error: Name is less than 1 character")
+        raise InputError(description="Error: Name is less than 1 character")
 
     # Check if valid user id
     id_status = False
@@ -111,7 +111,7 @@ def channels_create_v2(token, name, is_public):
             break
     
     if id_status is False:
-        raise AccessError("Error: Invalid user id")
+        raise AccessError(description="Error: Invalid user id")
     
     channel_id = len(database.data["channelList"])
 

@@ -20,14 +20,14 @@ def admin_user_remove_v1(token, u_id):
                 ownerCount += 1 
         
         if ownerCount == 1:
-            raise InputError('User is currently the only owner of Dreams')
+            raise InputError(description='User is currently the only owner of Dreams')
     
     #auth_user_id not an owner
     for user in database.data["accData"]:
         if user["id"] == auth_user_id:
             permission_id = user["permission"]
     if permission_id != 1:
-        raise AccessError("User is not an owner")
+        raise AccessError(description="User is not an owner")
     
     # Change all user message contents to "Remove User"
     for channel in database.data['channelList']:
@@ -71,7 +71,7 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         if user["id"] == auth_user_id:
             auth_permission_id = user["permission"]
     if auth_permission_id != 1:
-        raise AccessError('User is not an owner')
+        raise AccessError(description='User is not an owner')
 
     #permission_id is not valid
     if permission_id == 1 or permission_id == 2:
@@ -80,7 +80,7 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
             if user["id"] == u_id:
                 user["permission"] = permission_id
     else:
-        raise InputError('permission_id does not refer to a value permission')
+        raise InputError(description='permission_id does not refer to a value permission')
 
     return{}
 
