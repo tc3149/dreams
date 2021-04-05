@@ -209,7 +209,7 @@ def testsend_valid_case():
         "message": "lol",
     }
     messageSend = requests.post(config.url + funcURL, json=inputData)
-    messageSendR = json.loads(messageSend.text)
+    _ = json.loads(messageSend.text)
 
     # Channel Message Info -------
     funcURL = "channel/messages/v2"
@@ -361,7 +361,7 @@ def testedit_invalid_mID():
         "message": "Thomas Chen and Jonathan Qiu",
     }
     messageSend = requests.post(config.url + funcURL, json=inputData)
-    messageSendR = json.loads(messageSend.text)
+    _ = json.loads(messageSend.text)
     
     # Message Edit ---------
     funcURL = "message/edit/v2"
@@ -478,7 +478,7 @@ def testedit_valid_case():
         "message": "Jonathan",
     }
     messageEdit = requests.put(config.url + funcURL, json=inputData)
-    messageEditR = json.loads(messageEdit.text)
+    _ = json.loads(messageEdit.text)
     
     # Channel Message Info -------
     funcURL = "channel/messages/v2"
@@ -561,7 +561,7 @@ def testedit_comprehensive_valid():
         "message": "Jonathan",
     }
     messageEdit = requests.put(config.url + funcURL, json=inputData)
-    messageEditR = json.loads(messageEdit.text)
+    _ = json.loads(messageEdit.text)
     
     # Channel Message Info -------
     funcURL = "channel/messages/v2"
@@ -664,7 +664,7 @@ def testremove_invalid_mID():
         "message": "Thomas Chen and Jonathan Qiu",
     }
     messageSend = requests.post(config.url + funcURL, json=inputData)
-    messageSendR = json.loads(messageSend.text)
+    _ = json.loads(messageSend.text)
     
     # Message Remove ----
     funcURL = "message/remove/v1"
@@ -811,7 +811,7 @@ def testeremove_valid():
         "message_id": messageSendR["message_id"],
     }
     messageRemove = requests.delete(config.url + funcURL, json=inputData)
-    messageRemoveR = json.loads(messageRemove.text)
+    _ = json.loads(messageRemove.text)
     
     # Channel Message Info -------
     funcURL = "channel/messages/v2"
@@ -892,7 +892,7 @@ def testremove_comprehensive_valid():
         "message_id": messageSendR["message_id"],
     }
     messageRemove = requests.delete(config.url + funcURL, json=inputData)
-    messageRemoveR = json.loads(messageRemove.text)
+    _ = json.loads(messageRemove.text)
     
     # Channel Message Info -------
     funcURL = "channel/messages/v2"
@@ -1047,7 +1047,7 @@ def testsenddm_invalid_dmID():
         "u_ids": userList,
     }
     dm = requests.post(config.url + funcURL, json=inputData)
-    dmR = json.loads(dm.text)
+    _ = json.loads(dm.text)
 
     # Message Send DM -------
     funcURL = "message/senddm/v1"
@@ -1165,7 +1165,7 @@ def testsenddm_valid_case():
         "message": "Jonathan Qiu is such a nice guy",
     }
     messageSendDM = requests.post(config.url + funcURL, json=inputData)
-    messageSendDMR = json.loads(messageSendDM.text)
+    _ = json.loads(messageSendDM.text)
 
     # DM Message Info -------
     funcURL = "dm/messages/v1"
@@ -1193,7 +1193,7 @@ def testsenddm_valid_case():
         "message": "Look at Thomas Chen, so inspirational",
     }
     messageSendDM2 = requests.post(config.url + funcURL, json=inputData)
-    messageSendDM2R = json.loads(messageSendDM2.text)
+    _ = json.loads(messageSendDM2.text)
 
     # Channel Message Info v2 -------
     funcURL = "dm/messages/v1"
