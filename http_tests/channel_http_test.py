@@ -33,7 +33,7 @@ def testjoin_invalid_channelID():
         "name_last": "nameLast",
     }
     user2 = requests.post(config.url + funcURL, json=inputData)
-    user2R = json.loads(user2.text)
+    _ = json.loads(user2.text)
 
     # Channel Create -------
     funcURL = "channels/create/v2"
@@ -43,7 +43,7 @@ def testjoin_invalid_channelID():
         "is_public": True,
     }
     channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
+    _ = json.loads(channel.text)
 
     # Channel Join -------
     funcURL = "channel/join/v2"
@@ -80,7 +80,7 @@ def testjoin_invalid_tokenn():
         "name_last": "nameLast",
     }
     user2 = requests.post(config.url + funcURL, json=inputData)
-    user2R = json.loads(user2.text)
+    _ = json.loads(user2.text)
 
     # Channel Create -------
     funcURL = "channels/create/v2"
@@ -147,7 +147,7 @@ def testjoin_joined_already():
         "channel_id": channelR["channel_id"],
     }
     join = requests.post(config.url + funcURL, json=inputData)
-    joinR = json.loads(join.text)
+    _ = json.loads(join.text)
 
     # Channel Join Error -------
     funcURL = "channel/join/v2"
@@ -296,7 +296,7 @@ def testjoin_valid_case():
         "channel_id": channelR["channel_id"],
     }
     join = requests.post(config.url + funcURL, json=inputData)
-    joinR = json.loads(join.text)
+    _ = json.loads(join.text)
 
     # Channel Join (Third Person) -------
     funcURL = "channel/join/v2"
@@ -305,7 +305,7 @@ def testjoin_valid_case():
         "channel_id": channelR["channel_id"],
     }
     join2 = requests.post(config.url + funcURL, json=inputData)
-    join2R = json.loads(join2.text)
+    _ = json.loads(join2.text)
 
     # Channel Details
     funcURL = "channel/details/v2"
@@ -421,7 +421,7 @@ def testaddowner_invalid_uID():
         "name_last": "nameLast",
     }
     user2 = requests.post(config.url + funcURL, json=inputData)
-    user2R = json.loads(user2.text)
+    _ = json.loads(user2.text)
 
     # Channel Create -------
     funcURL = "channels/create/v2"
@@ -480,7 +480,7 @@ def testaddowner_invalid_channelID():
         "is_public": True,
     }
     channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
+    _ = json.loads(channel.text)
 
     # Add Owner ------
     funcURL = "channel/addowner/v1"
@@ -518,7 +518,7 @@ def testaddowner_already_owner():
         "name_last": "nameLast",
     }
     user2 = requests.post(config.url + funcURL, json=inputData)
-    user2R = json.loads(user2.text)
+    _ = json.loads(user2.text)
 
     # Channel Create -------
     funcURL = "channels/create/v2"
@@ -528,7 +528,7 @@ def testaddowner_already_owner():
         "is_public": True,
     }
     channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
+    _ = json.loads(channel.text)
 
     # Add Owner ------
     funcURL = "channel/addowner/v1"
@@ -543,7 +543,7 @@ def testaddowner_already_owner():
 
 
 # Non-Authorised User Adding Owners
-def testaddowner_already_owner():
+def testaddowner_unauthorised_token():
     requests.delete(config.url + "clear/v1")
 
     # Register --------
@@ -596,7 +596,7 @@ def testaddowner_already_owner():
         "channel_id": channelR["channel_id"],
     }
     join = requests.post(config.url + funcURL, json=inputData)
-    joinR = json.loads(join.text)
+    _ = json.loads(join.text)
 
     # Channel Join Person 3 -------
     funcURL = "channel/join/v2"
@@ -605,7 +605,7 @@ def testaddowner_already_owner():
         "channel_id": channelR["channel_id"],
     }
     join2 = requests.post(config.url + funcURL, json=inputData)
-    join2R = json.loads(join2.text)
+    _ = json.loads(join2.text)
  
     # Add Owner ------
     funcURL = "channel/addowner/v1"
@@ -673,7 +673,7 @@ def testaddowner_not_in_channel():
         "channel_id": channelR["channel_id"],
     }
     join = requests.post(config.url + funcURL, json=inputData)
-    joinR = json.loads(join.text)
+    _ = json.loads(join.text)
  
     # Add Owner ------
     funcURL = "channel/addowner/v1"
@@ -730,7 +730,7 @@ def testaddowner_valid_case():
         "channel_id": channelR["channel_id"],
     }
     join = requests.post(config.url + funcURL, json=inputData)
-    joinR = json.loads(join.text)
+    _ = json.loads(join.text)
  
     # Add Owner ------
     funcURL = "channel/addowner/v1"
@@ -740,7 +740,7 @@ def testaddowner_valid_case():
         "u_id": user2R["auth_user_id"],
     }
     addOwner = requests.post(config.url + funcURL, json=inputData)
-    addOwnerR = json.loads(addOwner.text)
+    _ = json.loads(addOwner.text)
 
     # Channel Details
     funcURL = "channel/details/v2"
