@@ -417,6 +417,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     return {
     }
 
+
 def channel_removeowner_v1(token, channel_id, u_id):
 
     auth_user_id = get_user_id_from_token(token)
