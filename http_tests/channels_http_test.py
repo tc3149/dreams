@@ -73,11 +73,11 @@ def test_http_channels_create_multiple():
         "is_public": True,
     }
     channel2 = requests.post(config.url + funcURL, json=inputData)
-    channel2R = json.loads(channel.text)
+    channel2R = json.loads(channel2.text)
     # ----------------------------
 
     assert channelR["channel_id"] == 0
-    assert channel2R["channel_id"] == 0
+    assert channel2R["channel_id"] == 1
 
 def test_http_channels_create_invalid_token():
 
