@@ -23,6 +23,7 @@ idData = {
     "userId": 0, 
     "sessionId": 0,
     "dmId": 0,
+    "messageId": 0, # starts from 1
 }
 
 secretSauce = "placeholder"

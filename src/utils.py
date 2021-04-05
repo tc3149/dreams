@@ -7,21 +7,21 @@ import jwt
 def valid_userid(auth_user_id):
     # Check if user id is valid
     for user in database.data["accData"]:
-        if user.get("id") is auth_user_id:
+        if user.get("id") == auth_user_id:
             return True
     return False
 
 def valid_channelid(channel_id):
     # Check if channel id is valid
     for channel in database.data["channelList"]:
-        if channel.get("id") is channel_id:
+        if channel.get("id") == channel_id:
             return True
     return False
 
 def valid_dmid(dm_id):
     # Check if dm id is valid
     for dm in database.data["dmList"]:
-        if dm.get("id") is dm_id:
+        if dm.get("id") == dm_id:
             return True
     return False
 
@@ -29,15 +29,15 @@ def valid_dmid(dm_id):
 def check_channelprivate(channel_id):
 
     for channel in database.data["channelList"]:
-        if channel.get("id") is channel_id:
-            if channel.get("is_public") is True:
+        if channel.get("id") == channel_id:
+            if channel.get("is_public") == True:
                 return False
     return True
 
 def check_useralreadyinchannel(auth_user_id, channel_id):
 
     for channel in database.data["channelList"]:
-        if channel.get("id") is channel_id:
+        if channel.get("id") == channel_id:
             for member in channel["member_ids"]:
                 if auth_user_id is member:
                     return True
@@ -45,7 +45,7 @@ def check_useralreadyinchannel(auth_user_id, channel_id):
 
 def check_useralreadyindm(auth_user_id, dm_id):
     for dms in database.data["dmList"]:
-        if dms.get("id") is dm_id:
+        if dms.get("id") == dm_id:
             for member in dms["member_ids"]:
                 if auth_user_id is member:
                     return True
@@ -57,7 +57,7 @@ def check_messageid(message_id):
 
     for i in database.data["channelList"]:
         for message1 in i['messages']:
-            if message1.get('message_id') is message_id:
+            if message1.get('message_id') == message_id:
                 return False
     return True
 
@@ -162,3 +162,13 @@ def make_dm_name(u_ids):
 def saveData():
     with open("serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
+
+def getUserAccData(u_id):
+    for user in database.data["accData"]:
+        if user["id"] == u_id:
+            return user
+
+def getUserProfileData(u_id):
+    for user in database.data["userProfiles"]:
+        if user["u_id"] == u_id:
+            return user

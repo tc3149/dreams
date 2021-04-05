@@ -9,12 +9,14 @@ from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1
 from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
-from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1
+from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1
 from src.utils import saveData
 from src.other import clear_v1, search_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
-from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2
-from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1
+from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2, channel_invite_v2
+from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1, dm_details_v1
+from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
+
 
 def defaultHandler(err):
     response = err.get_response()
@@ -150,6 +152,12 @@ def messageSendDM():
     saveData()
     return dumps(returnData)
 
+@APP.route("/message/share/v1", methods=["POST"])
+def messageShare():
+    inputData = request.get_json()
+    returnData = message_share_v1(inputData["token"], inputData["og_message_id"], inputData["message"],inputData["channel_id"],inputData["dm_id"])
+    saveData()
+    return dumps(returnData)
 
 
 # #############################################################################
@@ -202,6 +210,15 @@ def channelLeave():
     returnData = channel_leave_v1(inputData["token"], inputData["channel_id"])
     saveData()
     return dumps(returnData)
+
+@APP.route("/channel/invite/v2", methods = ["POST"])
+def channelInvite():
+    inputData = request.get_json()
+    returnData = channel_invite_v2(inputData["token"],inputData["channel_id"],inputData["u_id"])
+    saveData()
+    return dumps(returnData)
+
+
 
 # #############################################################################
 #                                                                             #
@@ -269,18 +286,44 @@ def dmInvite():
 @APP.route("/dm/leave/v1", methods=["POST"])
 def dmLeave():
     inputData = request.get_json()
-    dm_leave_v1(inputData["token"], inputData["dm_id"])
+    returnData = dm_leave_v1(inputData["token"], inputData["dm_id"])
     saveData()
-    return {}
+    return dumps(returnData)
 
 @APP.route("/dm/remove/v1", methods=["DELETE"])
 def dmRemove():
     inputData = request.get_json()
-    dm_remove_v1(inputData["token"], inputData["dm_id"])
+    returnData = dm_remove_v1(inputData["token"], inputData["dm_id"])
     saveData()
-    return {}
+    return dumps(returnData)
 
-# DM_DETAILS WRAPPING HERE
+@APP.route("/dm/details/v1", methods=["GET"])
+def dmDetails():
+    inputToken = request.args.get("token")
+    inputdmID = int(request.args.get("dm_id"))
+    returnData = dm_details_v1(inputToken, inputdmID)
+    saveData()
+    return dumps(returnData)
+
+# #############################################################################
+#                                                                             #
+#                           ADMIN FUNCTIONS                                   #
+#                                                                             #
+# #############################################################################
+
+@APP.route("/admin/user/remove/v1", methods = ["DELETE"])
+def adminUserRemove():
+    inputData = request.get_json()
+    returnData = admin_user_remove_v1(inputData["token"], inputData["u_id"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/admin/userpermission/change/v1", methods = ["POST"])
+def adminUserpermissionChange():
+    inputData = request.get_json()
+    returnData = admin_userpermission_change_v1(inputData["token"], inputData["u_id"], inputData["permission_id"])
+    saveData()
+    return dumps(returnData)
 
 
 # #############################################################################

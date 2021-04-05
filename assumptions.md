@@ -8,6 +8,27 @@
 - auth_register_v1:
     - Assumption made regarding handle appending in the function auth_register_v1 of auth.py : "The addition of this final number may result in the handle exceeding the 20 character limit." does not specify clearly if an appended handle is allowed to remain over the 20 character limit. Therefore we will make the assumption that when appending a handle, it IS ALLOWED to remain over 20 characters long.
 
+- auth_logout_v1:
+    - Assumes AccessError is session id doesnt exist
+
+
+**user.py**
+
+- user_profile_v2
+    - Assumes InputError if u_id does not exist
+
+- user_profile_setname_v2
+    - Assumes set both accData names and profileData names
+
+- user_profile_setemail_v2
+    - Assumes set both accData email and profileData email
+
+- user_profile_sethandle_v1
+    - Assumes set both accData handle and profileData handle
+
+- user_all_v1
+    - N/A
+
 
 **channels.py**
 
@@ -81,6 +102,12 @@
     - Assumes a message cannot be empty ('') as this is considered a removed message
     - Assumes an invalid channel ID will produce an InputError
 
+- message_share_v1
+    - Assumes a message id can be a channel message or a dm message regardless where shared to
+    - Assumes messages can be shared to the same channel
+    - The opposite of shared will be searched first for message id
+    - Assumes if both dm_id and channel_id are -1 or both not -1 returns InputError
+
 
 **dm.py**
 
@@ -101,6 +128,21 @@
 - dm_invite_v1
     - Owner cannot invite himself into the dm
     - Owner cannot invite members already in the dm into the dm
+
+- dm_details_v1
+    - Assumes removed users can be returned
+
+
+**admin.py**
+- admin_user_remove_v1
+    - Assumes owner cannot remove themself if they are the only owner
+    - Assumes removed user message data is left intact and only the 
+        message contents and user name is changed
+    - Removes accData but leaves profile data
+
+- admin_userpermission_change_v1
+    - Assumes owner cannot change their permission if they are the only owner
+    - Assumes you can change permission 1 to 1 and 2 to 2
 
 
 **other.py**

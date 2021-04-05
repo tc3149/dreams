@@ -8,7 +8,7 @@ from src import config
 from src.other import clear_v1
 from src.auth import auth_register_v2
 from src.message import message_send_v2, message_edit_v2, message_remove_v1
-from src.message import message_senddm_v1
+from src.message import message_senddm_v1, message_share_v1
 from src.channel import channel_messages_v2, channel_join_v2
 from src.channels import channels_create_v2
 from src.dm import dm_create_v1, dm_messages_v1
@@ -1346,3 +1346,362 @@ def testsenddm_valid_case():
             assert msg["message_id"] == 2
             assert msg["message"] == "Look at Thomas Chen, so inspirational"
 
+# ##############################################################################################################
+# MESSAGE/SHARE/V1 TESTS
+def test_http_message_share_not_member_of_channel_sharing_to():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(user2.text)
+    # ----------------------------
+    # Creating Channel--------------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testChannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+    # ----------------------------
+    # Message Send -------
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Thomas",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    
+    #checking message_share
+    funcURL = "message/share/v1"
+    invalidToken = jwt.encode({"sessionId": 8}, database.secretSauce, algorithm="HS256")
+    inputData ={
+        'token': invalidToken,
+        'og_message_id': messageSendR["message_id"],
+        'message': "",
+        'channel_id': channelR['channel_id'],
+        'dm_id': -1,
+    }
+    messageShare = requests.post(config.url + funcURL, json=inputData)
+    messageShareR = json.loads(messageShare.text)
+
+    assert messageShareR["code"] == 403
+
+def test_http_message_share_not_member_of_dm_sharing_to():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+     # Creating DM-----------------
+    funcURL = "dm/create/v1"
+    inputData = {
+        "token": userR["token"],
+        "u_ids": [user2R["auth_user_id"]],
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text) 
+    # ---------------------------
+    # Message Send -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Hi",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    invalidToken = jwt.encode({"sessionId": 8}, database.secretSauce, algorithm="HS256")
+    #checking message_share
+    funcURL = "message/share/v1"
+    inputData ={
+        'token': invalidToken,
+        'og_message_id': messageSendR["message_id"],
+        'message': "",
+        'channel_id': -1,
+        'dm_id': dmR['dm_id'],
+    }
+    messageShare = requests.post(config.url + funcURL, json=inputData)
+    messageShareR = json.loads(messageShare.text)
+
+    assert messageShareR["code"] == 403
+
+def test_http_message_share_Optional_message_channel():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(user2.text)
+    # ----------------------------
+    # Creating Channel--------------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testChannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+    # ----------------------------
+    # Message Send -------
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Hi",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    
+    #checking message_share
+    funcURL = "message/share/v1"
+    inputData ={
+        'token': userR["token"],
+        'og_message_id': messageSendR["message_id"],
+        'message': "Hello",
+        'channel_id': channelR['channel_id'],
+        'dm_id': -1,
+    }
+    messageShare = requests.post(config.url + funcURL, json=inputData)
+    messageShareR = json.loads(messageShare.text)
+
+    assert messageShareR == {"shared_message_id": messageShareR["shared_message_id"]}
+
+def test_http_message_share_no_optional_message():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(user2.text)
+    # ----------------------------
+    # Creating Channel--------------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testChannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+    # ----------------------------
+    # Message Send -------
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Hi",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    
+    #checking message_share
+    funcURL = "message/share/v1"
+    inputData ={
+        'token': userR["token"],
+        'og_message_id': messageSendR["message_id"],
+        'message': "",
+        'channel_id': channelR['channel_id'],
+        'dm_id': -1,
+    }
+    messageShare = requests.post(config.url + funcURL, json=inputData)
+    messageShareR = json.loads(messageShare.text)
+
+    assert messageShareR == {"shared_message_id": messageShareR["shared_message_id"]}
+
+def test_http_message_share_optional_message_dm():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+     # Creating DM-----------------
+    funcURL = "dm/create/v1"
+    inputData = {
+        "token": userR["token"],
+        "u_ids": [user2R["auth_user_id"]],
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text) 
+    # ---------------------------
+    # Message Send -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Hi",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    
+    #checking message_share
+    funcURL = "message/share/v1"
+    inputData ={
+        'token': userR["token"],
+        'og_message_id': messageSendR["message_id"],
+        'message': "Hello",
+        'channel_id': -1,
+        'dm_id': dmR["dm_id"],
+    }
+    messageShare = requests.post(config.url + funcURL, json=inputData)
+    messageShareR = json.loads(messageShare.text)
+
+    assert messageShareR == {"shared_message_id": messageShareR["shared_message_id"]}
+
+def test_http_message_share_no_optional_message_dm():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+     # Creating DM-----------------
+    funcURL = "dm/create/v1"
+    inputData = {
+        "token": userR["token"],
+        "u_ids": [user2R["auth_user_id"]],
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text) 
+    # ---------------------------
+    # Message Send -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Hi",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    
+    #checking message_share
+    funcURL = "message/share/v1"
+    inputData ={
+        'token': userR["token"],
+        'og_message_id': messageSendR["message_id"],
+        'message': "",
+        'channel_id': -1,
+        'dm_id': dmR["dm_id"],
+    }
+    messageShare = requests.post(config.url + funcURL, json=inputData)
+    messageShareR = json.loads(messageShare.text)
+
+    assert messageShareR == {"shared_message_id": messageShareR["shared_message_id"]}

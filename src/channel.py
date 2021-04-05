@@ -51,7 +51,7 @@ def channel_invite_v2(token, channel_id, u_id):
    
     if auth_id_status is False:
         # auth_user_id does not exist
-        raise InputError ("Inviting user does not exist")
+        raise InputError (description="Inviting user does not exist")
             
     
     #check if auth_user_id owner member of channel
@@ -64,7 +64,7 @@ def channel_invite_v2(token, channel_id, u_id):
                
     if owner_status is False:
         #user does not have access
-        raise AccessError ("User does not have access")
+        raise AccessError (description="User does not have access")
 
     #check if u_id exists
     u_id_status = False
@@ -252,11 +252,11 @@ def channel_messages_v2(token, channel_id, start):
     auth_user_id = get_user_id_from_token(token)
     # Check if user id is valid
     if valid_userid(auth_user_id) is False:
-        raise AccessError("Error: Invalid user id")
+        raise AccessError(description="Error: Invalid user id")
 
     # Check if channel id is valid
     if valid_channelid(channel_id) is False:
-        raise InputError("Error: Invalid channel")
+        raise InputError(description="Error: Invalid channel")
 
     #Check if user is authorised to be in the channel
     authorisation = False
@@ -267,7 +267,7 @@ def channel_messages_v2(token, channel_id, start):
                     authorisation = True
                     break
     if authorisation is False:
-        raise AccessError("User is not in channel")
+        raise AccessError(description="User is not in channel")
 
     # Return Function
     for channel in database.data["channelList"]:
@@ -275,7 +275,7 @@ def channel_messages_v2(token, channel_id, start):
             messages = channel["messages"].copy()
 
     if start > len(messages):
-        raise InputError("Start is greater than total number of messages")
+        raise InputError(description="Start is greater than total number of messages")
 
     # 0th index is the most recent message... therefore must reverse list?
     messages.reverse()
@@ -328,7 +328,7 @@ def channel_leave_v1(token, channel_id):
     auth_user_id = get_user_id_from_token(token)
     #Checking if channel is valid
     if valid_channelid(channel_id) is False:
-        raise InputError("Error: Channel ID is not a valid channel")
+        raise InputError(description="Error: Channel ID is not a valid channel")
     #Checking if user is in the channel and removing the user
     id_status = False
     for channel in database.data["channelList"]:
@@ -339,7 +339,7 @@ def channel_leave_v1(token, channel_id):
                     channel["member_ids"].remove(member)
     #If the user is invalid
     if id_status is False:
-        raise AccessError("Error: Authorised user is not a member of channel with channel_id")
+        raise AccessError(description="Error: Authorised user is not a member of channel with channel_id")
     return {
     }
 
@@ -367,15 +367,15 @@ def channel_join_v2(token, channel_id):
 
     # check whether channel is invalid
     if valid_channelid(channel_id) is False:
-        raise InputError("Error: Invalid channel")
+        raise InputError(description="Error: Invalid channel")
 
     # check if channel is private
     if check_channelprivate(channel_id) is True:
-        raise AccessError("Private Channel")
+        raise AccessError(description="Private Channel")
     
     # check user already in channel
     if check_useralreadyinchannel(auth_user_id, channel_id) is True:
-        raise AccessError("User already in channel")
+        raise AccessError(description="User already in channel")
 
     for channel in database.data["channelList"]:
         if channel["id"] is channel_id:
@@ -414,23 +414,23 @@ def channel_addowner_v1(token, channel_id, u_id):
     
     # If u_id is valid
     if valid_userid(u_id) is False:
-        raise InputError("Error: Invalid user id")
+        raise InputError(description="Error: Invalid user id")
     
     # If channel_id is valid
     if valid_channelid(channel_id) is False:
-        raise InputError("Error: Invalid channel ID")
+        raise InputError(description="Error: Invalid channel ID")
 
     # If u_id is in channel
     if check_useralreadyinchannel(u_id, channel_id) is False:
-        raise AccessError("Error: Not in channel")
+        raise AccessError(description="Error: Not in channel")
 
     # If the u_id is already an owner
     if checkOwner(u_id, channel_id) is True:
-        raise InputError("Error: Already Owner")
+        raise InputError(description="Error: Already Owner")
 
     # If the token is not an owner / also checks if they're in channel
     if checkOwner(auth_user_id, channel_id) is False:
-        raise AccessError("Error: Not an owner")
+        raise AccessError(description="Error: Not an owner")
     
     for counter in database.data["channelList"]:
         if counter["id"] is channel_id:
@@ -465,25 +465,25 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     # If u_id is valid
     if valid_userid(u_id) is False:
-        raise InputError("Error: Invalid user id")
+        raise InputError(description="Error: Invalid user id")
 
     # If channel_id is valid
     if valid_channelid(channel_id) is False:
-        raise InputError("Error: Invalid channel ID")
+        raise InputError(description="Error: Invalid channel ID")
 
     # If the u_id is the only owner
     for channel in database.data["channelList"]:
         if channel_id == channel["id"]:
             if len(channel["owner_ids"]) == 1:
-                raise InputError("Error: Only one owner")
+                raise InputError(description="Error: Only one owner")
 
     # If the u_id is not an owner
     if checkOwner(u_id, channel_id) is False:
-        raise InputError("Error: Not An Owner")
+        raise InputError(description="Error: Not An Owner")
 
     # If the token is not an owner
     if checkOwner(auth_user_id, channel_id) is False:
-        raise InputError("Error: Token is Not Owner")
+        raise InputError(description="Error: Token is Not Owner")
 
     # Main Implemenation
     for channel in database.data["channelList"]:

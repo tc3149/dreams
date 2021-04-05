@@ -1,7 +1,7 @@
 import pytest
 import jwt
 from src.other import clear_v1
-from src.dm import dm_create_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1
+from src.dm import dm_create_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1, dm_details_v1
 from src.auth import auth_register_v2
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2, channel_invite_v2, channel_details_v2, channel_leave_v1, channel_addowner_v1, checkOwner
@@ -433,3 +433,64 @@ def test_dm_remove_invalid_token():
          dm_remove_v1(temp, dm["dm_id"])
 
 # ------------------------------------------------------------------------------------------------------
+#dm details tests
+
+def test_dm_does_not_exist():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
+    id_list = []
+    id_list.append(user1["auth_user_id"])
+    id_list.append(user2["auth_user_id"])
+
+    _ = dm_create_v1(user1["token"], id_list)
+
+    with pytest.raises(InputError):
+        dm_details_v1(user1['token'],21423431)
+
+def test_user_not_member_of_dm():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+
+    id_list = []
+    id_list.append(user1["auth_user_id"])
+    id_list.append(user2["auth_user_id"])
+
+    dm = dm_create_v1(user1["token"], id_list)
+    
+
+    with pytest.raises(AccessError):
+        dm_details_v1(user3['token'],dm['dm_id'])
+
+
+def test_valid_input():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    
+
+    assert dm_details_v1(user1['token'], dm['dm_id']) == {
+                                            'name': 'namelastname,namelastname0',
+                                            'members': [
+                                                {
+                                                    'u_id': user1["auth_user_id"],
+                                                    'email': 'email@gmail.com',
+                                                    'name_first': 'Name',
+                                                    'name_last': 'Lastname',
+                                                    'handle_str': 'namelastname',
+                                                    
+                                                },
+                                                {
+                                                    'u_id': user2["auth_user_id"],
+                                                    'email': 'email2@gmail.com',
+                                                    'name_first': 'Name',
+                                                    'name_last': 'Lastname',
+                                                    'handle_str': 'namelastname0',   
+                                                }
+                                            ],
+                                           }

@@ -1,6 +1,6 @@
 import re
 import src.database as database
-from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid
+from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid, getUserProfileData
 from src.error import InputError, AccessError
 
 '''
@@ -166,7 +166,7 @@ list for return.
 
 Arguments:
     token (string) - Unique user id created by auth_register_v2
-    channel_id (integer) - Unique channel id created by channels_create_v2
+    dm_id (integer) - Unique dm id created by dm_create_v2
     start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
     indexes relating to recent messages
 
@@ -320,3 +320,42 @@ def dm_remove_v1(token, dm_id):
             else:
                 database.data["dmList"].remove(dm)
                 return {}
+
+def dm_details_v1 (token, dm_id):
+    #user id from token
+    user_id = get_user_id_from_token(token)
+
+    #check if dm exists
+    dmExists = False
+    for dm in database.data['dmList']:
+        if dm["id"] == dm_id:
+            #dm does exist
+            dmExists = True
+            dmName = dm['dm_name']
+            break 
+    if not dmExists:
+        #dm does not exist
+        raise InputError(description="Dm does not exist")
+
+    # check if user is a part of the dm
+    dm_member = False 
+    for dm in database.data['dmList']:
+        if dm["id"] == dm_id:
+            for member in dm["member_ids"]:
+                if member == user_id:
+                    dm_member = True
+            if not dm_member:
+                raise AccessError(description="User is not a member of this DM")
+
+    allMembers = []
+    for dm in database.data["dmList"]:
+        if dm["id"] == dm_id:
+            for userId in dm["member_ids"]:
+                currUser = getUserProfileData(userId)
+                allMembers.append(currUser)
+    
+    return {
+        'name': dmName,
+        'members': allMembers
+
+    }
