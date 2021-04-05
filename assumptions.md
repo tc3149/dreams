@@ -9,7 +9,6 @@
     - Assumption made regarding handle appending in the function auth_register_v1 of auth.py : "The addition of this final number may result in the handle exceeding the 20 character limit." does not specify clearly if an appended handle is allowed to remain over the 20 character limit. Therefore we will make the assumption that when appending a handle, it IS ALLOWED to remain over 20 characters long.
 
 
-
 **channels.py**
 
 - Overall:
@@ -30,7 +29,6 @@
     - Channel id starts at zero and continues linearly by one.
     - Owners are automatically joined as members into channels they create
     - Channel names are not 'nothing', and as such are greater than 0 characters.
-
 
 
 **channel.py**
@@ -89,3 +87,25 @@
 - dm_leave_v1
     - Assumes the owner cannot leave
     - Assumes that the name is deleted from data in dm_name 
+
+- dm_create_v1
+    - Assumes the user id of the creator wont be in the u_ids list
+    - Possible to create more than one dm with a single user id
+    - Dm id starts at zero and continues linearly by one for each dm created
+    - A DM id can never be used twice, i.e. if dm_id 0 is deleted, the next dm created is still dm_id = 1
+
+- dm_list_v1
+    - Assume that the list begins with dm ids from smallest to largest
+    - If there are no dms, return empty list
+
+- dm_invite_v1
+    - Owner cannot invite himself into the dm
+    - Owner cannot invite members already in the dm into the dm
+
+
+**other.py**
+
+- search_v1
+    - Assumes the query string is case sensitive
+    - Assumes search uses ascii characters
+
