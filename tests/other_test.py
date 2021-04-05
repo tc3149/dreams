@@ -15,7 +15,7 @@ from src.dm import dm_create_v1, dm_messages_v1
 def test_clear_register():
 
     clear_v1()
-    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     clear_v1()
     print(data)
     assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': []}
@@ -24,7 +24,7 @@ def test_clear_channel():
 
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel1 = channels_create_v2(user1["token"], "testchannel", True)
+    channels_create_v2(user1["token"], "testchannel", True)
     clear_v1()
     assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': []}
 
@@ -34,7 +34,7 @@ def test_clear_dm():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
     id_list = [user1.get("auth_user_id")]
-    dm = dm_create_v1(user["token"], id_list)
+    dm_create_v1(user["token"], id_list)
     clear_v1()
     assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': []}
 
@@ -46,10 +46,10 @@ def test_search_single_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel1 = channels_create_v2(user1["token"], "testchannel", True)
-    message_id = message_send_v2(user1["token"], channel1["channel_id"], "testtest")
+    message_send_v2(user1["token"], channel1["channel_id"], "testtest")
     user2 = auth_register_v2("user2@gmail.com", "password", "Firstname", "Lastname")
     channel2 = channels_create_v2(user2["token"], "channel2", True)
-    message_id2 = message_send_v2(user2["token"], channel2["channel_id"], "testing")
+    message_send_v2(user2["token"], channel2["channel_id"], "testing")
     search = search_v1(user1["token"], "test")
     search_list = search["messages"]
 
@@ -63,11 +63,11 @@ def test_search_multiple_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel1 = channels_create_v2(user1["token"], "testchannel", True)
-    message_id = message_send_v2(user1["token"], channel1["channel_id"], "testtest")
+    message_send_v2(user1["token"], channel1["channel_id"], "testtest")
     user2 = auth_register_v2("user2@gmail.com", "password", "Firstname", "Lastname")
     channel2 = channels_create_v2(user2["token"], "channel2", True)
-    message_id2 = message_send_v2(user2["token"], channel2["channel_id"], "testing")
-    message_id3 = message_send_v2(user1["token"], channel1["channel_id"], "testtttt")
+    message_send_v2(user2["token"], channel2["channel_id"], "testing")
+    message_send_v2(user1["token"], channel1["channel_id"], "testtttt")
     search = search_v1(user1["token"], "test")
     search_list = search["messages"]
 
@@ -87,9 +87,9 @@ def test_search_single_dm():
     dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
     message_senddm_v1(user2["token"], dm["dm_id"], "TestingDmFirst")
     message_senddm_v1(user2["token"], dm["dm_id"], "Shouldnt Match")
-    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    dm_messages_v1(user2["token"], dm["dm_id"], 0)
     message_senddm_v1(user["token"], dm["dm_id"], "TestingDmSecond")
-    message_info2 = dm_messages_v1(user["token"], dm["dm_id"], 0)
+    dm_messages_v1(user["token"], dm["dm_id"], 0)
     search = search_v1(user["token"], "Shouldnt")
     search_list = search["messages"]
 
@@ -105,9 +105,9 @@ def test_search_multiple_dm():
     dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
     message_senddm_v1(user2["token"], dm["dm_id"], "TestingDmFirst")
     message_senddm_v1(user2["token"], dm["dm_id"], "Shouldnt Match")
-    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    dm_messages_v1(user2["token"], dm["dm_id"], 0)
     message_senddm_v1(user["token"], dm["dm_id"], "TestingDmSecond")
-    message_info2 = dm_messages_v1(user["token"], dm["dm_id"], 0)
+    dm_messages_v1(user["token"], dm["dm_id"], 0)
     search = search_v1(user["token"], "Test")
     search_list = search["messages"]
 
@@ -132,18 +132,18 @@ def test_search_dm_and_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel1 = channels_create_v2(user1["token"], "testchannel", True)
-    message_id = message_send_v2(user1["token"], channel1["channel_id"], "testtest")
+    message_send_v2(user1["token"], channel1["channel_id"], "testtest")
     user2 = auth_register_v2("user2@gmail.com", "password", "Firstname", "Lastname")
     channel2 = channels_create_v2(user2["token"], "channel2", True)
-    message_id2 = message_send_v2(user2["token"], channel2["channel_id"], "testing")
-    message_id3 = message_send_v2(user1["token"], channel1["channel_id"], "testtttt")
+    message_send_v2(user2["token"], channel2["channel_id"], "testing")
+    message_send_v2(user1["token"], channel1["channel_id"], "testtttt")
 
     dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
     message_senddm_v1(user2["token"], dm["dm_id"], "testingDmFirst")
     message_senddm_v1(user2["token"], dm["dm_id"], "Shouldnt Match")
-    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    dm_messages_v1(user2["token"], dm["dm_id"], 0)
     message_senddm_v1(user1["token"], dm["dm_id"], "testingDmSecond")
-    message_info2 = dm_messages_v1(user1["token"], dm["dm_id"], 0)
+    dm_messages_v1(user1["token"], dm["dm_id"], 0)
 
     search = search_v1(user1["token"], "test")
     search_list = search["messages"]
