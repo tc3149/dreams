@@ -96,6 +96,37 @@ def dm_invite_v1(token, dm_id, u_id):
 
     return {}
 
+
+'''
+dm_messages_v1 takes in a user id, a specific dm id, and a 'start' to
+determine after what amount of messages to show, e.g. recent 5 messages have 
+already been seen, thus start would equal 5 to see later messages.
+The function first does security checks, then reverses the messages list, so
+that the most recent messages are at the head of the list, then appends to a new
+list for return.
+
+Arguments:
+    token (string) - Unique user id created by auth_register_v2
+    channel_id (integer) - Unique channel id created by channels_create_v2
+    start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
+    indexes relating to recent messages
+
+Exceptions:
+    AccessError - Occurs when token is not valid (i.e. not created)
+
+Return Value:
+    Most cases Returns:
+        'messages': messages_shown,
+        'start': start,
+        'end': end,
+    If there are less than 50 messages in the list, or no 'later' messages
+    returns: 
+        'messages': messages_shown,
+        'start': start,
+        'end': -1,
+
+'''
+
 def dm_messages_v1(token, dm_id, start):
 
     auth_user_id = get_user_id_from_token(token)
@@ -153,6 +184,30 @@ def dm_messages_v1(token, dm_id, start):
         'end': end,
     }
 
+'''
+dm_leave_v1 takes in a token and a specific dm id.
+The first segment checks for inputError when a invalid dm_id is added.
+After that segment is passed, the next segment checks if the user is in the channel
+and if the user is present, the user is removed from the list of member ids in channel database.
+Otherwise, if the user is not present, an AccessError is raised.
+
+Arguments:
+    token (string) - Unique user id created by auth_register_v2
+    channel_id (integer) - Unique channel id created by channels_create_v2
+    start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
+    indexes relating to recent messages
+
+Exceptions:
+    InputError - dm_id is invalid
+    AccessError - Occurs when token is not valid (i.e. not created)
+
+Return Value:
+    Most cases Returns:
+        '{}'
+
+'''
+
+
 def dm_leave_v1(token, dm_id):
 
     auth_user_id = get_user_id_from_token(token)
@@ -169,6 +224,28 @@ def dm_leave_v1(token, dm_id):
                     return {}
     raise AccessError(description="Invalid")
                     
+'''
+dm_remove_v1 takes in a token and a specific dm id.
+The first segment checks for inputError when a invalid dm_id is added.
+After that segment is passed, the next segment checks if the user the creator
+and if the user is the creator, the dm is removed from the list of dm_ids in dmList database.
+Otherwise, if the user is not the creator, an AccessError is raised.
+
+Arguments:
+    token (string) - Unique user id created by auth_register_v2
+    channel_id (integer) - Unique channel id created by channels_create_v2
+    start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
+    indexes relating to recent messages
+
+Exceptions:
+    InputError - dm_id is invalid
+    AccessError - Occurs when token is not valid (i.e. not created)
+
+Return Value:
+    Most cases Returns:
+        '{}'
+
+'''
 
 def dm_remove_v1(token, dm_id):
 

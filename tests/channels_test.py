@@ -113,7 +113,6 @@ def test_channels_list_invalid():
   
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "name", "Lastname")
-    auth_register_v2("email2@gmail.com", "password", "name", "Lastname")
     channels_create_v2(user1.get("token"), "testChannel", True)
     invalid_id = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
