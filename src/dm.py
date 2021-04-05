@@ -162,7 +162,7 @@ def dm_leave_v1(token, dm_id):
             for users in dm["member_ids"]:
                 if auth_user_id is users:
                     dm["member_ids"].remove(auth_user_id)
-                    return
+                    return {}
     raise AccessError
                     
 
@@ -181,4 +181,4 @@ def dm_remove_v1(token, dm_id):
                 raise AccessError
             else:
                 database.data["dmList"].remove(dm)
-                return
+                return {}

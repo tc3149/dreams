@@ -351,7 +351,6 @@ def test_http_channel_leave_working():
     channelListR = json.loads(channelList.text)
     assert channelListR == {'channels': [{'channel_id': channel2R.get("channel_id"), 'name': 'testChannel2'}]}
     # ----------------------------
-'''
 def test_http_channel_leave_channel_valid():
     requests.delete(config.url + "clear/v1")
 
@@ -431,4 +430,3 @@ def test_http_channel_leave_user_valid():
     channelLeaveR = json.loads(channelLeave.text)
     assert channelLeaveR["code"] == 403
     # ----------------------------
-'''
