@@ -5,7 +5,7 @@ from src.other import clear_v1
 from src.auth import auth_register_v2, auth_login_v2
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2, channel_join_v2
-from src.channels import channels_create_v2, channels_list_v2, channels_listall_v1
+from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 
 # ------------------------------------------------------------------------------------------------------
 # Channel Create Tests
@@ -158,7 +158,7 @@ def test_channels_listall():
     user1 = auth_register_v2("email@gmail.com", "password", "name", "Lastname")
     channel1 = channels_create_v2(user1.get("token"), "testChannel", True)
     channel2 = channels_create_v2(user1.get("token"), "testChannel2", True)
-    assert channels_listall_v1(user1.get("token")) == {'channels': [{'channel_id': channel1.get("channel_id"), 'name': 'testChannel'}, {'channel_id': channel2.get("channel_id"), 'name': 'testChannel2'}]}
+    assert channels_listall_v2(user1.get("token")) == {'channels': [{'channel_id': channel1.get("channel_id"), 'name': 'testChannel'}, {'channel_id': channel2.get("channel_id"), 'name': 'testChannel2'}]}
 
 def test_channels_listall_invalid():
 
@@ -167,7 +167,7 @@ def test_channels_listall_invalid():
     clear_v1()
     invalid_id = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
-        assert channels_listall_v1(invalid_id) == AccessError
+        assert channels_listall_v2(invalid_id) == AccessError
 
 def test_channels_listall_no_channels():
 
@@ -175,7 +175,7 @@ def test_channels_listall_no_channels():
 
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "name", "Lastname")
-    result = channels_listall_v1(user1.get("token")) 
+    result = channels_listall_v2(user1.get("token")) 
     assert result == {'channels': []}
 
 def test_channels_listall_private():
@@ -186,7 +186,7 @@ def test_channels_listall_private():
     user1 = auth_register_v2("email@gmail.com", "password", "name", "Lastname")
     channel1 = channels_create_v2(user1.get("token"), "testChannel", False)
     channel2 = channels_create_v2(user1.get("token"), "testChannel2", False)
-    result = channels_listall_v1(user1.get("token"))
+    result = channels_listall_v2(user1.get("token"))
     assert result == {'channels': [{'channel_id': channel1.get("channel_id"), 'name': 'testChannel'}, {'channel_id': channel2.get("channel_id"), 'name': 'testChannel2'}]}
 
 def test_channels_listall_public_private():
@@ -197,5 +197,5 @@ def test_channels_listall_public_private():
     user1 = auth_register_v2("email@gmail.com", "password", "name", "Lastname")
     channel1 = channels_create_v2(user1.get("token"), "testChannel", False)
     channel2 = channels_create_v2(user1.get("token"), "testChannel2",True)
-    result = channels_listall_v1(user1.get("token"))
+    result = channels_listall_v2(user1.get("token"))
     assert result == {'channels': [{'channel_id': channel1.get("channel_id"), 'name': 'testChannel'}, {'channel_id': channel2.get("channel_id"), 'name': 'testChannel2'}]}

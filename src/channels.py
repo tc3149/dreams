@@ -11,7 +11,7 @@ The functions then checks if the user_id is valid.
 If the user_id is valid, the function then returns all the channels associated
 with the user_id in a list.
 Arguments:
-    auth_user_id (string) - ID of user
+    token (string) - ID of user
 Exceptions:
     AccessError - Occurs when given id does not match accData
 Return Value:
@@ -39,17 +39,17 @@ def channels_list_v2(token):
     return {'channels': newchannelList}
 
 '''
-channels_list_v2 takes in a user_id string.
+channels_listall_v2 takes in a user_id string.
 The functions then checks if the user_id is valid.
 If the user_id is valid, the function then returns all channels.
 Arguments:
-    auth_user_id (string) - ID of user
+    token (string) - ID of user
 Exceptions:
     AccessError - Occurs when given id does not match accData
 Return Value:
     Returns list | {'channels': newchannelList}
 '''
-def channels_listall_v1(token):
+def channels_listall_v2(token):
     auth_user_id = get_user_id_from_token(token)
     id_status = False
     for user in database.data["accData"]:
