@@ -21,11 +21,11 @@ def dm_create_v1(token, u_ids):
     total_ids = [auth_user_id]
     total_ids.extend(u_ids)
 
-    dm_id = len(database.data["dmList"])
 
 
     # Make dm name as alphabetically sorted list of handles
     dm_name = make_dm_name(total_ids)
+    dm_id = database.idData["dmId"]
 
     dmData = {
         'dm_name': dm_name,
@@ -34,7 +34,7 @@ def dm_create_v1(token, u_ids):
         'member_ids': total_ids,
         'owner_ids': [auth_user_id],
     }
-
+    database.idData["dmId"] = database.idData["dmId"] + 1
     # Adding user data and database
     database.data["dmList"].append(dmData)
 
@@ -124,7 +124,7 @@ def dm_messages_v1(token, dm_id, start):
     # Return Function
     for dm in database.data["dmList"]:
         if dm["id"] is dm_id:
-            messages = dm["messages"]
+            messages = dm["messages"].copy()
 
     if start > len(messages):
         raise InputError(description="Start is greater than total number of messages")
