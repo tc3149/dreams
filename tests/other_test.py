@@ -17,7 +17,6 @@ def test_clear_register():
     clear_v1()
     auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     clear_v1()
-    print(data)
     assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': []}
 
 def test_clear_channel():
@@ -111,13 +110,13 @@ def test_search_multiple_dm():
     search = search_v1(user["token"], "Test")
     search_list = search["messages"]
 
-    assert search_list[0].get('message_id') == 3
-    assert search_list[0].get('message') == "TestingDmSecond"
-    assert search_list[0].get('u_id') == 0
+    assert search_list[0].get('message_id') == 1
+    assert search_list[0].get('message') == "TestingDmFirst"
+    assert search_list[0].get('u_id') == 1
 
-    assert search_list[1].get('message_id') == 1
-    assert search_list[1].get('message') == "TestingDmFirst"
-    assert search_list[1].get('u_id') == 1
+    assert search_list[1].get('message_id') == 3
+    assert search_list[1].get('message') == "TestingDmSecond"
+    assert search_list[1].get('u_id') == 0
 
 def test_search_thousand_char():
 
@@ -156,10 +155,10 @@ def test_search_dm_and_channel():
     assert search_list[1].get('message') == "testtttt"
     assert search_list[1].get('u_id') == 0
 
-    assert search_list[2].get('message_id') == 6
-    assert search_list[2].get('message') == "testingDmSecond"
-    assert search_list[2].get('u_id') == 0
+    assert search_list[2].get('message_id') == 4
+    assert search_list[2].get('message') == "testingDmFirst"
+    assert search_list[2].get('u_id') == 1
 
-    assert search_list[3].get('message_id') == 4
-    assert search_list[3].get('message') == "testingDmFirst"
-    assert search_list[3].get('u_id') == 1
+    assert search_list[3].get('message_id') == 6
+    assert search_list[3].get('message') == "testingDmSecond"
+    assert search_list[3].get('u_id') == 0

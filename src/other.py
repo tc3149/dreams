@@ -15,6 +15,7 @@ def clear_v1():
     '''
     database.idData["sessionId"] = 0
     database.idData["userId"] = 0
+    database.idData["dmId"] = 0
 
     database.data["accData"].clear() 
     database.data["channelList"].clear() 

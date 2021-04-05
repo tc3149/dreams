@@ -7,7 +7,7 @@ from src import config
 from src.other import clear_v1
 import src.database as database
 
-# CHANNEL JOIN TESTING
+# CHANNEL JOIN TESTING ---------------------------------------------------------------
 
 # Invalid Channel ID
 def testjoin_invalid_channelID():
@@ -346,7 +346,8 @@ def testjoin_valid_case():
                                             }
                                         ]
 
-# ADD OWNER TESTING
+
+# ADD OWNER TESTING -----------------------------------------------------------------
 
 # Invalid Token
 def testaddowner_invalid_tokenn():
@@ -1200,3 +1201,211 @@ def test_http_channel_leave_user_valid():
     channelLeaveR = json.loads(channelLeave.text)
     assert channelLeaveR["code"] == 403
     # ----------------------------
+
+# CHANNEL MESSAGES #########################################
+
+def test_http_channel_messages_working():
+
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message Send -------
+    funcURL = "message/send/v2"
+    
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Hello World",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageSend.text)
+
+    # Channel Message Info -------
+    funcURL = "channel/messages/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    channelMessages = requests.get(config.url + funcURL + "?" + qData)
+    channelMessagesR = json.loads(channelMessages.text)
+
+    for msg in channelMessagesR["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == "Hello World"
+        assert msg["u_id"] == userR["auth_user_id"]  
+
+def test_http_channel_messages_invalid_channel():
+
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Message Info -------
+    funcURL = "channel/messages/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": 50,
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    channelMessages = requests.get(config.url + funcURL + "?" + qData)
+    channelMessagesR = json.loads(channelMessages.text)
+
+    assert channelMessagesR["code"] == 400
+
+def test_http_channel_messages_startgreater():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+    # ----------------------------
+    # Checking Messages-----------------
+    funcURL = "channel/messages/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "start": 1,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+    assert dmMessagesR["code"] == 400
+    # ----------------------------
+
+def test_http_channel_messages_not_authorised():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+    # ----------------------------
+
+    # Checking Messages-----------------
+    funcURL = "channel/messages/v2"
+    inputData = {
+        "token": user2R["token"],
+        "channel_id": channelR["channel_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+    assert dmMessagesR["code"] == 403
+
+def test_http_channel_messages_endnegativeone():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+    # ----------------------------
+
+    # Checking Messages-----------------
+    funcURL = "channel/messages/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+
+    assert dmMessagesR.get("end") == -1

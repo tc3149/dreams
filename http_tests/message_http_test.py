@@ -3,7 +3,7 @@ import requests
 import json
 import jwt
 import urllib
-from src.database import data, secretSauce
+import src.database as database
 from src import config
 from src.other import clear_v1
 from src.auth import auth_register_v2
@@ -14,6 +14,43 @@ from src.channels import channels_create_v2
 from src.dm import dm_create_v1, dm_messages_v1
 
 # MESSAGE_SEND TESTING
+
+# Empty Message
+def testsend_empty_message():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message send
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": '',
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+    assert messageSendR["code"] == 400
+
 
 # Invalid Long Message
 def testsend_invalid_long_msg():
@@ -79,7 +116,7 @@ def testsend_invalid_token():
 
     # Message send
     funcURL = "message/send/v2"
-    invalid_token = jwt.encode({"sessionId": 2954}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2954}, database.secretSauce, algorithm = "HS256")
 
     inputData = {
         "token": invalid_token,
@@ -231,6 +268,53 @@ def testsend_valid_case():
 
 # MESSAGE EDIT TESTING
 
+# Empty Message
+def testedit_empty():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message Send
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Thomas Chen and Jonathan Qiu",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+    
+    # Message Edit
+    funcURL = "message/edit/v2"
+
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+        "message": '',
+    }
+    messageEdit = requests.put(config.url + funcURL, json=inputData)
+    messageEditR = json.loads(messageEdit.text)
+    assert messageEditR["code"] == 400
+
 # Invalid Long Message
 def testedit_invalid_long_msg():
     requests.delete(config.url + "clear/v1")
@@ -317,7 +401,7 @@ def testedit_invalid_token():
     
     # Message Edit
     funcURL = "message/edit/v2"
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     inputData = {
         "token": invalid_token,
@@ -620,7 +704,7 @@ def testremove_invalid_token_id():
     
     # Message Remove ----
     funcURL = "message/remove/v1"
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     inputData = {
         "token": invalid_token,
@@ -914,6 +998,55 @@ def testremove_comprehensive_valid():
 
 # MESSAGE SENDDM TESTING
 
+# Empty Message
+def testsenddm_invalid_empty_message():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message Send DM -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "",
+    }
+    messageSendDM = requests.post(config.url + funcURL, json=inputData)
+    messageSendDMR = json.loads(messageSendDM.text)
+    assert messageSendDMR["code"] == 400
+
+
 # Invalid Message
 def testsenddm_invalid_long_msg():
     requests.delete(config.url + "clear/v1")
@@ -1002,7 +1135,7 @@ def testsenddm_invalid_token_ID():
 
     # Message Send DM -------
     funcURL = "message/senddm/v1"
-    invalid_token = jwt.encode({"sessionId": "notInt"}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": "notInt"}, database.secretSauce, algorithm = "HS256")
     inputData = {
         "token": invalid_token,
         "dm_id": dmR["dm_id"],
