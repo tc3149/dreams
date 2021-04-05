@@ -1,5 +1,5 @@
 import re
-from src.database import data
+import src.database as database
 
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError, AccessError
@@ -20,7 +20,7 @@ Return Value:
 def channels_list_v2(token):
     auth_user_id = get_user_id_from_token(token)
     id_status = False
-    for user in data["accData"]:
+    for user in database.data["accData"]:
         if user.get("id") is auth_user_id:
             id_status = True
             break
@@ -29,7 +29,7 @@ def channels_list_v2(token):
         raise AccessError("Error: Invalid user id")
 
     newchannelList = []
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if auth_user_id in channel.get('member_ids'):
                 channelDict = {}
                 channelDict['channel_id'] = channel.get('id')
@@ -52,7 +52,7 @@ Return Value:
 def channels_listall_v1(token):
     auth_user_id = get_user_id_from_token(token)
     id_status = False
-    for user in data["accData"]:
+    for user in database.data["accData"]:
         if user.get("id") is auth_user_id:
             id_status = True
             break
@@ -61,7 +61,7 @@ def channels_listall_v1(token):
         raise AccessError("Error: Invalid user id")
 
     newchannelList = []
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         channelDict = {}
         channelDict['channel_id'] = channel.get('id')
         channelDict['name'] = channel.get('name')
@@ -105,7 +105,7 @@ def channels_create_v2(token, name, is_public):
 
     # Check if valid user id
     id_status = False
-    for user in data["accData"]:
+    for user in database.data["accData"]:
         if user.get("id") is auth_user_id:
             id_status = True
             break
@@ -113,7 +113,7 @@ def channels_create_v2(token, name, is_public):
     if id_status is False:
         raise AccessError("Error: Invalid user id")
     
-    channel_id = len(data["channelList"])
+    channel_id = len(database.data["channelList"])
 
     channelData = {
         'name': name,
@@ -127,7 +127,7 @@ def channels_create_v2(token, name, is_public):
     # Adding user data
     channelData['owner_ids'].append(auth_user_id)
     channelData['member_ids'].append(auth_user_id)
-    data["channelList"].append(channelData)
+    database.data["channelList"].append(channelData)
 
     return {
         'channel_id': channel_id,

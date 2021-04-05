@@ -9,7 +9,7 @@ from src.user import users_all_v1
 from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
-from src.database import secretSauce
+import src.database as database
 import jwt
 
 
@@ -215,7 +215,7 @@ def test_users_all_v1_invalid_token():
     clear_v1()
 
     _ = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
-    invalidToken = jwt.encode({"invalidKey": "invalidValue"}, secretSauce, algorithm="HS256")
+    invalidToken = jwt.encode({"invalidKey": "invalidValue"}, database.secretSauce, algorithm="HS256")
 
     with pytest.raises(AccessError):
         users_all_v1(invalidToken)
