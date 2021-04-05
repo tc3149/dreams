@@ -12,11 +12,17 @@ def dm_create_v1(token, u_ids):
     #Obtain user id of creator from token
     auth_user_id = get_user_id_from_token(token)
 
+    # Check if u_ids are valid
+    for u_id in u_ids:
+        if valid_userid(u_id) is False:
+            raise InputError(description="User ID does not exist")
+
     # Set dm_id to length of dmlist in database
     total_ids = [auth_user_id]
     total_ids.extend(u_ids)
 
     dm_id = len(database.data["dmList"])
+
 
     # Make dm name as alphabetically sorted list of handles
     dm_name = make_dm_name(total_ids)
@@ -36,8 +42,6 @@ def dm_create_v1(token, u_ids):
         'dm_id': dm_id,
         'dm_name': dm_name,
     }
-
-
 
 def dm_list_v1(token):
     auth_user_id = get_user_id_from_token(token)
@@ -67,11 +71,11 @@ def dm_invite_v1(token, dm_id, u_id):
             break
     if dmExists is False:
         # Dm doesnt exist
-        raise InputError("DM does not exist")
+        raise InputError(description="DM does not exist")
 
     # Check if u_id refers to a valid user
     if valid_userid(u_id) is False:
-        raise InputError("User ID does not exist")
+        raise InputError(description="User ID does not exist")
 
     # Check if the inviter is part of the dm
     authorised = False
@@ -81,7 +85,7 @@ def dm_invite_v1(token, dm_id, u_id):
                 authorised = True
                 break
     if authorised is False:
-        raise AccessError("User is not a part of the DM to be able to invite")
+        raise AccessError(description="User is not a part of the DM to be able to invite")
 
     # Security measures complete
     # assumption they will not be in the dm already?
@@ -98,11 +102,11 @@ def dm_messages_v1(token, dm_id, start):
 
     # Check if user id is valid
     if valid_userid(auth_user_id) is False:
-        raise AccessError("Error: Invalid user id")
+        raise AccessError(description="Error: Invalid user id")
 
     # Check if dm id is valid
     if valid_dmid(dm_id) is False:
-        raise InputError("Error: Invalid dm")
+        raise InputError(description="Error: Invalid dm")
 
     #Check if user is authorised to be in the dm
     authorisation = False
@@ -113,7 +117,7 @@ def dm_messages_v1(token, dm_id, start):
                     authorisation = True
                     break
     if authorisation is False:
-        raise AccessError("User is not in dm")
+        raise AccessError(description="User is not in dm")
 
 
 
@@ -123,7 +127,7 @@ def dm_messages_v1(token, dm_id, start):
             messages = dm["messages"]
 
     if start > len(messages):
-        raise InputError("Start is greater than total number of messages")
+        raise InputError(description="Start is greater than total number of messages")
 
     # 0th index is the most recent message... therefore must reverse list?
     messages.reverse()
@@ -162,8 +166,8 @@ def dm_leave_v1(token, dm_id):
             for users in dm["member_ids"]:
                 if auth_user_id is users:
                     dm["member_ids"].remove(auth_user_id)
-                    return
-    raise AccessError
+                    return {}
+    raise AccessError(description="Invalid")
                     
 
 def dm_remove_v1(token, dm_id):
@@ -178,7 +182,7 @@ def dm_remove_v1(token, dm_id):
     for dm in database.data["dmList"]:
         if dm_id is dm["id"]:
             if auth_user_id not in dm["owner_ids"]:
-                raise AccessError
+                raise AccessError(description="User not the creator of DM")
             else:
                 database.data["dmList"].remove(dm)
-                return
+                return {}
