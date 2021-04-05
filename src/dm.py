@@ -1,6 +1,6 @@
 import re
 import src.database as database
-from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid
+from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid, getUserAccData
 from src.error import InputError, AccessError
 
 '''
@@ -191,46 +191,42 @@ def dm_details_v1 (token, dm_id):
     #user id from token
     user_id = get_user_id_from_token(token)
 
-    #check if user_id exists 
-    user_id_satus = valid_userid(user_id)
-    #user does not exist
-    if user_id_satus == False:
-        # user_id does not exist
-        raise InputError ("User does not exist")
-
     #check if dm exists
     dmExists = False
-    for dm in data['dmList']:
-        if dm_id is dm['id']:
+    for dm in database.data['dmList']:
+        if dm["id"] == dm_id:
             #dm does exist
             dmExists = True
             dmName = dm['dm_name']
             break 
-    if dmExists is False:
+    if not dmExists:
         #dm does not exist
-        raise InputError ("Dm does not exist")
+        raise InputError("Dm does not exist")
+
+    # check if user is a part of the dm
     dm_member = False 
-    for user in data['dmList'][dm_id]['member_ids']:
-        if user_id in data['dmList'][dm_id]['member_ids']:
-            #member of the dm
-            dm_member = True
-        #not a member of the dm    
-        else:
-            raise AccessError ("User is not a member of this DM")
+    for dm in database.data['dmList']:
+        if dm["id"] == dm_id:
+            for member in dm["member_ids"]:
+                if member == user_id:
+                    dm_member = True
+            if not dm_member:
+                raise AccessError("User is not a member of this DM")
 
     allMembers = []
-    for memberID in data['dmList'][dm_id]['member_ids']:
-        for mem in data['accData']:
-            if memberID is mem['id']:
-                new_member = {
-                    'u_id':memberID,
-                    'email': data["accData"][memberID]['email'],
-                    'name_first': data["accData"][memberID]['name_first'],
-                    'name_last': data["accData"][memberID]['name_last'],
-                    'handle_str': data["accData"][memberID]['handle']
+    for dm in database.data["dmList"]:
+        if dm["id"] == dm_id:
+            print(dm["member_ids"])
+            for userId in dm["member_ids"]:
+                currUser = getUserAccData(userId)
+                dmMember = {
+                    'u_id':currUser["id"],
+                    'email': currUser['email'],
+                    'name_first': currUser['name_first'],
+                    'name_last': currUser['name_last'],
+                    'handle_str': currUser['handle']
                 }
-                allMembers.append(new_member)
-                break 
+                allMembers.append(dmMember)
     
     return {
         'name': dmName,

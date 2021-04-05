@@ -162,3 +162,8 @@ def make_dm_name(u_ids):
 def saveData():
     with open("serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
+
+def getUserAccData(u_id):
+    for user in database.data["accData"]:
+        if user["id"] == u_id:
+            return user
