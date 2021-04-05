@@ -47,10 +47,10 @@ def test_http_admin_user_remove_u_id_does_not_exist():
         "token": userR['token']
         "u-id": 3
     }
-    dmDetails = requests.get(config.url + funcURL + "?" + qData)
-    dmDetailsR = json.loads(dmDetails.text)
+    adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
+    adminUserRemoveR = json.loads(adminUserRemove.text)
 
-    assert dmDetailsR["code"] == 400
+    assert adminUserRemoveR["code"] == 400
 
 def test_http_admin_user_remove_auth_not_owner():
     requests.delete(config.url + "clear/v1")
@@ -95,10 +95,10 @@ def test_http_admin_user_remove_auth_not_owner():
         "token": user2R['token']
         "u-id": user3R['u_id']
     }
-    dmDetails = requests.get(config.url + funcURL + "?" + qData)
-    dmDetailsR = json.loads(dmDetails.text)
+    adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
+    adminUserRemoveR = json.loads(adminUserRemove.text)
 
-    assert dmDetailsR['code'] == 403
+    assert adminUserRemoveR['code'] == 403
 
 def test_http_admin_user_remove_auth_only_owner():
     requests.delete(config.url + "clear/v1")
@@ -120,10 +120,10 @@ def test_http_admin_user_remove_auth_only_owner():
         "token": userR['token']
         "u-id": userR['u_id']
     }
-    dmDetails = requests.get(config.url + funcURL + "?" + qData)
-    dmDetailsR = json.loads(dmDetails.text)
+    adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
+    adminUserRemoveR = json.loads(adminUserRemove.text)
 
-    assert dmDetailsR['code'] == 400
+    assert adminUserRemoveR['code'] == 400
 
 def test_http_admin_user_remove_successful_removed():
     requests.delete(config.url + "clear/v1")
@@ -157,8 +157,50 @@ def test_http_admin_user_remove_successful_removed():
         "token": userR['token']
         "u-id": user2R['u_id']
     }
-    dmDetails = requests.get(config.url + funcURL + "?" + qData)
-    dmDetailsR = json.loads(dmDetails.text)
+    adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
+    adminUserRemoveR = json.loads(adminUserRemove.text)
     #---------------------------------
     #check if removed
     assert valid_userid(user2R['auth_user_id']) == False
+
+
+############################################################################################################################################
+# Admin_userpermission_tests
+
+def test_http_admin_userpermission_u_id_does_not_exist():
+     requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+    #chec admin user permission
+    funcURL = "admin/userpermission/change/v1"
+    inputData ={
+        "token": userR['token']
+        "u-id": 3
+        "permission_id": 1
+    }
+    adminUserPermissin = requests.get(config.url + funcURL + "?" + qData)
+    adminUserPermissinR = json.loads(adminUserPermissin.text)
+
+    assert adminUserPermissionR["code"] == 400
+
