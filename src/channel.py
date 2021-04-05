@@ -376,6 +376,10 @@ def channel_addowner_v1(token, channel_id, u_id):
     if valid_channelid(channel_id) is False:
         raise InputError("Error: Invalid channel ID")
 
+    # If u_id is in channel
+    if check_useralreadyinchannel(u_id, channel_id) is False:
+        raise AccessError("Error: Not in channel")
+
     # If the u_id is already an owner
     if checkOwner(u_id, channel_id) is True:
         raise InputError("Error: Already Owner")
@@ -391,6 +395,7 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     return {
     }
+
 
 def channel_removeowner_v1(token, channel_id, u_id):
 

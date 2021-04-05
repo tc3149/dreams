@@ -13,7 +13,7 @@ from src.message import message_send_v2, message_edit_v2, message_remove_v1, mes
 from src.utils import saveData
 from src.other import clear_v1
 from src.channels import channels_create_v2, channels_list_v2
-from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1
+from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2
 from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1
 
 def defaultHandler(err):
@@ -188,12 +188,21 @@ def channelRemoveowner():
     saveData()
     return dumps(returnData)
 
+@APP.route("/channel/details/v2", methods=["GET"])
+def channelDetails():
+    inputToken = request.args.get("token")
+    inputchannelID = int(request.args.get("channel_id"))
+    returnData = channel_details_v2(inputToken, inputchannelID)
+    saveData()
+    return dumps(returnData)
+
 @APP.route("/channel/leave/v1", methods=["POST"])
 def channelLeave():
     inputData = request.get_json()
     returnData = channel_leave_v1(inputData["token"], inputData["channel_id"])
     saveData()
     return dumps(returnData)
+
 
 # #############################################################################
 #                                                                             #
@@ -255,16 +264,14 @@ def dmInvite():
 @APP.route("/dm/leave/v1", methods=["POST"])
 def dmLeave():
     inputData = request.get_json()
-    returnData = dm_leave_v1(inputData["token"], inputData["dm_id"])
-    saveData()
-    return dumps(returnData)
+    dm_leave_v1(inputData["token"], inputData["dm_id"])
+    return {}
 
 @APP.route("/dm/remove/v1", methods=["DELETE"])
 def dmRemove():
     inputData = request.get_json()
-    returnData = dm_remove_v1(inputData["token"], inputData["dm_id"])
-    saveData()
-    return dumps(returnData)
+    dm_remove_v1(inputData["token"], inputData["dm_id"])
+    return {}
 
 # DM_DETAILS WRAPPING HERE
 

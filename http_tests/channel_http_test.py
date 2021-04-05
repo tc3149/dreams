@@ -808,6 +808,13 @@ def test_http_channel_removeowner_working():
     user2 = requests.post(config.url + funcURL, json=inputData)
     user2R = json.loads(user2.text)
     # ----------------------------
+     # Channel Join Person 2 -------
+    funcURL = "channel/join/v2"
+    inputData = {
+        "token": user2R["token"],
+        "channel_id": channelR["channel_id"],
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
     # Adding Owner--------------------
     funcURL = "channel/addowner/v1"
     inputData = {
@@ -1103,7 +1110,6 @@ def test_http_channel_leave_working():
         "channel_id": channelR["channel_id"],
     }
     _ = requests.post(config.url + funcURL, json=inputData)
-    print(json.loads(_.text))
     # ----------------------------
     # Listing Channel--------------
     funcURL = "channels/list/v2"
