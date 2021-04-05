@@ -9,9 +9,9 @@ from json import loads
 
 
 '''
-auth_login_v1 takes in an email string and password string. 
+auth_login_v2 takes in an email and password. 
 The function then checks if the email is valid, if a user exists for that email and if the password is correct.
-Returns the user id associated with that email if above conditions are met, otherwise raises an InputError
+Returns the session id and user id if above conditions are met, otherwise raises an InputError
 
 Arguments:
     email (string)    - Email of user
@@ -58,12 +58,13 @@ def auth_login_v2(email, password):
 
 
 '''
-auth_register_v1 takes in an email string, password string, first name string and last name string. 
+auth_register_v2 takes in an email string, password string, first name string and last name string. 
 The function then checks if the names are within length, password is wwithin lengh and email is a valid email
 according to the regex.
-If all conditions are met, the function will create a handle for the user, assign a id and append accData list 
-with a dictionary of the users information (first name, last name, email, password, id, handle).
-Returns the user id that is associated the the new user if above conditions are met, otherwise raises an InputError
+If all conditions are met, the function will create a session id, handle for the user, hash the password, assign a id 
+and append accData list with a dictionary of the users information (first name, last name, email, password, id, handle).
+Also creates a profile for that user and appends it to a profileList
+Returns the token that is associated the the new user if above conditions are met, otherwise raises an InputError
 
 Arguments:
     email (string)    - Email of user
@@ -80,7 +81,7 @@ Exceptions:
     InputError  - Occurs when given email is already registered
 
 Return Value:
-    Returns user id | 'auth_user_id': userID
+    Returns token | 'auth_user_id': userID
 '''
 def auth_register_v2(email, password, name_first, name_last):
     # Checking length of input variables | Error checking for inputs
@@ -150,6 +151,20 @@ def auth_register_v2(email, password, name_first, name_last):
         "auth_user_id": userID,
     }
 
+'''
+Arguments:
+    token (string)    - jwt encrypted session id
+
+
+
+Exceptions:
+    AccessError - Occurs when session does not exist
+    AccessError - Occurs when token is invalid value
+    AccessError - Occurs when token is invalid data type
+
+Return Value:
+    Returns token | 'auth_user_id': userID
+'''
 def auth_logout_v1(token):
     sessionId = is_valid_token_return_data(token)
     for user in database.data["accData"]:
@@ -162,7 +177,7 @@ def auth_logout_v1(token):
     raise AccessError(description="Session doesn't exist")
 
 
- # utils
+# util functions
 def search_email(email):
     for items in database.data["accData"]:
         if items["email"] == email:
