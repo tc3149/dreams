@@ -1,6 +1,6 @@
 import re
 import jwt
-from src.database import data, secretSauce
+import src.database as database
 from src.utils import is_valid_token_return_data
 from src.error import InputError, AccessError
 from hashlib import sha256
@@ -26,7 +26,6 @@ Exceptions:
 Return Value:
     Returns user id | 'auth_user_id': get_user_id(email)
 '''
-sessionIdVar = 0
 
 def auth_login_v2(email, password):
     hashedPass = sha256(password.encode()).hexdigest()
@@ -115,7 +114,8 @@ def auth_register_v2(email, password, name_first, name_last):
             if search_handle(userHandle):
                 # Same handle exists, appending latest handle according to spec
                 userHandle = append_handle(userHandle)
-            userID = len(data["accData"])
+            userID = database.idData["userId"]
+            database.idData["userId"] += 1
             userData = {
                 "name_first": name_first,
                 "name_last": name_last,
@@ -129,7 +129,7 @@ def auth_register_v2(email, password, name_first, name_last):
             newSessionId = new_session_id()
             sessionToken = create_session_token(newSessionId)
             userData["sessions"].append(newSessionId)
-            data["accData"].append(userData)
+            database.data["accData"].append(userData)
 
             # Create profile
             userProfile = {
@@ -139,7 +139,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "name_last": name_last,
                 "handle_str": userHandle,
             }
-            data["userProfiles"].append(userProfile)
+            database.data["userProfiles"].append(userProfile)
     else:
         # Error
         raise InputError(description="Error: Email is not valid")
@@ -152,7 +152,7 @@ def auth_register_v2(email, password, name_first, name_last):
 
 def auth_logout_v1(token):
     sessionId = is_valid_token_return_data(token)
-    for user in data["accData"]:
+    for user in database.data["accData"]:
         for session in user["sessions"]:
             if session == sessionId["sessionId"]:
                 user["sessions"].remove(sessionId["sessionId"])
@@ -164,13 +164,13 @@ def auth_logout_v1(token):
 
  # utils
 def search_email(email):
-    for items in data["accData"]:
+    for items in database.data["accData"]:
         if items["email"] == email:
             return True
     return False
 
 def verify_password(email, password):
-    for items in data["accData"]:
+    for items in database.data["accData"]:
         if items["email"] == email:
             if items["password"] == password:
                 return True
@@ -178,13 +178,13 @@ def verify_password(email, password):
                 return False
 
 def search_handle(currUserHandle):
-    for items in data["accData"]:
+    for items in database.data["accData"]:
         if items["handle"] == currUserHandle:
             return True
     return False
 
 def get_user_id(email):
-    for items in data["accData"]:
+    for items in database.data["accData"]:
         if items["email"] == email:
             userID = items["id"]
             return userID
@@ -208,15 +208,15 @@ def create_handle(first, last):
     return createUserHandle
 
 def new_session_id():
-    global sessionIdVar
-    sessionIdVar += 1
-    return sessionIdVar
+    database.idData["sessionId"] = database.idData["sessionId"] + 1
+    return database.idData["sessionId"]
+
 
 def create_session_token(sessionId):
-    sessionToken = jwt.encode({"sessionId": sessionId}, secretSauce, algorithm="HS256")
+    sessionToken = jwt.encode({"sessionId": sessionId}, database.secretSauce, algorithm="HS256")
     return sessionToken
 
 def email_search_append_sessiontoken(email, sessionId):
-    for items in data["accData"]:
+    for items in database.data["accData"]:
         if items["email"] == email:
             items["sessions"].append(sessionId)

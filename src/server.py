@@ -4,7 +4,7 @@ from flask import Flask, request, abort
 from flask_cors import CORS
 from src.error import InputError, AccessError
 from src import config
-from src.database import data, secretSauce
+import src.database as database
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1
 from src.user import user_profile_setname_v2, user_profile_sethandle_v1
@@ -38,9 +38,8 @@ APP.register_error_handler(Exception, defaultHandler)
 
 # Load database
 
-with open("serverDatabase.json", "r") as file:
-    data = loads(file.read())
-print("server: ", data)
+with open("serverDatabase.json", "r") as dataFile:
+    database.data = loads(dataFile.read())
 
 
 # #############################################################################
@@ -55,7 +54,6 @@ def authRegister():
     returnData = auth_register_v2(
             inputData["email"], inputData["password"], inputData["name_first"], inputData["name_last"])
     saveData()
-    print(data)
     return dumps(returnData)
 
 @APP.route("/auth/login/v2", methods=["POST"])

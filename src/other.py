@@ -5,7 +5,7 @@ from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
-from src.database import data
+import src.database as database
 from json import dumps, loads
 from src.utils import saveData, get_user_id_from_token
 
@@ -13,13 +13,17 @@ def clear_v1():
     '''
     Reset Everything to default state
     '''
-    data["accData"].clear() 
-    data["channelList"].clear() 
-    data["message_ids"].clear()
-    data["dmList"].clear()
-    data["userProfiles"].clear()
+    database.idData["sessionId"] = 0
+    database.idData["userId"] = 0
+
+    database.data["accData"].clear() 
+    database.data["channelList"].clear() 
+    database.data["message_ids"].clear()
+    database.data["dmList"].clear()
+    database.data["userProfiles"].clear()
+
     with open("serverDatabase.json", "w") as dataFile:
-        dataFile.write(dumps(data))
+        dataFile.write(dumps(database.data))
 
 def search_v1(token, query_str):
 
@@ -30,11 +34,11 @@ def search_v1(token, query_str):
 
     # Store every message in channels/dms that the user is a part of
     message_list = []
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if auth_user_id in channel.get("member_ids"):
             message_list.extend(channel["messages"])
 
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if auth_user_id in dm.get("member_ids"):
             message_list.extend(dm["messages"])
     

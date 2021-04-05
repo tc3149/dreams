@@ -1,12 +1,13 @@
 import pytest
 import jwt
 from src.other import clear_v1
+from src.dm import dm_create_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1
 from src.auth import auth_register_v2
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2, channel_invite_v2, channel_details_v2, channel_leave_v1, channel_addowner_v1, checkOwner
 from src.channels import channels_create_v2, channels_list_v2
-from src.database import data, secretSauce
-from src.dm import make_dm_name, dm_create_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_messages_v1, dm_invite_v1
+import src.database as database
+from src.dm import make_dm_name, dm_create_v1
 
 # ------------------------------------------------------------------------------------------------------
 #dm create tests
@@ -42,7 +43,7 @@ def test_dm_create_invalid_token():
 
     user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
     id_list = [user1.get("auth_user_id")]
-    invalid_id = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_id = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         assert dm_create_v1(invalid_id, id_list) == AccessError
 
@@ -83,7 +84,7 @@ def test_dm_list_multiple():
 def test_dm_list_invalidtoken():
 
     clear_v1()
-    invalid_id = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_id = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         assert dm_list_v1(invalid_id) == AccessError
 
@@ -98,10 +99,10 @@ def test_dm_invite_one():
     user2 = auth_register_v2("two@gmail.com", "password", "awo", "Lastname")
     id_list = [user1.get("auth_user_id")]
     dm_create_v1(user["token"], id_list)
-    assert data["dmList"][0]["member_ids"] == [0, 1]
+    assert database.data["dmList"][0]["member_ids"] == [0, 1]
 
     dm_invite_v1(user["token"], 0, user2.get("auth_user_id"))
-    assert data["dmList"][0]["member_ids"] == [0, 1, 2]
+    assert database.data["dmList"][0]["member_ids"] == [0, 1, 2]
 
 def test_dm_invite_multiple():
 
@@ -111,20 +112,20 @@ def test_dm_invite_multiple():
     user2 = auth_register_v2("two@gmail.com", "password", "awo", "Lastname")
     id_list = [user1.get("auth_user_id")]
     dm_create_v1(user["token"], id_list)
-    assert data["dmList"][0]["member_ids"] == [0, 1]
+    assert database.data["dmList"][0]["member_ids"] == [0, 1]
 
     dm_invite_v1(user["token"], 0, user2.get("auth_user_id"))
-    assert data["dmList"][0]["member_ids"] == [0, 1, 2]
+    assert database.data["dmList"][0]["member_ids"] == [0, 1, 2]
 
     user3 = auth_register_v2("three@gmail.com", "password", "three", "Lastname")
     dm_invite_v1(user1["token"], 0, user3.get("auth_user_id"))
-    assert data["dmList"][0]["member_ids"] == [0, 1, 2, 3]
+    assert database.data["dmList"][0]["member_ids"] == [0, 1, 2, 3]
 
     user4 = auth_register_v2("four@gmail.com", "password", "four", "Lastname")
     user5 = auth_register_v2("five@gmail.com", "password", "five", "Lastname")
     dm_invite_v1(user3["token"], 0, user5.get("auth_user_id"))
     dm_invite_v1(user3["token"], 0, user4.get("auth_user_id"))
-    assert data["dmList"][0]["member_ids"] == [0, 1, 2, 3, 5, 4]
+    assert database.data["dmList"][0]["member_ids"] == [0, 1, 2, 3, 5, 4]
 
 def test_dm_invite_invalid_dm():
 
@@ -188,7 +189,7 @@ def test_dm_messages_invalid_userid():
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
     
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": "notInt"}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         dm_messages_v1(temp, dm["dm_id"], 0)
 
@@ -417,7 +418,7 @@ def test_dm_remove_invalid_token():
 
     dm = dm_create_v1(user["token"], id_list)
 
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     with pytest.raises(AccessError):
          dm_remove_v1(temp, dm["dm_id"])

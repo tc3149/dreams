@@ -1,6 +1,6 @@
 import re
 from src.error import InputError, AccessError
-from src.database import data
+import src.database as database
 from src.channels import channels_create_v2
 from src.auth import auth_register_v2
 from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner
@@ -32,7 +32,7 @@ def channel_invite_v2(token, channel_id, u_id):
 
     #check if channel exists
     channelExists = False
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel_id is channel["id"]:
             #channel does exist
             channelExists = True
@@ -43,7 +43,7 @@ def channel_invite_v2(token, channel_id, u_id):
     
     #check if auth_user_id exists 
     auth_id_status = False
-    for user in data["accData"]:
+    for user in database.data["accData"]:
         if user.get("id") is auth_user_id:
             #auth_user_id exists
             auth_id_status = True
@@ -56,8 +56,8 @@ def channel_invite_v2(token, channel_id, u_id):
     
     #check if auth_user_id owner member of channel
     owner_status = False
-    for user in data["channelList"][channel_id]['owner_ids']:   
-        if auth_user_id in data["channelList"][channel_id]['owner_ids']:
+    for user in database.data["channelList"][channel_id]['owner_ids']:   
+        if auth_user_id in database.data["channelList"][channel_id]['owner_ids']:
             #user is owner member of channel
             owner_status = True
             break
@@ -68,7 +68,7 @@ def channel_invite_v2(token, channel_id, u_id):
 
     #check if u_id exists
     u_id_status = False
-    for user2 in data["accData"]:
+    for user2 in database.data["accData"]:
         if user2.get("id") is u_id:
             #u_id exists
             u_id_status = True
@@ -79,8 +79,8 @@ def channel_invite_v2(token, channel_id, u_id):
         raise InputError ("Invited user does not exist")
     
     #check if u_id already member of the channel
-    for user2 in data["channelList"][channel_id]['member_ids']:
-        if u_id in data["channelList"][channel_id]['member_ids']:
+    for user2 in database.data["channelList"][channel_id]['member_ids']:
+        if u_id in database.data["channelList"][channel_id]['member_ids']:
             #u_id is member of channel
             raise InputError ("User already a member")    
 
@@ -88,7 +88,7 @@ def channel_invite_v2(token, channel_id, u_id):
     
     #add u_id to channel
     
-    data["channelList"][channel_id]['member_ids'].append(u_id)
+    database.data["channelList"][channel_id]['member_ids'].append(u_id)
     
     return {
 
@@ -138,7 +138,7 @@ def channel_details_v2(token, channel_id):
     auth_user_id = get_user_id_from_token(token)
     #check if channel exists
     channelExists = False
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel_id is channel["id"]:
             #channel does exist
             channelExists = True
@@ -151,7 +151,7 @@ def channel_details_v2(token, channel_id):
 
     #check if auth_user_id exists 
     auth_id_status = False
-    for user in data["accData"]:
+    for user in database.data["accData"]:
         if user.get("id") is auth_user_id:
             #auth_user_id exists
             auth_id_status = True
@@ -164,9 +164,9 @@ def channel_details_v2(token, channel_id):
     
     #check if auth_user_id owner member of channel
     member_status = False
-    for user in data["channelList"][channel_id]['member_ids']:
+    for user in database.data["channelList"][channel_id]['member_ids']:
         
-        if auth_user_id in data["channelList"][channel_id]['member_ids']:
+        if auth_user_id in database.data["channelList"][channel_id]['member_ids']:
             #user is owner member of channel
             member_status = True
             break
@@ -179,15 +179,15 @@ def channel_details_v2(token, channel_id):
     
     allMembers = []
     ownMembers = []
-    for memberID in data["channelList"][channel_id]['member_ids']:
-        for mem in data["accData"]:
+    for memberID in database.data["channelList"][channel_id]['member_ids']:
+        for mem in database.data["accData"]:
             if memberID is mem['id']:
                 new_member = {
                     'u_id':memberID,
-                    'email': data["accData"][memberID]['email'],
-                    'name_first': data["accData"][memberID]['name_first'],
-                    'name_last': data["accData"][memberID]['name_last'],
-                    'handle_str': data["accData"][memberID]['handle']
+                    'email': database.data["accData"][memberID]['email'],
+                    'name_first': database.data["accData"][memberID]['name_first'],
+                    'name_last': database.data["accData"][memberID]['name_last'],
+                    'handle_str': database.data["accData"][memberID]['handle']
                 }
                 allMembers.append(new_member)
                 break
@@ -195,15 +195,15 @@ def channel_details_v2(token, channel_id):
             
     #loop to add owner details
     
-    for ownerID in data["channelList"][channel_id]['owner_ids']:       
-        for own in data["accData"]:
+    for ownerID in database.data["channelList"][channel_id]['owner_ids']:       
+        for own in database.data["accData"]:
             if ownerID is own['id']:
                 owner = {
                     'u_id':ownerID,
-                    'email': data["accData"][ownerID]['email'],
-                    'name_first': data["accData"][ownerID]['name_first'],
-                    'name_last': data["accData"][ownerID]['name_last'],
-                    'handle_str': data["accData"][ownerID]['handle']
+                    'email': database.data["accData"][ownerID]['email'],
+                    'name_first': database.data["accData"][ownerID]['name_first'],
+                    'name_last': database.data["accData"][ownerID]['name_last'],
+                    'handle_str': database.data["accData"][ownerID]['handle']
                 }
                 ownMembers.append(owner)
                 break
@@ -260,7 +260,7 @@ def channel_messages_v2(token, channel_id, start):
 
     #Check if user is authorised to be in the channel
     authorisation = False
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel["id"] is channel_id:
             for user in channel["member_ids"]:
                 if user is auth_user_id:
@@ -270,7 +270,7 @@ def channel_messages_v2(token, channel_id, start):
         raise AccessError("User is not in channel")
 
     # Return Function
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel["id"] is channel_id:
             messages = channel["messages"]
 
@@ -308,7 +308,7 @@ def channel_leave_v1(token, channel_id):
         raise InputError("Error: Channel ID is not a valid channel")
     #Checking if user is in the channel and removing the user
     id_status = False
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel.get("id") is channel_id:
             for member in channel["member_ids"]:
                 if auth_user_id is member:
@@ -357,7 +357,7 @@ def channel_join_v2(token, channel_id):
     if check_useralreadyinchannel(auth_user_id, channel_id) is True:
         raise AccessError("User already in channel")
 
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel["id"] is channel_id:
             channel["member_ids"].append(auth_user_id)
 
@@ -384,7 +384,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     if checkOwner(auth_user_id, channel_id) is False:
         raise AccessError("Error: Not an owner")
     
-    for counter in data["channelList"]:
+    for counter in database.data["channelList"]:
         if counter["id"] is channel_id:
             counter["owner_ids"].append(u_id)
             break
@@ -405,9 +405,9 @@ def channel_removeowner_v1(token, channel_id, u_id):
         raise InputError("Error: Invalid channel ID")
 
     # If the u_id is the only owner
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel_id == channel["id"]:
-            if len(channel["owner_ids"]) is 1:
+            if len(channel["owner_ids"]) == 1:
                 raise InputError("Error: Only one owner")
 
     # If the u_id is not an owner
@@ -419,7 +419,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
         raise InputError("Error: Token is Not Owner")
 
     # Main Implemenation
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel_id == channel["id"]:
             for owner in channel["owner_ids"]:
                 if u_id is owner:

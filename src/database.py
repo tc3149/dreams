@@ -19,4 +19,10 @@ data = {
     "userProfiles": [],
 }
 
+idData = {
+    "userId": 0, 
+    "sessionId": 0,
+}
+
 secretSauce = "placeholder"
+

@@ -1002,7 +1002,7 @@ def testsenddm_invalid_token_ID():
 
     # Message Send DM -------
     funcURL = "message/senddm/v1"
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": "notInt"}, secretSauce, algorithm = "HS256")
     inputData = {
         "token": invalid_token,
         "dm_id": dmR["dm_id"],

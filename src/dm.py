@@ -1,11 +1,12 @@
 import re
+import src.database as database
+from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid
 from src.error import InputError, AccessError
-from src.database import data
-from src.utils import get_user_id_from_token, make_dm_name, valid_userid, valid_dmid
 
 '''
 Direct Messages
 '''
+
 def dm_create_v1(token, u_ids):
     
     #Obtain user id of creator from token
@@ -15,7 +16,7 @@ def dm_create_v1(token, u_ids):
     total_ids = [auth_user_id]
     total_ids.extend(u_ids)
 
-    dm_id = len(data["dmList"])
+    dm_id = len(database.data["dmList"])
 
     # Make dm name as alphabetically sorted list of handles
     dm_name = make_dm_name(total_ids)
@@ -29,7 +30,7 @@ def dm_create_v1(token, u_ids):
     }
 
     # Adding user data and database
-    data["dmList"].append(dmData)
+    database.data["dmList"].append(dmData)
 
     return {
         'dm_id': dm_id,
@@ -43,7 +44,7 @@ def dm_list_v1(token):
 
     newdmList = []
 
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if auth_user_id in dm.get('member_ids'):
             dmDict = {}
             dmDict['dm_id'] = dm.get('id')
@@ -59,7 +60,7 @@ def dm_invite_v1(token, dm_id, u_id):
 
     # Check if dm_id exists
     dmExists = False
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if dm_id is dm["id"]:
             # Dm exists
             dmExists = True
@@ -74,7 +75,7 @@ def dm_invite_v1(token, dm_id, u_id):
 
     # Check if the inviter is part of the dm
     authorised = False
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if dm.get("id") is dm_id:
             if auth_user_id in dm.get("member_ids"):
                 authorised = True
@@ -85,7 +86,7 @@ def dm_invite_v1(token, dm_id, u_id):
     # Security measures complete
     # assumption they will not be in the dm already?
     # Add user id into the list of member ids
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if dm.get("id") is dm_id:
             dm["member_ids"].append(u_id)
 
@@ -105,7 +106,7 @@ def dm_messages_v1(token, dm_id, start):
 
     #Check if user is authorised to be in the dm
     authorisation = False
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if dm["id"] is dm_id:
             for user in dm["member_ids"]:
                 if user is auth_user_id:
@@ -117,7 +118,7 @@ def dm_messages_v1(token, dm_id, start):
 
 
     # Return Function
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if dm["id"] is dm_id:
             messages = dm["messages"]
 
@@ -156,7 +157,7 @@ def dm_leave_v1(token, dm_id):
     if valid_dmid(dm_id) is False:
         raise InputError
     # Main Implemenation
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if dm_id is dm["id"]:
             for users in dm["member_ids"]:
                 if auth_user_id is users:
@@ -174,10 +175,10 @@ def dm_remove_v1(token, dm_id):
         raise InputError
 
     # User is not DM creator and main Implementation
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if dm_id is dm["id"]:
             if auth_user_id not in dm["owner_ids"]:
                 raise AccessError
             else:
-                data["dmList"].remove(dm)
+                database.data["dmList"].remove(dm)
                 return
