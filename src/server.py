@@ -188,6 +188,12 @@ def channelRemoveowner():
     saveData()
     return dumps(returnData)
 
+@APP.route("/channel/leave/v1", methods=["POST"])
+def channelLeave():
+    inputData = request.get_json()
+    returnData = channel_leave_v1(inputData["token"], inputData["channel_id"])
+    saveData()
+    return dumps(returnData)
 
 # #############################################################################
 #                                                                             #
@@ -249,14 +255,16 @@ def dmInvite():
 @APP.route("/dm/leave/v1", methods=["POST"])
 def dmLeave():
     inputData = request.get_json()
-    dm_leave_v1(inputData["token"], inputData["dm_id"])
-    return {}
+    returnData = dm_leave_v1(inputData["token"], inputData["dm_id"])
+    saveData()
+    return dumps(returnData)
 
 @APP.route("/dm/remove/v1", methods=["DELETE"])
 def dmRemove():
     inputData = request.get_json()
-    dm_remove_v1(inputData["token"], inputData["dm_id"])
-    return {}
+    returnData = dm_remove_v1(inputData["token"], inputData["dm_id"])
+    saveData()
+    return dumps(returnData)
 
 # DM_DETAILS WRAPPING HERE
 
