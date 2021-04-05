@@ -132,19 +132,3 @@ def channels_create_v2(token, name, is_public):
     return {
         'channel_id': channel_id,
     }
-
-
-
-'''
-if __name__ == "__main__":
-    user0 = auth_register_v1("email2@gmail.com", "password1", "1Name", "1Lastname")
-    user1 = auth_register_v1("email3@gmail.com", "password3", "3Name", "3Lastname")
-    user2 = auth_register_v1("email@gmail.com", "password", "Name", "Lastname")
-    
-    for user in accData:
-        print(user.get("id"))
-
-    print(user2.get("auth_user_id"))
-    
-    print(channels_create_v2(user2.get("auth_user_id"), "Channel", True))
-'''

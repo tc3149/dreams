@@ -334,7 +334,7 @@ def message_share_v1(token,og_message_id,message,channel_id,dm_id):
                 raise InputError("Messages must be between 0 and 1000 characters")
             shared_message_id = message_send_v2(token, channel_id, final_message)
         else:
-            raise AccessError ('User not member of target Channel')
+            raise AccessError (description='User not member of target Channel')
     else:
         raise InputError(description="Only specify either a dm or channel")
 

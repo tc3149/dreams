@@ -1,6 +1,6 @@
 import re
 import src.database as database
-from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid, getUserAccData
+from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid, getUserProfileData
 from src.error import InputError, AccessError
 
 '''
@@ -350,9 +350,8 @@ def dm_details_v1 (token, dm_id):
     allMembers = []
     for dm in database.data["dmList"]:
         if dm["id"] == dm_id:
-            print(dm["member_ids"])
             for userId in dm["member_ids"]:
-                currUser = getUserAccData(userId)
+                currUser = getUserProfileData(userId)
                 dmMember = {
                     'u_id':currUser["id"],
                     'email': currUser['email'],

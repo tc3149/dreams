@@ -167,3 +167,8 @@ def getUserAccData(u_id):
     for user in database.data["accData"]:
         if user["id"] == u_id:
             return user
+
+def getUserProfileData(u_id):
+    for user in database.data["profileList"]:
+        if user["u_id"] == u_id:
+            return user

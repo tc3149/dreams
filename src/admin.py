@@ -12,8 +12,6 @@ def admin_user_remove_v1(token, u_id):
         # user_id does not exist
         raise InputError ("User does not exist")
     
-    print(f"{auth_user_id} and {u_id}")
-    print(database.data["accData"][0]["permission"])
     #if user is only owner and is trying to remove themselves
     if auth_user_id == u_id:
         ownerCount = 0
