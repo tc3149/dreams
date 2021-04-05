@@ -52,6 +52,37 @@
     - Assumes an invalid (does not exist in database) auth_user_id will raise an InputError
     - Assumes a private channel will always return an AccessError as global owner has not been implemented yet
 
+- channel_addowner_v1:
+    - Assumes that a user has to be part of the channel in order to become owner
+    - Assumes an invalid u_ID produces an InputError
+
+- channel_removeowner_v1:
+    - Assumes that removing an owner does not kick them from the channel
+
+
+**message.py**
+- message_send_v2:
+    - Assumes the message can be of 1000 characters, but no more
+    - Assumes a message cannot be empty ('') as this is considered a removed message
+    - Assumes an invalid channel ID will produce an InputError
+
+- message_edit_v2:
+    - Assume the message can be of 1000 characters, but no more
+    - Assumes an invalid channel ID will produce an InputError
+    - Assumes an invalid message ID will produce an InputError
+    - Only the OP, Owner and Dreams Owner can edit a message
+
+- message_remove_v1:
+    - Assumes an invalid channel ID will produce an InputError
+    - Assumes an invalid message ID will produce an InputError
+    - Only the OP, Owner and Dreams Owner can remove a message
+    - When deleting a message, the message will delete, however, the information (e.g. message_id) contents will stay, only the message is deleted
+
+- message_senddm_v1
+    - Assumes the message can be of 1000 characters, but no more
+    - Assumes a message cannot be empty ('') as this is considered a removed message
+    - Assumes an invalid channel ID will produce an InputError
+
 
 **dm.py**
 
