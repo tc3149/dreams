@@ -476,7 +476,3 @@ def test_without_optional_message_dm():
     assert messages1["messages"][0]["message_id"] == 2
     assert messages1["messages"][0]["message"] == '\n\n"""\nThis is a message\n"""'
     assert messages1["messages"][0]["u_id"] == user1["auth_user_id"]
-
-##def test_final_message_above_limit():
-
-test_with_optional_message_dm()
