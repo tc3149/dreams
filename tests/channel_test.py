@@ -5,7 +5,7 @@ from src.auth import auth_register_v2
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2, channel_invite_v2, channel_details_v2, channel_leave_v1, channel_addowner_v1, checkOwner, channel_removeowner_v1
 from src.channels import channels_create_v2, channels_list_v2
-from src.database import data, secretSauce
+import src.database as database
 from src.channel import channel_join_v2
 from src.utils import check_useralreadyinchannel
 
@@ -25,7 +25,7 @@ def test_channel_messages_invalid_userid():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
-    invalid_id = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_id = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         channel_messages_v2(invalid_id, channel["channel_id"], 0)
 
@@ -104,7 +104,7 @@ def test_joining_invalid_user():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     new = channels_create_v2(user1.get("token"), "channel1", True)
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     
     with pytest.raises(AccessError):
         channel_join_v2(temp, new.get("channel_id"))
@@ -117,7 +117,7 @@ def test_joining_invalid_channel():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     channels_create_v2(user1.get("token"), "channel1", True)
 
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     with pytest.raises(InputError):
         channel_join_v2(user2.get("token"), temp)
@@ -163,7 +163,7 @@ def test_channel_invite_auth_id_doesnt_exist():
     user1 = auth_register_v2("email1@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     channel1 = channels_create_v2(user1["token"], "testChannel", True)
-    invalid_id = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_id = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         channel_invite_v2(invalid_id, channel1["channel_id"], user2["auth_user_id"])
 
@@ -255,7 +255,7 @@ def test_user_doesnt_exist ():
 
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel1 = channels_create_v2(user1.get("token"), "testchannel", True)
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         channel_details_v2(temp, channel1["channel_id"])
 
@@ -408,7 +408,7 @@ def test_addowner_invalid_uID():
 
     new = channels_create_v2(user1_token, "channel1", False)
     
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")   
+    temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")   
     
     with pytest.raises(InputError):
         channel_addowner_v1(user1_token, new.get("channel_id"), temp)

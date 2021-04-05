@@ -5,7 +5,7 @@ from src.auth import auth_register_v2
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
-from src.database import data, secretSauce
+import src.database as database
 from src.channel import channel_join_v2
 from src.channel import channel_messages_v2
 from src.message import message_send_v2
@@ -33,7 +33,7 @@ def testsend_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     with pytest.raises(AccessError):
         message_send_v2(invalid_token, channel["channel_id"], "This is a messsage from Thomas Chen")    
@@ -98,7 +98,7 @@ def testedit_invalid_token():
     channel = channels_create_v2(user["token"], "testchannel", True)
     message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
     m_id = message1.get('message_id')
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     with pytest.raises(AccessError):
         message_edit_v2(invalid_token, m_id, 'Jonathan Chen')
@@ -171,7 +171,7 @@ def testremove_invalid_token():
     channel = channels_create_v2(user["token"], "testchannel", True)
     message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
     m_id = message1.get('message_id')
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     with pytest.raises(AccessError):
         message_remove_v1(invalid_token, m_id)

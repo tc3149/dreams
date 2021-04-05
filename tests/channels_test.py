@@ -1,6 +1,6 @@
 import pytest
 import jwt
-from src.database import secretSauce
+import src.database as database
 from src.other import clear_v1
 from src.auth import auth_register_v2, auth_login_v2
 from src.error import InputError, AccessError
@@ -24,7 +24,7 @@ def test_channels_create_invalid():
     # Testing if an error is given for invalid user ids
 
     clear_v1()
-    invalid_id = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_id = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         assert channels_create_v2(invalid_id, "testchannel", True) == AccessError
 
@@ -115,7 +115,7 @@ def test_channels_list_invalid():
     user1 = auth_register_v2("email@gmail.com", "password", "name", "Lastname")
     auth_register_v2("email2@gmail.com", "password", "name", "Lastname")
     channels_create_v2(user1.get("token"), "testChannel", True)
-    invalid_id = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_id = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         assert channels_list_v2(invalid_id)
 
@@ -165,7 +165,7 @@ def test_channels_listall_invalid():
     # Testing if an error is given from invalid user ids
 
     clear_v1()
-    invalid_id = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_id = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         assert channels_listall_v1(invalid_id) == AccessError
 
