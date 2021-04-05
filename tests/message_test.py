@@ -414,7 +414,7 @@ def test_optional_message_channel():
     messages1 = channel_messages_v2(user1["token"], channel2["channel_id"], 0)
 
     for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
+        assert msg["message_id"] == 2
         assert msg["message"] == 'from manu\n\n"""\nThis is a message\n"""'
         assert msg["u_id"] == user1["auth_user_id"]
 
@@ -434,7 +434,7 @@ def test_no_optional_message_valid_channel():
     messages1 = channel_messages_v2(user1["token"], channel2["channel_id"], 0)
 
     for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
+        assert msg["message_id"] == 2
         assert msg["message"] == '\n\n"""\nThis is a message\n"""'
         assert msg["u_id"] == user1["auth_user_id"]
 
@@ -451,12 +451,11 @@ def test_with_optional_message_dm():
     channel_id = -1
 
     message_share_v1(user1["token"],og_message_id["message_id"],message,channel_id,dm["dm_id"])
-    messages1 = channel_messages_v2(user1["token"], dm["dm_id"], 0)
+    messages1 = dm_messages_v1(user1["token"], dm["dm_id"], 0)
 
-    for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
-        assert msg["message"] == 'from manu\n\n"""\nThis is a message\n"""'
-        assert msg["u_id"] == user1["auth_user_id"]
+    assert messages1["messages"][0]["message_id"] == 2
+    assert messages1["messages"][0]["message"] == 'from manu\n\n"""\nThis is a message\n"""'
+    assert messages1["messages"][0]["u_id"] == user1["auth_user_id"]
 
 
 def test_without_optional_message_dm():
@@ -472,13 +471,12 @@ def test_without_optional_message_dm():
     channel_id = -1
 
     message_share_v1(user1["token"],og_message_id["message_id"],message,channel_id,dm["dm_id"])
-    messages1 = channel_messages_v2(user1["token"], dm["dm_id"], 0)
+    messages1 = dm_messages_v1(user1["token"], dm["dm_id"], 0)
 
-    for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
-        assert msg["message"] == 'from manu\n\n"""\nThis is a message\n"""'
-        assert msg["u_id"] == user1["auth_user_id"]
+    assert messages1["messages"][0]["message_id"] == 2
+    assert messages1["messages"][0]["message"] == '\n\n"""\nThis is a message\n"""'
+    assert messages1["messages"][0]["u_id"] == user1["auth_user_id"]
 
 ##def test_final_message_above_limit():
 
-test_optional_message_channel()
+test_with_optional_message_dm()

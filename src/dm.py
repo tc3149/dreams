@@ -166,7 +166,7 @@ list for return.
 
 Arguments:
     token (string) - Unique user id created by auth_register_v2
-    channel_id (integer) - Unique channel id created by channels_create_v2
+    dm_id (integer) - Unique dm id created by dm_create_v2
     start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
     indexes relating to recent messages
 

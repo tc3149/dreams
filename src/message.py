@@ -53,9 +53,8 @@ def message_send_v2(token, channel_id, message):
     remove_temp = temp.replace(microsecond = 0)
     final_time = remove_temp.timestamp()
     
-    length_of_total = len(database.data["message_ids"])
-    new_message_id = length_of_total + 1
-
+    database.idData['messageId'] = database.idData["messageId"] + 1
+    new_message_id = database.idData["messageId"]
     message_final = {
         'message': message,
         'message_id': new_message_id,
@@ -198,7 +197,7 @@ If conditions are breached, it raises an InputError or AccessError.
 
 Arguments:
     token (string) - User's Authorisation Hash
-    dm_id (int) - DM's ID
+    message_id (int) - DM's ID
     message (string) - User's desired message
 
 Exceptions:
@@ -234,8 +233,8 @@ def message_senddm_v1(token, dm_id, message):
     remove_temp = temp.replace(microsecond = 0)
     final_time = remove_temp.timestamp()
     
-    length_of_total = len(database.data["message_ids"])
-    new_message_id = length_of_total + 1
+    database.idData['messageId'] = database.idData["messageId"] + 1
+    new_message_id = database.idData['messageId']
 
     message_final = {
         'message': message,
