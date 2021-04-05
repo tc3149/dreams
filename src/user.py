@@ -14,6 +14,7 @@ Exceptions:
     AccessError - Occurs when value does not exist in database
     AccessError - Occurs when token value is invalid data type
     AccessError - Occurs when token is invalid data type
+    InputError  - Occurs when given u_id is not a valid user
 
 Return Value:
     Dictionary of this format = {
@@ -27,9 +28,12 @@ Return Value:
 def user_profile_v2(token, u_id):
     _ = get_user_id_from_token(token)
 
-    for user in database.data["userProfiles"]:
-        if user["u_id"] == u_id:
-            return user
+    if search_user(u_id):
+        for user in database.data["userProfiles"]:
+            if user["u_id"] == u_id:
+                return user
+    else:
+        raise InputError(description="User does not exist")
 
 
 '''
