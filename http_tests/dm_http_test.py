@@ -3,9 +3,8 @@ import requests
 import json
 import jwt
 import urllib
-from src.database import data, secretSauce
+import src.database as database
 from src import config
-from src.other import clear_v1
 
 #DM CREATE TEST---------------------------------------------------------------------------------------------------------
 def test_http_dm_create_working():
@@ -91,7 +90,7 @@ def test_http_dm_create_invalid_user():
 
 def test_http_dm_create_invalid_token():
     requests.delete(config.url + "clear/v1")
-    temp = jwt.encode({"sessionId": 7}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 7}, database.secretSauce, algorithm = "HS256")
 
     funcURL = "dm/create/v1"
     inputData = {
@@ -402,7 +401,7 @@ def test_http_dm_list_working():
 
 def test_http_dm_list_invalid_token():
     requests.delete(config.url + "clear/v1")
-    temp = jwt.encode({"sessionId": 7}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 7}, database.secretSauce, algorithm = "HS256")
 
     funcURL = "dm/list/v1"
     inputData = {
@@ -617,7 +616,7 @@ def test_http_dm_leave_invalid_token():
     dm = requests.post(config.url + funcURL, json=inputData)
     dmR = json.loads(dm.text)
     # ----------------------------
-    temp = jwt.encode({"sessionId": 7}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 7}, database.secretSauce, algorithm = "HS256")
     # Leaving DM-----------------
     funcURL = "dm/leave/v1"
     inputData = {
@@ -830,7 +829,7 @@ def test_http_dm_remove_invalid_token():
     dm = requests.post(config.url + funcURL, json=inputData)
     dmR = json.loads(dm.text)
     # ----------------------------
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
     # Removing DM-----------------
     funcURL = "dm/remove/v1"
     inputData = {
@@ -931,7 +930,7 @@ def test_http_dm_message_invalid_user():
     dm = requests.post(config.url + funcURL, json=inputData)
     dmR = json.loads(dm.text)
     # ----------------------------
-    temp = jwt.encode({"sessionId": 7}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 7}, database.secretSauce, algorithm = "HS256")
     # Checking Messages-----------------
     funcURL = "dm/messages/v1"
     inputData = {
