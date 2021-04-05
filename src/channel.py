@@ -301,6 +301,29 @@ def channel_messages_v2(token, channel_id, start):
         'end': end,
     }
 
+'''
+channel_leave_v1 takes in a token and a specific channel id.
+The first segment checks for inputError when a invalid channel_id is added.
+After that segment is passed, the next segment checks if the user is in the channel
+and if the user is present, the user is removed from the list of member ids in channel database.
+Otherwise, if the user is not present, an AccessError is raised.
+
+Arguments:
+    auth_user_id (integer) - Unique user id created by auth_register_v1
+    channel_id (integer) - Unique channel id created by channels_create_v2
+    start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
+    indexes relating to recent messages
+
+Exceptions:
+    InputError - channel_id is invalid
+    AccessError - Occurs when auth_user_id is not valid (i.e. not created)
+
+Return Value:
+    Most cases Returns:
+        '{}'
+
+'''
+
 def channel_leave_v1(token, channel_id):
     auth_user_id = get_user_id_from_token(token)
     #Checking if channel is valid
@@ -417,6 +440,24 @@ def channel_addowner_v1(token, channel_id, u_id):
     return {
     }
 
+'''
+channel_removeowner_v1 takes in the user's token and the u_id they wish to remove as owner.
+The function then checks whether both the token and u_id is valid, the channel is valid, if the user's token is the only owner and if u_id is not an owner.
+If so, it removed the user's ID in the channel's 'member ids' and returns nothing. If conditions are breached, it raises an InputError or AccessError
+
+Arguments:
+    token(string) - User's ID
+    channel_id (string) - Channel's ID
+
+Exceptions:
+    InputError - when the user's ID is invalid
+    InputError - when the channel ID is invalid
+    InputError - when the u_id is not an owner
+    InputError - when the token is not an owner
+
+Return Value:
+    Returns nothing.
+'''
 
 def channel_removeowner_v1(token, channel_id, u_id):
 

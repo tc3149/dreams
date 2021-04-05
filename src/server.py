@@ -12,7 +12,7 @@ from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1
 from src.utils import saveData
 from src.other import clear_v1, search_v1
-from src.channels import channels_create_v2, channels_list_v2
+from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2
 from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1
 
@@ -223,6 +223,12 @@ def channelList():
     saveData()
     return dumps(returnData)
 
+@APP.route("/channels/listall/v2", methods=["GET"])
+def channelListall():
+    inputToken = request.args.get("token")
+    returnData = channels_listall_v2(inputToken)
+    saveData()
+    return dumps(returnData)
 
 # #############################################################################
 #                                                                             #
