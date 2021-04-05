@@ -1157,3 +1157,55 @@ def test_http_dm_message_endnegativeone():
     dmMessagesR = json.loads(dmMessages.text)
     assert dmMessagesR["end"] == -1
     # ----------------------------
+
+# ----------------------------#DM DETAILS TESTS -----------------------------------------------------------------------------------------------------------
+
+def test_http_dm_details_dm_does_not_exist():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+    # Creating DM-----------------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(userR["auth_user_id"])
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(dm.text) 
+    # ----------------------------
+    # checking details -----------
+    funcURL = "dm/details/v1"
+    inputData ={
+        "token": userR['token'],
+        "dm_id": 1242134
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmDetails = requests.get(config.url + funcURL + "?" + qData)
+    dmDetails = json.loads(dmDetails.text)
+    
+    assert dmDetails["code"] == 400
