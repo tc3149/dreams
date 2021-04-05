@@ -277,16 +277,16 @@ def dmInvite():
 @APP.route("/dm/leave/v1", methods=["POST"])
 def dmLeave():
     inputData = request.get_json()
-    dm_leave_v1(inputData["token"], inputData["dm_id"])
+    returnData = dm_leave_v1(inputData["token"], inputData["dm_id"])
     saveData()
-    return {}
+    return dumps(returnData)
 
 @APP.route("/dm/remove/v1", methods=["DELETE"])
 def dmRemove():
     inputData = request.get_json()
-    dm_remove_v1(inputData["token"], inputData["dm_id"])
+    returnData = dm_remove_v1(inputData["token"], inputData["dm_id"])
     saveData()
-    return {}
+    return dumps(returnData)
 
 @APP.route("/dm/details/v1", methods=["GET"])
 def dmDetails():
@@ -305,16 +305,16 @@ def dmDetails():
 @APP.route("/admin/user/remove/v1", methods = ["DELETE"])
 def adminUserRemove():
     inputData = request.get_json()
-    admin_user_remove_v1(inputData["token"], inputData["u_id"])
+    returnData = admin_user_remove_v1(inputData["token"], inputData["u_id"])
     saveData()
-    return {}
+    return dumps(returnData)
 
-@APP.route("/admin/userperission/change/v1", methods = ["POST"])
+@APP.route("/admin/userpermission/change/v1", methods = ["POST"])
 def adminUserpermissionChange():
     inputData = request.get_json()
-    admin_userpermission_change_v1(inputData["token"], inputData["u_id"], inputData["permission"])
+    returnData = admin_userpermission_change_v1(inputData["token"], inputData["u_id"], inputData["permission_id"])
     saveData()
-    return {}
+    return dumps(returnData)
 
 
 # #############################################################################
