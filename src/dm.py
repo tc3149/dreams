@@ -352,14 +352,7 @@ def dm_details_v1 (token, dm_id):
         if dm["id"] == dm_id:
             for userId in dm["member_ids"]:
                 currUser = getUserProfileData(userId)
-                dmMember = {
-                    'u_id':currUser["id"],
-                    'email': currUser['email'],
-                    'name_first': currUser['name_first'],
-                    'name_last': currUser['name_last'],
-                    'handle_str': currUser['handle']
-                }
-                allMembers.append(dmMember)
+                allMembers.append(currUser)
     
     return {
         'name': dmName,
