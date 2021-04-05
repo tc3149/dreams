@@ -35,7 +35,7 @@ def test_channel_messages_invalid_channelid():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channels_create_v2(user["token"], "testchannel", True)
     invalid_channel_id = 2
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_messages_v2(user["token"], invalid_channel_id, 0)
 
 def test_channel_messages_unauthorised_user():
