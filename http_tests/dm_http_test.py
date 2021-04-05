@@ -151,7 +151,7 @@ def test_http_dm_invite_working():
         "token": userR["token"],
         "u_ids": userList,
     }
-    dm = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     # Inviting User 3 to DM-----------------
     funcURL = "dm/invite/v1"
@@ -196,7 +196,7 @@ def test_http_dm_invite_invalid_dmid():
         "name_first": "nameFirst",
         "name_last": "nameLast",
     }
-    user2 = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     # ----------------------------
 
@@ -377,7 +377,7 @@ def test_http_dm_list_working():
         "token": userR["token"],
         "u_ids": userList,
     }
-    dm = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     # Creating DM-----------------
     funcURL = "dm/create/v1"
@@ -387,8 +387,7 @@ def test_http_dm_list_working():
         "token": userR["token"],
         "u_ids": userList,
     }
-    dm = requests.post(config.url + funcURL, json=inputData)
-    dmR = json.loads(dm.text)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     # Creating DM LIST---------------
     funcURL = "dm/list/v1"
