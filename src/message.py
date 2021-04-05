@@ -145,3 +145,54 @@ def message_senddm_v1(token, dm_id, message):
     database.data["message_ids"].append(message_id)
 
     return message_id
+def message_share_v1(token,og_message_id,message,channel_id,dm_id):
+    #if the message is being shared to a dm
+    if channel_id == -1:
+        #check if token belongs to a user in the DM
+        user_id = get_user_id_from_token(token)
+        if check_useralreadyindm(user_id,dm_id) == True: 
+            #find message from the og_message_id
+            
+            for channel in data['channelList']:
+                for messages in channel['messages']:
+                    if messages['message_id'] is og_message_id:
+                        og_message = messages['message_id']['message']
+                        break
+            #combine og message and the optional additional message
+            final_message = message + '\n\n"""\n' + og_message['message'] + '\n"""'
+
+            if len(final_message) > 1000 or len(final_message) == 0:
+                raise er.InputError("Messages must be between 0 and 1000 characters")
+            #share the dm
+            shared_message_id = message_senddm_v1(token,dm_id,final_message)
+            
+        else:
+            raise AccessError ('User not member of target DM')
+    
+    #if the message is being shared to a channel
+    if dm_id == -1:
+        #check if token belongs to a user in the Channel
+        user_id = get_user_id_from_token(token)
+        if check_useralreadyinchannel(user_id,channel_id) == True:
+            #find message from the og_message_id
+            
+            for channel in data['channelList']:
+                for messages in channel['messages']:
+                    if messages['message_id'] is og_message_id:
+                        og_message = messages['message_id']['message']
+                        break
+            #combine og message and the optional additional message
+            final_message = message + '\n\n"""\n' + og_message['message'] + '\n"""'
+
+            if len(final_message) > 1000 or len(final_message) == 0:
+                raise er.InputError("Messages must be between 0 and 1000 characters")
+                
+            #share the message
+            shared_message_id = message_send_v2(token,channel_id,final_message)
+            
+        else:
+            raise AccessError ('User not member of target Channel')
+    
+    return{
+        shared_message_id
+    }

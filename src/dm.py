@@ -186,3 +186,54 @@ def dm_remove_v1(token, dm_id):
             else:
                 database.data["dmList"].remove(dm)
                 return {}
+
+def dm_details_v1 (token, dm_id):
+    #user id from token
+    user_id = get_user_id_from_token(token)
+
+    #check if user_id exists 
+    user_id_satus = valid_userid(user_id)
+    #user does not exist
+    if user_id_satus == False:
+        # user_id does not exist
+        raise InputError ("User does not exist")
+
+    #check if dm exists
+    dmExists = False
+    for dm in data['dmList']:
+        if dm_id is dm['id']:
+            #dm does exist
+            dmExists = True
+            dmName = dm['dm_name']
+            break 
+    if dmExists is False:
+        #dm does not exist
+        raise InputError ("Dm does not exist")
+    dm_member = False 
+    for user in data['dmList'][dm_id]['member_ids']:
+        if user_id in data['dmList'][dm_id]['member_ids']:
+            #member of the dm
+            dm_member = True
+        #not a member of the dm    
+        else:
+            raise AccessError ("User is not a member of this DM")
+
+    allMembers = []
+    for memberID in data['dmList'][dm_id]['member_ids']:
+        for mem in data['accData']:
+            if memberID is mem['id']:
+                new_member = {
+                    'u_id':memberID,
+                    'email': data["accData"][memberID]['email'],
+                    'name_first': data["accData"][memberID]['name_first'],
+                    'name_last': data["accData"][memberID]['name_last'],
+                    'handle_str': data["accData"][memberID]['handle']
+                }
+                allMembers.append(new_member)
+                break 
+    
+    return {
+        'name': dmName,
+        'members': allMembers
+
+    }

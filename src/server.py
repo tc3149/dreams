@@ -196,6 +196,13 @@ def channelDetails():
     saveData()
     return dumps(returnData)
 
+@APP.route("/channel/leave/v1", methods=["POST"])
+def channelLeave():
+    inputData = request.get_json()
+    returnData = channel_leave_v1(inputData["token"], inputData["channel_id"])
+    saveData()
+    return dumps(returnData)
+
 
 # #############################################################################
 #                                                                             #
