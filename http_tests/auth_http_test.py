@@ -2,7 +2,7 @@ import pytest
 import requests
 import json
 import jwt
-from src.database import data, secretSauce
+import src.database as database
 from src import config
 from src.other import clear_v1
 
@@ -236,11 +236,11 @@ def test_http_logout_working():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    token = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    token = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"sessionId": token["sessionId"]}, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"sessionId": token["sessionId"]}, database.secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD == {
@@ -262,7 +262,7 @@ def test_http_logout_invalid_token_key():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"invalidKey": 6}, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"invalidKey": 6}, database.secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
@@ -282,7 +282,7 @@ def test_http_logout_invalid_token_value():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"sessionId": "notAnInt"}, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"sessionId": "notAnInt"}, database.secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
@@ -302,7 +302,7 @@ def test_http_logout_invalid_token_type():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"invalidKey": 9999}, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"invalidKey": 9999}, database.secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
@@ -322,7 +322,7 @@ def test_http_logout_nonexistant_user():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"sessionId": -99999}, secretSauce, algorithm="HS256")
+    inputData = jwt.encode({"sessionId": -99999}, database.secretSauce, algorithm="HS256")
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
