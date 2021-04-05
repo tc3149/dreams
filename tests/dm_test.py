@@ -47,6 +47,15 @@ def test_dm_create_invalid_token():
     with pytest.raises(AccessError):
         assert dm_create_v1(invalid_id, id_list) == AccessError
 
+def test_dm_create_invalid_user():
+
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
+    id_list = [user1.get("auth_user_id"), 67]
+    with pytest.raises(InputError):
+        dm_create_v1(user["token"], id_list)
+    
 # ------------------------------------------------------------------------------------------------------
 # DM List Tests
     
