@@ -169,6 +169,6 @@ def getUserAccData(u_id):
             return user
 
 def getUserProfileData(u_id):
-    for user in database.data["profileList"]:
+    for user in database.data["userProfiles"]:
         if user["u_id"] == u_id:
             return user
