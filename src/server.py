@@ -211,7 +211,6 @@ def channelLeave():
     saveData()
     return dumps(returnData)
 
-
 # #############################################################################
 #                                                                             #
 #                           CHANNELS FUNCTIONS                                #
@@ -232,6 +231,12 @@ def channelList():
     saveData()
     return dumps(returnData)
 
+@APP.route("/channels/listall/v2", methods=["GET"])
+def channelListall():
+    inputToken = request.args.get("token")
+    returnData = channels_listall_v2(inputToken)
+    saveData()
+    return dumps(returnData)
 
 # #############################################################################
 #                                                                             #
@@ -273,12 +278,14 @@ def dmInvite():
 def dmLeave():
     inputData = request.get_json()
     dm_leave_v1(inputData["token"], inputData["dm_id"])
+    saveData()
     return {}
 
 @APP.route("/dm/remove/v1", methods=["DELETE"])
 def dmRemove():
     inputData = request.get_json()
     dm_remove_v1(inputData["token"], inputData["dm_id"])
+    saveData()
     return {}
 
 @APP.route("/dm/details/v1", methods=["GET"])
@@ -310,12 +317,26 @@ def adminUserpermissionChange():
     return {}
 
 
-# ##############################################################################
+# #############################################################################
+#                                                                             #
+#                           OTHER FUNCTIONS                                   #
+#                                                                             #
+# #############################################################################
 
 @APP.route("/clear/v1", methods=["DELETE"])
 def clearAll():
     clear_v1()
     return {}
+
+@APP.route("/search/v2", methods=["GET"])
+def searchv2():
+    inputToken = request.args.get("token")
+    inputQuery = request.args.get("query_str")
+    returnData = search_v1(inputToken, inputQuery)
+    return dumps(returnData)
+
+
+# ########################################################################
 
 # Example
 @APP.route("/echo", methods=['GET'])
@@ -326,7 +347,6 @@ def echo():
     return dumps({
         'data': data
     })
-
 
 if __name__ == "__main__":
     APP.run(port=config.port) # Do not edit this port

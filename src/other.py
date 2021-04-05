@@ -9,12 +9,22 @@ import src.database as database
 from json import dumps, loads
 from src.utils import saveData, get_user_id_from_token
 
+'''
+clear_v1 resets everything to default state by clearing the database list, and
+setting id data to 0.
+
+Arguments:
+    N/A
+Exceptions:
+    N/A
+Return Value:
+    N/A
+'''
 def clear_v1():
-    '''
-    Reset Everything to default state
-    '''
+
     database.idData["sessionId"] = 0
     database.idData["userId"] = 0
+    database.idData["dmId"] = 0
 
     database.data["accData"].clear() 
     database.data["channelList"].clear() 
@@ -25,6 +35,24 @@ def clear_v1():
     with open("serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
 
+'''
+search_v1 takens in a query string and returns a collection of messages in all 
+of the channels/DMS that the user has joined that match the query. Firstly, security
+checks are made (ensuring token is valid) and query string is not too long (< 1000)
+The function first creates a message list of EVERY message that the user has access to
+and would visibly be able to see - this is done by looping through every channel and dm
+and extending any messages to the message list
+It then filters the message list using a lambda function and regex search to remove any
+messages that do not match the query string
+
+Arguments:
+    token (string) - User's Authorisation Hash
+    query_str (string) - User's desired string to search for
+
+Exceptions:
+    AccessError - when the token is invalid
+    InputError - when the query string is above 1000 characters
+'''
 def search_v1(token, query_str):
 
     auth_user_id = get_user_id_from_token(token)
