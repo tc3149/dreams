@@ -11,12 +11,20 @@ from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1
 from src.utils import saveData
+<<<<<<< HEAD
 from src.other import clear_v1, search_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2, channel_invite_v2
 from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1, dm_details_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 
+=======
+from src.other import clear_v1
+from src.channels import channels_create_v2, channels_list_v2
+from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2, channel_invite_v2
+from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1, dm_details_v1
+from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
+>>>>>>> mansirat_i2
 
 def defaultHandler(err):
     response = err.get_response()
@@ -211,6 +219,18 @@ def channelLeave():
     saveData()
     return dumps(returnData)
 
+<<<<<<< HEAD
+=======
+@APP.route("/channe/invite/v2", methods = ["POST"])
+def channelInvite():
+    inputData = request.get_json()
+    returnData = channel_invite_v2(inputData["token"],inputData["channel_id"],inputData["u_id"])
+    saveData()
+    return dumps(returnData)
+
+
+
+>>>>>>> mansirat_i2
 # #############################################################################
 #                                                                             #
 #                           CHANNELS FUNCTIONS                                #

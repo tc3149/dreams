@@ -1205,9 +1205,9 @@ def test_http_dm_details_dm_does_not_exist():
     }
     qData = urllib.parse.urlencode(inputData)
     dmDetails = requests.get(config.url + funcURL + "?" + qData)
-    dmDetails = json.loads(dmDetails.text)
-    print (dmDetails)
-    assert dmDetails["code"] == 400
+    dmDetailsR = json.loads(dmDetails.text)
+    
+    assert dmDetailsR["code"] == 400
 
 def test_http_dm_details_user_not_member_of_dm():
     requests.delete(config.url + "clear/v1")
@@ -1310,7 +1310,6 @@ def test_http_dm_details_valid():
     qData = urllib.parse.urlencode(inputData)
     dmDetails = requests.get(config.url + funcURL + "?" + qData)
     dmDetailsR = json.loads(dmDetails.text)
-    print(dmDetailsR)
     assert dmDetailsR == {
         'name': 'namelastname,namelastname0',
         'members': [

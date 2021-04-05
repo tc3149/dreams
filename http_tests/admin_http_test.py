@@ -87,7 +87,6 @@ def test_http_admin_user_remove_auth_not_owner():
     }
     user3 = requests.post(config.url + funcURL, json=inputData)
     user3R = json.loads(user3.text)
-    print(user3R)
     # ----------------------------------
     #check admin user remove
     funcURL = "admin/user/remove/v1"
