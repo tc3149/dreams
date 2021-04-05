@@ -209,8 +209,7 @@ def test_http_channels_list_invalid_user():
         "name_first": "nameFirst",
         "name_last": "nameLast",
     }
-    user = requests.post(config.url + funcURL, json=inputData)
-    userR = json.loads(user.text)
+    _ = requests.post(config.url + funcURL, json=inputData)
     # ----------------------------
     invalid_token = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
     # Listing Channel--------------
@@ -289,8 +288,7 @@ def test_http_channels_listall_invalid_user():
         "name_first": "nameFirst",
         "name_last": "nameLast",
     }
-    user = requests.post(config.url + funcURL, json=inputData)
-    userR = json.loads(user.text)
+    _ = requests.post(config.url + funcURL, json=inputData)
     # ----------------------------
     invalid_token = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
     # Listing Channel--------------
