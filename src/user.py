@@ -1,5 +1,5 @@
 from src.error import InputError, AccessError
-from src.database import data
+import src.database as database
 from src.utils import get_user_id_from_token, search_email
 from src.utils import search_handle, search_user
 from json import loads
@@ -10,13 +10,11 @@ def user_profile_v2(token, u_id):
 
     if search_user(u_id) == True:
         return {
-            'user': {
-                'u_id': u_id,
-                'email': data["accData"][u_id]["email"],
-                'name_first': data["accData"][u_id]["name_first"],
-                'name_last': data["accData"][u_id]["name_last"],
-                'handle_str': data["accData"][u_id]["handle"],
-            },
+            'u_id': u_id,
+            'email': database.data["userProfiles"][u_id]["email"],
+            'name_first': database.data["userProfiles"][u_id]["name_first"],
+            'name_last': database.data["userProfiles"][u_id]["name_last"],
+            'handle_str': database.data["userProfiles"][u_id]["handle_str"],
         }
     else:
         raise InputError("User not found")
@@ -30,8 +28,15 @@ def user_profile_setname_v2(token, name_first, name_last):
     if len(name_first) > 50 or len(name_last) > 50:
         # Error
         raise InputError("Error: First and/or last name is more than 50 characters")
-    data["accData"][userId]["name_first"] = name_first
-    data["accData"][userId]["name_last"] = name_last
+    
+    for user in database.data["accData"]:
+        if user["id"] == userId:
+            user["name_first"] = name_first
+            user["name_last"] = name_last
+    for user in database.data["userProfiles"]:
+        if user["u_id"] == userId:
+            user["name_first"] = name_first
+            user["name_last"] = name_last
 
     return {}
 
@@ -42,7 +47,12 @@ def user_profile_setemail_v2(token, email):
     isValidEmail = bool(re.match("^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$", email))
     if isValidEmail:
         if not search_email(email):
-            data["accData"][userId]["email"] = email
+            for user in database.data["accData"]:
+                if user["id"] == userId:
+                    user["email"] = email
+            for user in database.data["userProfiles"]:
+                if user["u_id"] == userId:
+                    user["email"] = email
         else:
             raise InputError("Email already in use")
     else:
@@ -60,9 +70,12 @@ def user_profile_sethandle_v1(token, handle_str):
         raise InputError("Handle is not allowed to be shorter than 3 characters")
 
     if not search_handle(handle_str):
-        for item in data["accData"]:
-            if item["id"] == userId:                
-                item["handle"] = handle_str
+        for user in database.data["accData"]:
+            if user["id"] == userId:
+                user["handle"] = handle_str
+        for user in database.data["userProfiles"]:
+            if user["u_id"] == userId:
+                user["handle_str"] = handle_str
     else:
         raise InputError("Handle is taken by another user")
 
@@ -70,16 +83,5 @@ def user_profile_sethandle_v1(token, handle_str):
 
 def users_all_v1(token):
     _ = get_user_id_from_token(token)
-
-    usersList = []
-    for items in range(len(data["accData"])):
-        userData = {
-            'u_id': data["accData"][items]["id"],
-            'email': data["accData"][items]["email"],
-            'name_first': data["accData"][items]["name_first"],
-            'name_last': data["accData"][items]["name_last"],
-            'handle_str': data["accData"][items]["handle"],
-        }
-        usersList.append(userData)
     
-    return usersList
+    return database.data["userProfiles"] 

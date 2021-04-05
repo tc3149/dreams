@@ -9,7 +9,7 @@ from src.user import users_all_v1
 from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
-from src.database import secretSauce
+import src.database as database
 import jwt
 
 
@@ -20,13 +20,11 @@ def test_user_profile_v2_working():
     
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     expectedOutput = {
-        "user": {
-            'u_id': user1["auth_user_id"],
-            'email': "testemail@hotmail.com",
-            'name_first': "firstName",
-            'name_last': "lastName",
-            'handle_str': "firstnamelastname",
-        }
+        'u_id': user1["auth_user_id"],
+        'email': "testemail@hotmail.com",
+        'name_first': "firstName",
+        'name_last': "lastName",
+        'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
 
@@ -45,14 +43,12 @@ def test_user_profile_setname_v2_working():
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     _ = user_profile_setname_v2(user1["token"], "newFirst", "newLast")
     expectedOutput = {
-                    "user": {
-                        'u_id': user1["auth_user_id"],
-                        'email': "testemail@hotmail.com",
-                        'name_first': "newFirst",
-                        'name_last': "newLast",
-                        'handle_str': "firstnamelastname",
-                    }
-                }
+        'u_id': user1["auth_user_id"],
+        'email': "testemail@hotmail.com",
+        'name_first': "newFirst",
+        'name_last': "newLast",
+        'handle_str': "firstnamelastname",
+    }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
 
 def test_user_profile_setname_v2_first_long():
@@ -106,14 +102,12 @@ def test_user_profile_sethandle_v1_working():
 
     _ = user_profile_sethandle_v1(user1["token"], "newHandle")
     expectedOutput = {
-                    "user": {
-                        'u_id': user1["auth_user_id"],
-                        'email': "testemail@hotmail.com",
-                        'name_first': "firstName",
-                        'name_last': "lastName",
-                        'handle_str': "newHandle",
-                    }
-                }
+        'u_id': user1["auth_user_id"],
+        'email': "testemail@hotmail.com",
+        'name_first': "firstName",
+        'name_last': "lastName",
+        'handle_str': "newHandle",
+    }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
 
 
@@ -125,14 +119,12 @@ def test_user_profile_sethandle_v1_handle_taken():
 
     _ = user_profile_sethandle_v1(user1["token"], "newHandle")
     expectedOutput = {
-                    "user": {
-                        'u_id': user1["auth_user_id"],
-                        'email': "testemail@hotmail.com",
-                        'name_first': "firstName",
-                        'name_last': "lastName",
-                        'handle_str': "newHandle",
-                    }
-                }
+        'u_id': user1["auth_user_id"],
+        'email': "testemail@hotmail.com",
+        'name_first': "firstName",
+        'name_last': "lastName",
+        'handle_str': "newHandle",
+    }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
 
     with pytest.raises(InputError):
@@ -165,14 +157,12 @@ def test_user_profile_setemail_v2_working():
     user_profile_setemail_v2(user1["token"], "newEmail@hotmail.com")
 
     expectedOutput = {
-                    "user": {
-                        'u_id': user1["auth_user_id"],
-                        'email': "newEmail@hotmail.com",
-                        'name_first': "firstName",
-                        'name_last': "lastName",
-                        'handle_str': "firstnamelastname",
-                    }
-                }
+        'u_id': user1["auth_user_id"],
+        'email': "newEmail@hotmail.com",
+        'name_first': "firstName",
+        'name_last': "lastName",
+        'handle_str': "firstnamelastname",
+    }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
 
 
@@ -225,7 +215,7 @@ def test_users_all_v1_invalid_token():
     clear_v1()
 
     _ = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
-    invalidToken = jwt.encode({"invalidKey": "invalidValue"}, secretSauce, algorithm="HS256")
+    invalidToken = jwt.encode({"invalidKey": "invalidValue"}, database.secretSauce, algorithm="HS256")
 
     with pytest.raises(AccessError):
         users_all_v1(invalidToken)

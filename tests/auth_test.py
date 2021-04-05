@@ -1,7 +1,7 @@
 import jwt
 import pytest
 import re
-from src.database import data, secretSauce
+import src.database as database
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
@@ -168,14 +168,14 @@ def test_auth_logout_v1_working():
 def test_auth_logout_v1_invalid_token():
     clear_v1()
 
-    invalidToken = jwt.encode({"invalidKey": 0}, secretSauce, algorithm="HS256")
+    invalidToken = jwt.encode({"invalidKey": 0}, database.secretSauce, algorithm="HS256")
     with pytest.raises(AccessError):
         auth_logout_v1(invalidToken)
 
 def test_auth_logout_v1_inactive_token():
     clear_v1()
 
-    inactiveToken = jwt.encode({"sessionId": 1}, secretSauce, algorithm="HS256")
+    inactiveToken = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm="HS256")
     _ = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
 
     with pytest.raises(AccessError):
