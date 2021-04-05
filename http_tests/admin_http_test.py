@@ -44,7 +44,7 @@ def test_http_admin_user_remove_u_id_does_not_exist():
     #chec admin user remove
     funcURL = "admin/user/remove/v1"
     inputData ={
-        "token": userR['token']
+        "token": userR['token'],
         "u-id": 3
     }
     adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
@@ -92,7 +92,7 @@ def test_http_admin_user_remove_auth_not_owner():
     #check admin user remove
     funcURL = "admin/user/remove/v1"
     inputData ={
-        "token": user2R['token']
+        "token": user2R['token'],
         "u-id": user3R['u_id']
     }
     adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
@@ -117,7 +117,7 @@ def test_http_admin_user_remove_auth_only_owner():
     #check admin user remove
     funcURL = "admin/user/remove/v1"
     inputData ={
-        "token": userR['token']
+        "token": userR['token'],
         "u-id": userR['u_id']
     }
     adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
@@ -154,7 +154,7 @@ def test_http_admin_user_remove_successful_removed():
     #admin user remove
     funcURL = "admin/user/remove/v1"
     inputData ={
-        "token": userR['token']
+        "token": userR['token'],
         "u-id": user2R['u_id']
     }
     adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
@@ -195,8 +195,8 @@ def test_http_admin_userpermission_u_id_does_not_exist():
     #chec admin user permission
     funcURL = "admin/userpermission/change/v1"
     inputData ={
-        "token": userR['token']
-        "u-id": 3
+        "token": userR['token'],
+        "u-id": 3,
         "permission_id": 1
     }
     adminUserPermissin = requests.get(config.url + funcURL + "?" + qData)
@@ -204,3 +204,173 @@ def test_http_admin_userpermission_u_id_does_not_exist():
 
     assert adminUserPermissionR["code"] == 400
 
+def test_http_admin_userpermission_permission_id_not_valid():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+    #check admin user permission
+    funcURL = "admin/userpermission/change/v1"
+    inputData ={
+        "token": userR['token'],
+        "u-id": user2['u_id'],
+        "permission_id": 5
+    }
+    adminUserPermissin = requests.get(config.url + funcURL + "?" + qData)
+    adminUserPermissinR = json.loads(adminUserPermissin.text)
+
+    assert adminUserPermissionR["code"] == 400
+
+def test_http_admin_userpermission_auth_not_owner():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test3@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user3 = requests.post(config.url + funcURL, json=inputData)
+    user3R = json.loads(user3.text)
+    # ----------------------------------
+    #check admin user rpermssion
+    funcURL = "admin/userpermission/change/v1"
+    inputData ={
+        "token": user2R['token'],
+        "u-id": user3R['u_id'],
+        "permission_id": 1
+
+    }
+    adminUserRemove = requests.get(config.url + funcURL + "?" + qData)
+    adminUserRemoveR = json.loads(adminUserRemove.text)
+
+    assert adminUserRemoveR['code'] == 403
+
+def test_http_admin_userpermission_member_to_owner_permission():
+    equests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+    #check admin user permission
+    funcURL = "admin/userpermission/change/v1"
+    inputData ={
+        "token": userR['token'],
+        "u-id": user2R['u_id'],
+        "permission_id": 1
+    }
+    adminUserPermissin = requests.get(config.url + funcURL + "?" + qData)
+    adminUserPermissinR = json.loads(adminUserPermissin.text)
+
+    assert data['accData'][user2['auth_user_id']]['permission'] == 1
+
+def test_http_admin_userpermission_owner_to_member_permission():
+    equests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+    #check admin user permission
+    funcURL = "admin/userpermission/change/v1"
+    inputData ={
+        "token": userR['token'],
+        "u-id": user2R['u_id'],
+        "permission_id": 1
+    }
+    adminUserPermissin = requests.get(config.url + funcURL + "?" + qData)
+    adminUserPermissinR = json.loads(adminUserPermissin.text)
+
+    #old owner to member
+    funcURL = "admin/userpermission/change/v1"
+    inputData ={
+        "token": user2R['token'],
+        "u-id": userR['u_id'],
+        "permission_id": 2
+    }
+    adminUserPermissin = requests.get(config.url + funcURL + "?" + qData)
+    adminUserPermissinR = json.loads(adminUserPermissin.text)
+
+    assert data['accData'][user2['auth_user_id']]['permission'] == 2
