@@ -17,7 +17,6 @@ def test_clear_register():
     clear_v1()
     auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     clear_v1()
-    print(data)
     assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': []}
 
 def test_clear_channel():
