@@ -5,7 +5,7 @@ from src.auth import auth_register_v2
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2, channel_invite_v2, channel_details_v2, channel_leave_v1, channel_addowner_v1, checkOwner
 from src.channels import channels_create_v2, channels_list_v2
-from src.database import data, secretSauce
+import src.database as database
 from src.dm import make_dm_name, dm_create_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_messages_v1, dm_invite_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.utils import get_user_id_from_token, make_dm_name, valid_userid, valid_dmid
@@ -102,7 +102,7 @@ def test_member_to_owner_permission():
 
     admin_userpermission_change_v1(user1['token'], user2['auth_user_id'], 1)
     
-    assert data['accData'][user2['auth_user_id']]['permission'] == 1
+    assert database.data['accData'][user2['auth_user_id']]['permission'] == 1
 
 
 def test_owner_to_member_permission():
@@ -117,7 +117,7 @@ def test_owner_to_member_permission():
     admin_userpermission_change_v1(user2['token'],user1['auth_user_id'],2)
    
 
-    assert data['accData'][user1['auth_user_id']]['permission'] == 2
+    assert database.data['accData'][user1['auth_user_id']]['permission'] == 2
 
 
 
