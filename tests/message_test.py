@@ -7,10 +7,8 @@ from src.channels import channels_create_v2
 import src.database as database
 from src.channel import channel_join_v2
 from src.channel import channel_messages_v2
-from src.message import message_send_v2
-from src.message import message_edit_v2
-from src.message import message_remove_v1
-from src.message import message_senddm_v1
+from src.message import message_send_v2, message_edit_v2
+from src.message import message_senddm_v1, message_share_v1, message_remove_v1
 from src.dm import dm_create_v1, dm_messages_v1
 
 # MESSAGE SEND TESTING
@@ -377,7 +375,7 @@ def test_user_not_member_of_channel_they_sharing_to():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    og_message_id = message_send_v2(user1["token"],channel['channel_id'],'This is a message')
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
     message = ""
     dm_id = -1
     
@@ -397,7 +395,7 @@ def test_user_not_member_of_dm_they_sharing_to():
 
     dm = dm_create_v1(user1["token"], id_list)
 
-    og_message_id = message_send_v2(user1["token"],channel['channel_id'],'This is a message')
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
     message = ""
     channel_id = -1
     with pytest.raises(AccessError):
@@ -412,12 +410,12 @@ def test_optional_message_channel():
     og_message_id = message_send_v2(user1["token"],channel['channel_id'],'This is a message')
     message = "from manu"
     dm_id = -1
-    message_share_v1(user1["token"],og_message_id,message,channel2['channel_id'],dm_id)
+    message_share_v1(user1["token"], og_message_id["message_id"], message,channel2['channel_id'], dm_id)
     messages1 = channel_messages_v2(user1["token"], channel2["channel_id"], 0)
 
     for msg in messages1["messages"]:
-        assert msg["message_id"] == 2
-        assert msg["message"] == 'This is a message from manu'
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'from manu\n\n"""\nThis is a message\n"""'
         assert msg["u_id"] == user1["auth_user_id"]
 
 
@@ -428,16 +426,16 @@ def test_no_optional_message_valid_channel():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
     channel2 = channels_create_v2(user1["token"], "testchannel2", True)
-    og_message_id = message_send_v2(user1["token"],channel['channel_id'],'This is a message')
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
     message = ""
     dm_id = -1 
 
-    message_share_v1(user1["token"],og_message_id,message,channel2['channel_id'],dm_id)
+    message_share_v1(user1["token"],og_message_id["message_id"],message,channel2['channel_id'],dm_id)
     messages1 = channel_messages_v2(user1["token"], channel2["channel_id"], 0)
 
     for msg in messages1["messages"]:
-        assert msg["message_id"] == 2
-        assert msg["message"] == 'This is a message'
+        assert msg["message_id"] == 1
+        assert msg["message"] == '\n\n"""\nThis is a message\n"""'
         assert msg["u_id"] == user1["auth_user_id"]
 
 def test_with_optional_message_dm():
@@ -445,23 +443,19 @@ def test_with_optional_message_dm():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
-    
-    id_list = []
-    id_list.append(user1["auth_user_id"])
-    id_list.append(user2["auth_user_id"])
 
-    dm = dm_create_v1(user1["token"], id_list)
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
 
-    og_message_id = message_send_v2(user1["token"],channel['channel_id'],'This is a message')
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
     message = "from manu"
     channel_id = -1
 
-    message_share_v1(user1["token"],og_message_id,message,channel_id,dm["dm_id"])
+    message_share_v1(user1["token"],og_message_id["message_id"],message,channel_id,dm["dm_id"])
     messages1 = channel_messages_v2(user1["token"], dm["dm_id"], 0)
 
     for msg in messages1["messages"]:
-        assert msg["message_id"] == 2
-        assert msg["message"] == 'This is a message from manu'
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'from manu\n\n"""\nThis is a message\n"""'
         assert msg["u_id"] == user1["auth_user_id"]
 
 
@@ -471,22 +465,20 @@ def test_without_optional_message_dm():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
 
-    id_list = []
-    id_list.append(user1["auth_user_id"])
-    id_list.append(user2["auth_user_id"])
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
 
-    dm = dm_create_v1(user1["token"], id_list)
-
-    og_message_id = message_send_v2(user1["token"],channel['channel_id'],'This is a message')
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
     message = ""
     channel_id = -1
 
-    message_share_v1(user1["token"],og_message_id,message,channel_id,dm["dm_id"])
+    message_share_v1(user1["token"],og_message_id["message_id"],message,channel_id,dm["dm_id"])
     messages1 = channel_messages_v2(user1["token"], dm["dm_id"], 0)
 
     for msg in messages1["messages"]:
-        assert msg["message_id"] == 2
-        assert msg["message"] == 'This is a message'
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'from manu\n\n"""\nThis is a message\n"""'
         assert msg["u_id"] == user1["auth_user_id"]
 
 ##def test_final_message_above_limit():
+
+test_optional_message_channel()

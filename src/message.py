@@ -256,53 +256,64 @@ def message_senddm_v1(token, dm_id, message):
 
     return message_id
 def message_share_v1(token,og_message_id,message,channel_id,dm_id):
-    #if the message is being shared to a dm
+    if channel_id == -1 and dm_id == -1:
+        raise InputError("No channel or dm id specified")
+
+    user_id = get_user_id_from_token(token)
+    # Set og_message to False
+    og_message = ""
+
     if channel_id == -1:
-        #check if token belongs to a user in the DM
-        user_id = get_user_id_from_token(token)
-        if check_useralreadyindm(user_id,dm_id) == True: 
-            #find message from the og_message_id
-            
-            for channel in data['channelList']:
-                for messages in channel['messages']:
-                    if messages['message_id'] is og_message_id:
-                        og_message = messages['message_id']['message']
-                        break
-            #combine og message and the optional additional message
-            final_message = message + '\n\n"""\n' + og_message['message'] + '\n"""'
-
+        # Sharing to a dm
+        # Check if user is in dm
+        if check_useralreadyindm(user_id, dm_id):
+            # Find message using message id
+            # Check channel messages
+            for channel in database.data["channelList"]:
+                for messages in channel["messages"]:
+                    if messages["message_id"] == og_message_id:
+                        og_message = messages["message"]
+            if not og_message:
+                # Check dm messages
+                for dm in database.data["dmList"]:
+                    for dmMessages in dm["messages"]:
+                        if dmMessages["message_id"] == og_message_id:
+                            og_message = dmMessages["message"]
+            if not og_message:
+                raise InputError("Message does not exist")
+            final_message = message + '\n\n"""\n' + og_message + '\n"""'
             if len(final_message) > 1000 or len(final_message) == 0:
-                raise er.InputError("Messages must be between 0 and 1000 characters")
-            #share the dm
-            shared_message_id = message_senddm_v1(token,dm_id,final_message)
-            
+                raise InputError("Messages must be between 0 and 1000 characters")
+            shared_message_id = message_senddm_v1(token,dm_id,final_message)        
         else:
-            raise AccessError ('User not member of target DM')
-    
-    #if the message is being shared to a channel
-    if dm_id == -1:
-        #check if token belongs to a user in the Channel
-        user_id = get_user_id_from_token(token)
-        if check_useralreadyinchannel(user_id,channel_id) == True:
-            #find message from the og_message_id
-            
-            for channel in data['channelList']:
-                for messages in channel['messages']:
-                    if messages['message_id'] is og_message_id:
-                        og_message = messages['message_id']['message']
-                        break
-            #combine og message and the optional additional message
-            final_message = message + '\n\n"""\n' + og_message['message'] + '\n"""'
-
+            raise AccessError ('User not member of target dm')
+    elif dm_id == -1:
+        # Sharing to a channel
+        # Check if user is in channel
+        if check_useralreadyinchannel(user_id, channel_id):
+            # Find message using message id
+            # Check dm messages
+            for dm in database.data["dmList"]:
+                    for dmMessages in dm["messages"]:
+                        if dmMessages["message_id"] == og_message_id:
+                            og_message = dmMessages["message"]
+            if not og_message:
+                # Check channel messages
+                for channel in database.data["channelList"]:
+                    for messages in channel["messages"]:
+                        if messages["message_id"] == og_message_id:
+                            og_message = messages["message"]
+            if not og_message:
+                raise InputError(description="Message does not exist")
+            final_message = message + '\n\n"""\n' + og_message + '\n"""'
             if len(final_message) > 1000 or len(final_message) == 0:
-                raise er.InputError("Messages must be between 0 and 1000 characters")
-                
-            #share the message
-            shared_message_id = message_send_v2(token,channel_id,final_message)
-            
+                raise InputError("Messages must be between 0 and 1000 characters")
+            shared_message_id = message_send_v2(token, channel_id, final_message)
         else:
             raise AccessError ('User not member of target Channel')
-    
-    return{
-        shared_message_id
+    else:
+        raise InputError(description="Only specify either a dm or channel")
+
+    return {
+        "shared_message_id": shared_message_id
     }
