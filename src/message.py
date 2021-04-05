@@ -145,6 +145,31 @@ def message_senddm_v1(token, dm_id, message):
     database.data["message_ids"].append(message_id)
 
     return message_id
+
+'''
+message_share_v1 takes in a token from the user calling the function, an og_message_id integer from the message the user wantsshare, an optional message string, the channel_id or dm_id of the channel or dm the user wants to share the message to.
+The function then checks whether the user wants to share to a DM or a channel indicated by the non target function which has the value(-1).
+Then the fuction checks if the dm_id or channel_id exist depending on the intended target also verifies if the authorising user is indeed a member of the channel or DM they a sharing the message to.
+If all requirements are met the function then shares the og_message combined with the optional message, and returns the id of the shared function(shared_messag-id).
+
+Arguments:
+    token (integer)             - Users authorisation Hash
+    og_message_id(integre)      -Id of the message being shared
+    message                     -String a user may add to the original message    
+    channel_id (integer)        - Id of channel
+    dm_id (integer)             - Id of dm  
+    ...
+
+Exceptions:
+    InputError  - Occurs when given channel_id does not exist
+    InputError  - Occurs when given dm_id does not exist
+    InputError  - Occurs when given u_id already a member of the channel they are being added to
+    ValueError  - Occurs when given token is not a member of the channel
+    ValueError  - Occurs when given token is not a member of the DM
+
+Return Value:
+    Returns {shared_message_id}
+'''
 def message_share_v1(token,og_message_id,message,channel_id,dm_id):
     #if the message is being shared to a dm
     if channel_id == -1:
