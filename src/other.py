@@ -34,11 +34,11 @@ def search_v1(token, query_str):
 
     # Store every message in channels/dms that the user is a part of
     message_list = []
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if auth_user_id in channel.get("member_ids"):
             message_list.extend(channel["messages"])
 
-    for dm in data["dmList"]:
+    for dm in database.data["dmList"]:
         if auth_user_id in dm.get("member_ids"):
             message_list.extend(dm["messages"])
     

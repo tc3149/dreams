@@ -189,7 +189,7 @@ def test_dm_messages_invalid_userid():
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
     
-    temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": "notInt"}, database.secretSauce, algorithm = "HS256")
     with pytest.raises(AccessError):
         dm_messages_v1(temp, dm["dm_id"], 0)
 

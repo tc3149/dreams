@@ -404,9 +404,9 @@ def channel_removeowner_v1(token, channel_id, u_id):
         raise InputError("Error: Invalid channel ID")
 
     # If the u_id is the only owner
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel_id == channel["id"]:
-            if len(channel["owner_ids"]) is 1:
+            if len(channel["owner_ids"]) == 1:
                 raise InputError("Error: Only one owner")
 
     # If the u_id is not an owner
@@ -418,7 +418,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
         raise InputError("Error: Token is Not Owner")
 
     # Main Implemenation
-    for channel in data["channelList"]:
+    for channel in database.data["channelList"]:
         if channel_id == channel["id"]:
             for owner in channel["owner_ids"]:
                 if u_id is owner:

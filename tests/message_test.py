@@ -249,7 +249,7 @@ def testsenddm_invalid_token():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
 
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
 
     with pytest.raises(AccessError):
         message_senddm_v1(invalid_token, dm["dm_id"], "Thomas Chen")

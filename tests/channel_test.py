@@ -596,7 +596,7 @@ def test_removeowner_not_authorised_user():
 
     channel_addowner_v1(user1_token, channel1.get("channel_id"), user2_id)
 
-    temp = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    temp = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
 
     with pytest.raises(AccessError):
         channel_removeowner_v1(temp, channel1.get("channel_id"), user1["auth_user_id"])
