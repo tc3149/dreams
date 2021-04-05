@@ -3,7 +3,7 @@ import requests
 import json
 import jwt
 import urllib
-from src.database import data, secretSauce
+import src.database as database
 from src import config
 from src.other import clear_v1
 
@@ -24,7 +24,7 @@ def test_http_user_profile_working():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     u_id = respD["auth_user_id"]
     # ----------------------------
 
@@ -59,7 +59,7 @@ def test_http_user_profile_v2_nonexistant_user():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     funcURL = "user/profile/v2"
@@ -91,7 +91,7 @@ def test_user_profile_setname_working():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     u_id = respD["auth_user_id"]
     # ----------------------------
 
@@ -138,7 +138,7 @@ def test_http_user_profile_setname_short_first():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set name -------------------
@@ -168,7 +168,7 @@ def test_http_user_profile_setname_short_last():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set name -------------------
@@ -198,7 +198,7 @@ def test_http_user_profile_setname_long_first():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set name -------------------
@@ -228,7 +228,7 @@ def test_http_user_profile_setname_long_last():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set name -------------------
@@ -261,7 +261,7 @@ def test_http_user_profile_setemail_working():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     u_id = respD["auth_user_id"]
     # ----------------------------
 
@@ -308,7 +308,7 @@ def test_http_user_profile_setemail_invalid_email():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set email-------------------
@@ -337,7 +337,7 @@ def test_http_user_profile_setemail_email_taken():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
     
     # Register--------------------
@@ -351,7 +351,7 @@ def test_http_user_profile_setemail_email_taken():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set email-------------------
@@ -383,7 +383,7 @@ def test_http_user_profile_sethandle_working():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     u_id = respD["auth_user_id"]
     # ----------------------------
 
@@ -432,7 +432,7 @@ def test_http_user_profile_sethandle_short_handle():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set handle -----------------
@@ -461,7 +461,7 @@ def test_http_user_profile_sethandle_long_handle():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set handle -----------------
@@ -501,7 +501,7 @@ def test_http_user_profile_sethandle_handle_taken():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     # Set handle -----------------
@@ -545,7 +545,7 @@ def test_http_users_all_working():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    _ = jwt.decode(jwtToken, secretSauce, algorithms="HS256")
+    _ = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     u_id2 = respD["auth_user_id"]
     # ----------------------------
 

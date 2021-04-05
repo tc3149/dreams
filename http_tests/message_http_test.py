@@ -3,7 +3,7 @@ import requests
 import json
 import jwt
 import urllib
-from src.database import data, secretSauce
+import src.database as database
 from src import config
 from src.other import clear_v1
 from src.auth import auth_register_v2
@@ -79,7 +79,7 @@ def testsend_invalid_token():
 
     # Message send
     funcURL = "message/send/v2"
-    invalid_token = jwt.encode({"sessionId": 2954}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2954}, database.secretSauce, algorithm = "HS256")
 
     inputData = {
         "token": invalid_token,
@@ -317,7 +317,7 @@ def testedit_invalid_token():
     
     # Message Edit
     funcURL = "message/edit/v2"
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     inputData = {
         "token": invalid_token,
@@ -620,7 +620,7 @@ def testremove_invalid_token_id():
     
     # Message Remove ----
     funcURL = "message/remove/v1"
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
 
     inputData = {
         "token": invalid_token,
@@ -1002,7 +1002,7 @@ def testsenddm_invalid_token_ID():
 
     # Message Send DM -------
     funcURL = "message/senddm/v1"
-    invalid_token = jwt.encode({"sessionId": "notInt"}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": "notInt"}, database.secretSauce, algorithm = "HS256")
     inputData = {
         "token": invalid_token,
         "dm_id": dmR["dm_id"],
