@@ -114,14 +114,12 @@ def message_remove_v1(token, message_id):
                         raise InputError(description="Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
-                        break
                 
                 elif message_info.get("u_id") is u_id:
                     if message_info['message'] is None:
                         raise InputError(description="Message already removed")
                     else:
                         channels1['messages'].remove(message_info)
-                        break   
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
             
@@ -175,11 +173,9 @@ def message_edit_v2(token, message_id, message):
             if message_info.get("message_id") is message_id:
                 if checkOwner(u_id, channel_id):
                     message_info["message"] = message
-                    break
                 
                 elif message_info.get("u_id") is u_id:
                     message_info["message"] = message
-                    break
                 
                 else:
                     raise AccessError(description="Error: Editor not an owner nor original poster")
