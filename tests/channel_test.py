@@ -267,6 +267,7 @@ def test_valid_input ():
 
     assert channel_details_v2(user1["token"], channel1["channel_id"]) == {
                                         'name': 'testchannel',
+                                        'is_public': True,
                                         'owner_members': [
                                             {
                                                 'u_id': user1["auth_user_id"],
@@ -309,6 +310,7 @@ def test_identical_handles_details():
     channel_invite_v2(user1["token"], channel1["channel_id"], user2["auth_user_id"])
     assert channel_details_v2(user1["token"], channel1["channel_id"]) == {
                                         'name': 'testchannel',
+                                        'is_public': True,
                                         'owner_members': [
                                             {
                                                 'u_id': user1["auth_user_id"],

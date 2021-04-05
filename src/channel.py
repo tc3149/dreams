@@ -143,6 +143,7 @@ def channel_details_v2(token, channel_id):
             #channel does exist
             channelExists = True
             channelName = channel["name"]
+            is_public = channel["is_public"]
             break
     if channelExists is False:
         #channel does not exist
@@ -211,9 +212,9 @@ def channel_details_v2(token, channel_id):
     
     return {
         'name': channelName,
+        'is_public': is_public,
         'owner_members':ownMembers,
-        'all_members':allMembers
-    
+        'all_members':allMembers,
     }
 
 

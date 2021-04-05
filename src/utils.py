@@ -65,8 +65,8 @@ def getchannelID(message_id):
 
     for i in database.data["channelList"]:
         for message1 in i['messages']:
-            if message1.get('message_id') is message_id:
-                channel_id1 = i.get("channel_id")
+            if message1["message_id"] is message_id:
+                channel_id1 = i.get("id")
                 break
     return channel_id1
 
