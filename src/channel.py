@@ -321,16 +321,16 @@ def channel_leave_v1(token, channel_id):
     }
 
 '''
-channel_join_v2 takes in the user's ID and the channel they wish to join.
-The function then checks whether the ID is valid, the channel is valid, if the channel is private or if the user is already in the channel.
+channel_join_v2 takes in the user's token and the channel they wish to join.
+The function then checks whether the token is valid, the channel is valid, if the channel is private or if the user is already in the channel.
 If so, it appends the user's ID into the channel's 'member ids' and returns nothing. If conditions are breached, it raises an InputError or AccessError
 
 Arguments:
-    auth_user_id (string) - User's ID
+    token (string) - User's Authorisation Hash
     channel_id (string) - Channel's ID
 
 Exceptions:
-    InputError - when the user's ID is invalid
+    AccessError - when the user's token is invalid
     InputError - when the channel ID is invalid
     AccessError - when user tries to join a private channel
     AccessError - when user is already in the channel
@@ -341,9 +341,6 @@ Return Value:
 
 def channel_join_v2(token, channel_id):
     auth_user_id = get_user_id_from_token(token)
-    # check whether id is valid
-    if valid_userid(auth_user_id) is False:
-        raise InputError("Error: Invalid user id")
 
     # check whether channel is invalid
     if valid_channelid(channel_id) is False:
@@ -363,6 +360,30 @@ def channel_join_v2(token, channel_id):
 
     return {
     }
+
+
+'''
+channel_addowner_v1 takes in the token of an authorised user (owner), a channel ID and a user's ID that wishes to be owner of the channel.
+The function then checks whether the u_ID is valid, the channel_ID is valid, if the user (u_ID) is in the channel, if the user (u_ID) is in the channel,
+or if the token is authorised to do so.
+If so, it appends the user's ID into the channel's 'owner_ids' and returns nothing. If conditions are breached, it raises an InputError or AccessError.
+
+Arguments:
+    token (string) - User A's Authorisation Hash
+    channel_id (int) - Channel's ID
+    u_id (int) - User B's ID
+
+Exceptions:
+    InputError - when the user's ID is invalid
+    InputError - when the channel ID is invalid
+    InputError - when the user is already an owner
+    AccessError - when the user is not in the channel
+    AccessError - when the authorised user is not in channel
+    AccessError - when the authorised user is not authorised (not an owner)
+
+Return Value:
+    Returns nothing.
+'''
 
 def channel_addowner_v1(token, channel_id, u_id):
 
@@ -384,7 +405,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     if checkOwner(u_id, channel_id) is True:
         raise InputError("Error: Already Owner")
 
-    # If the token is not an owner
+    # If the token is not an owner / also checks if they're in channel
     if checkOwner(auth_user_id, channel_id) is False:
         raise AccessError("Error: Not an owner")
     
@@ -395,6 +416,7 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     return {
     }
+
 
 def channel_removeowner_v1(token, channel_id, u_id):
 

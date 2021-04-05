@@ -18,3 +18,34 @@ Meeting minutes - Echo
 7/03/2021 (7:30pm - 10pm):
     -Finalising code
     -Pair programming to help eachother
+
+25/03/2021 (5:30pm - 8pm):
+    -Discussing Iteration 2, and allocating which function each person does
+    -Experimenting with front-end coding, and sharing information on the basic blueprints of each functions
+
+29/03/2021 (7pm - 10:30pm):
+    -Our first standup as it is a week before due date, everyone shared progress on what they've been up to, if there was any issues. This lasted 30 minutes
+    -From this, we made pair programming groups to help solve these issues and improve everyone's understanding so that we're on track together
+    -Unsolved issues we wrote into a notepad to ask the tutor next time
+    -Stayed together and coded for the remaining time
+
+03/04/2021 (9pm - 1:00am):
+    -Closer to the deadline, more meetings are frequent as this iteration is prone to more merge conflicts and errors
+    -Another standup was done to keep progress on what everyone is doing, this is because functions are moreso reliant on one another, and thus is important to keep track of work.
+    -This standup lasted for an hour as every member had alot to say, and thus ensured disucssions on how to improve quality of life
+    -Unsolved issues we wrote into a notepad to ask the tutor next time
+    -Pair programming is now more important, as debugging in a group allows for easier finds on mistakes
+    -Stayed together and coded for the remaining time
+
+04/04/2021 (11pm - 2am):
+    -Another meeting was set up to figure out how to code HTTP concurrently
+    -As such, group discussions were created and every member participated in order to solve a group problem; our fix was to wrap HTTP functions first then solve test cases.
+    -Our discussions were ongoing throughout the whole night
+    -Thus, we pair programmed until the remaining time
+    -Group debugging was therefore, more frequent
+
+05/04/2021 - 06/04/2021 (11:30pm - 3am)
+    -This last meeting was used to merge our code all together, and finilise any issues made
+    -Issues were to be pair programmed, or group programmed as each member threw suggestions to improve/fix code and merge conflicts
+    -A last standup was done to disucss any final issues, or comments to be made. We then used this standup to brainstorm assumptions made when coding the functions in
+    -This standup lasted an hour and 30 minutes due to the nature of the contents and discussions
