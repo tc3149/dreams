@@ -68,7 +68,7 @@ def test_channel_messages_endnegativeone():
 
 
 # ------------------------------------------------------------------------------------------------------
-# TEST JOINING
+# CHANNEL JOIN TESTING
 
 # VALID CASES
 
@@ -88,16 +88,6 @@ def test_join_correct():
 
     
 # FAIL CASES
-
-# joining empty
-def test_joining_nonexistant_channel():
-    clear_v1()
-    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    channels_create_v2(user1.get("token"), "channel1", True)
-
-    with pytest.raises(InputError):
-        channel_join_v2(user2.get("token"), 1000)
 
 # invalid user token
 def test_joining_invalid_user():
@@ -124,7 +114,7 @@ def test_joining_invalid_channel():
 
 
 # user already joined
-def test_joining_user_alrady_joined():
+def test_joining_user_already_joined():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -134,7 +124,7 @@ def test_joining_user_alrady_joined():
         channel_join_v2(user2["token"], channel1["channel_id"])
 
     
-# private channel accesserror...?
+# Accessing Private Channel
 
 def test_private_channel():
     clear_v1()
@@ -145,7 +135,8 @@ def test_private_channel():
     with pytest.raises(AccessError):
         channel_join_v2(user2["token"], new["channel_id"])
 
-# Tested on a private channel
+
+# Joining already joined channel
 def test_user_already_in_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
@@ -402,13 +393,28 @@ def test_channel_leave_user_valid():
 # ------------------------------------------------------------------------------------------------------
 # ADD OWNER TESTING
 
-    # invalid user ID
+# invalid token
+def test_addowner_invalid_token():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user1_token = user1.get("token")
+
+    new = channels_create_v2(user1_token, "channel1", True)
+    
+    temp = jwt.encode({"sessionId": 24324}, database.secretSauce, algorithm = "HS256")   
+    
+    with pytest.raises(AccessError):
+        channel_addowner_v1(temp, new.get("channel_id"), user2["token"])
+
+
+# invalid user ID
 def test_addowner_invalid_uID():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
 
-    new = channels_create_v2(user1_token, "channel1", False)
+    new = channels_create_v2(user1_token, "channel1", True)
     
     temp = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")   
     
@@ -416,14 +422,13 @@ def test_addowner_invalid_uID():
         channel_addowner_v1(user1_token, new.get("channel_id"), temp)
 
 
-    # invalid channel ID
-
+# invalid channel ID
 def test_addowner_invalid_cID():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
 
-    channels_create_v2(user1_token, "channel1", False)
+    channels_create_v2(user1_token, "channel1", True)
     
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
@@ -440,37 +445,58 @@ def test_addowner_already():
     user1_token = user1.get("token")
     user1_id = user1.get("auth_user_id")
 
-    new = channels_create_v2(user1_token, "channel1", False)
+    new = channels_create_v2(user1_token, "channel1", True)
     
     with pytest.raises(InputError):
         channel_addowner_v1(user1_token, new.get("channel_id"), user1_id)
 
-# user not authorised to be added
 
-def test_not_authoriseduser():
+# Someone adding is not authorised to do so
+def test_not_authoriseduser_adding():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
+    new = channels_create_v2(user1_token, "channel1", True)
 
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    channel_join_v2(user2["token"], new["channel_id"])
+    channel_join_v2(user3["token"], new["channel_id"])
     user3_id = user3.get("auth_user_id")
-    new = channels_create_v2(user1_token, "channel1", False)
+    
 
     with pytest.raises(AccessError):
         channel_addowner_v1(user2.get("token"), new.get("channel_id"), user3_id)
+
+# Adding owner to someone not in channel
+def test_uID_not_in_channel():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user1_token = user1.get("token")
+    new = channels_create_v2(user1_token, "channel1", True)
+
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    channel_join_v2(user2["token"], new["channel_id"])
+    user3_id = user3.get("auth_user_id")
+    
+
+    with pytest.raises(AccessError):
+        channel_addowner_v1(user1.get("token"), new.get("channel_id"), user3_id)
 
 # Valid testing
 
 def test_valid_addowner():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel1 = channels_create_v2(user1["token"], "channel1", False)
+    channel1 = channels_create_v2(user1["token"], "channel1", True)
 
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
+    channel_join_v2(user2["token"], channel1["channel_id"])
 
     channel_addowner_v1(user1["token"], channel1.get("channel_id"), user2_id)
+
 
     assert checkOwner(user2_id, channel1.get("channel_id")) == True
 
@@ -482,10 +508,11 @@ def test_valid_addowner():
 def test_removeowner():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel1 = channels_create_v2(user1["token"], "channel1", False)
+    channel1 = channels_create_v2(user1["token"], "channel1", True)
 
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
+    channel_join_v2(user2["token"], channel1["channel_id"])
 
     channel_addowner_v1(user1["token"], channel1.get("channel_id"), user2_id)
     assert checkOwner(user2_id, channel1.get("channel_id")) == True
@@ -498,7 +525,7 @@ def test_removeowner():
 def test_removeowner_multiple():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel1 = channels_create_v2(user1["token"], "channel1", False)
+    channel1 = channels_create_v2(user1["token"], "channel1", True)
 
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
@@ -508,6 +535,10 @@ def test_removeowner_multiple():
 
     user4 = auth_register_v2("email4@gmail.com", "password", "Name", "Lastname")
     user4_id = user4.get("auth_user_id")
+    
+    channel_join_v2(user2["token"], channel1["channel_id"])
+    channel_join_v2(user3["token"], channel1["channel_id"])
+    channel_join_v2(user4["token"], channel1["channel_id"])
 
     channel_addowner_v1(user1["token"], channel1.get("channel_id"), user2_id)
     assert checkOwner(user2_id, channel1.get("channel_id")) == True
@@ -534,11 +565,12 @@ def test_removeowner_invalid_channel():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
 
-    channel1 = channels_create_v2(user1_token, "channel1", False)
+    channel1 = channels_create_v2(user1_token, "channel1", True)
     
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
 
+    channel_join_v2(user2["token"], channel1["channel_id"])
     channel_addowner_v1(user1["token"], channel1.get("channel_id"), user2_id)
 
     with pytest.raises(InputError):
@@ -551,11 +583,12 @@ def test_removeowner_invalid_user():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
 
-    channel1 = channels_create_v2(user1_token, "channel1", False)
+    channel1 = channels_create_v2(user1_token, "channel1", True)
     
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
 
+    channel_join_v2(user2["token"], channel1["channel_id"])
     channel_addowner_v1(user1["token"], channel1.get("channel_id"), user2_id)  
     
     with pytest.raises(InputError):
@@ -567,11 +600,12 @@ def test_removeowner_user_not_owner():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
 
-    channel1 = channels_create_v2(user1_token, "channel1", False)
+    channel1 = channels_create_v2(user1_token, "channel1", True)
     
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2.get("auth_user_id")
-    
+    channel_join_v2(user2["token"], channel1["channel_id"])
+
     with pytest.raises(InputError):
         channel_removeowner_v1(user1["token"], channel1.get("channel_id"), user2_id)
 
@@ -581,7 +615,7 @@ def test_removeowner_user_already_owner():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user1_token = user1.get("token")
 
-    channel1 = channels_create_v2(user1_token, "channel1", False)
+    channel1 = channels_create_v2(user1_token, "channel1", True)
     
     with pytest.raises(InputError):
         channel_removeowner_v1(user1_token, channel1.get("channel_id"), user1["auth_user_id"])
@@ -593,9 +627,11 @@ def test_removeowner_not_authorised_user():
 
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user2_id = user2["auth_user_id"]
+    
 
-    channel1 = channels_create_v2(user1_token, "channel1", False)
+    channel1 = channels_create_v2(user1_token, "channel1", True)
 
+    channel_join_v2(user2["token"], channel1["channel_id"])
     channel_addowner_v1(user1_token, channel1.get("channel_id"), user2_id)
 
     temp = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
