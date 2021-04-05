@@ -4,9 +4,28 @@ from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_us
 from src.error import InputError, AccessError
 
 '''
-Direct Messages
-'''
+dm_create_v1 takes in the token of a user, and a list of user ids to create a direct message
+with. Firstly, the auth_user_id of the user is extracted from their token then the function
+checks whether the user ids are valid (i.e. in the database).
+A list (total_ids) is then formed with all user ids in the direct message.
+The function then calls make_dm_name to create the dm_name which is a concatenation of 
+user handles in a list (string) sorted alphabetically.
+The direct message is then created using all above inputs and appended into the database
 
+Arguments:
+    token (string) - User's Authorisation Hash
+    u_ids (list) - List of user_ids
+
+Exceptions:
+    InputError - when the u_ids contains any user id that is not valid
+    AccessError - when the token is not valid
+
+Return Value:
+    Returns {
+        'dm_id': dm_id, (The number of dm_id that is created)
+        'dm_name': dm_name (The handle name that is created using make_dm_name),
+    }
+'''
 def dm_create_v1(token, u_ids):
     
     #Obtain user id of creator from token
@@ -17,11 +36,9 @@ def dm_create_v1(token, u_ids):
         if valid_userid(u_id) is False:
             raise InputError(description="User ID does not exist")
 
-    # Set dm_id to length of dmlist in database
+    # Make a list with all ids within the dm for use in member_ids
     total_ids = [auth_user_id]
     total_ids.extend(u_ids)
-
-
 
     # Make dm name as alphabetically sorted list of handles
     dm_name = make_dm_name(total_ids)
@@ -43,6 +60,26 @@ def dm_create_v1(token, u_ids):
         'dm_name': dm_name,
     }
 
+'''
+dm_list_v1 takes in the token of a user and returns a list of all dms that the 
+user is a part of. Firstly, the auth_user_id of the user is extracted from their token and
+then the function creates an empty list to store the dms that the user is a part of.
+This list is achieved through looping the database and using the get key to see if
+the user id is a part of the member_ids. If so, append the dm into the newly created
+list.
+
+Arguments: 
+    token (string) - User's Authorisation Hash
+
+Exceptions:
+    AccessError - When the token is invalid 
+
+Return Value:
+    Returns {
+        'dms': newdmList (list of all dms the user is a part of)
+    }
+
+'''
 def dm_list_v1(token):
     auth_user_id = get_user_id_from_token(token)
 
@@ -57,6 +94,28 @@ def dm_list_v1(token):
     
     return {'dms': newdmList}
 
+'''
+dm_invite_v1 takes in the token of the user (invitor), the dm to invite a user to, and
+the u_id of the invitee. Firstly, it scrapes the userid from the token and checks if
+the dm to invite into exists. Next, it checks if the u_id is a valid user, and if the
+invitor is a part of the dm (i.e. authorised to invite).
+Once the security checks are finished, the new user is appended into the member ids of
+the dm 
+
+Arguments:
+    token (string) - User's Authorisation Hash
+    dm_id (int) - Dm ID
+    u_id (int) - User id of the invitee
+
+Exceptions:
+    InputError - When the DM does not exist
+    InputError - When the User ID (invitee) is not valid
+    AccessError - When the invitor is not a part of the dm (not authorised)
+    AccessError - When the token is invalid
+
+Return Value:
+    Returns {}
+'''
 def dm_invite_v1(token, dm_id, u_id):
     # Obtain user id from token
     #
@@ -118,8 +177,6 @@ def dm_messages_v1(token, dm_id, start):
                     break
     if authorisation is False:
         raise AccessError(description="User is not in dm")
-
-
 
     # Return Function
     for dm in database.data["dmList"]:
