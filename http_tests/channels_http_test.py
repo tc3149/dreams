@@ -151,7 +151,7 @@ def test_http_channels_list_working():
         "name_last": "nameLast",
     }
     user2 = requests.post(config.url + funcURL, json=inputData)
-    user2R = json.loads(user.text)
+    user2R = json.loads(user2.text)
     # ----------------------------
 
     # Channel Create -------
@@ -211,17 +211,6 @@ def test_http_channels_list_invalid_user():
     }
     user = requests.post(config.url + funcURL, json=inputData)
     userR = json.loads(user.text)
-    # ----------------------------
-
-    # Channel Create -------
-    funcURL = "channels/create/v2"
-    inputData = {
-        "token": userR["token"],
-        "name": "testChannel",
-        "is_public": True,
-    }
-    channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
     # ----------------------------
     invalid_token = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
     # Listing Channel--------------
@@ -302,17 +291,6 @@ def test_http_channels_listall_invalid_user():
     }
     user = requests.post(config.url + funcURL, json=inputData)
     userR = json.loads(user.text)
-    # ----------------------------
-
-    # Channel Create -------
-    funcURL = "channels/create/v2"
-    inputData = {
-        "token": userR["token"],
-        "name": "testChannel",
-        "is_public": True,
-    }
-    channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
     # ----------------------------
     invalid_token = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
     # Listing Channel--------------
