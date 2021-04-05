@@ -11,7 +11,7 @@ from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1
 from src.utils import saveData
-from src.other import clear_v1
+from src.other import clear_v1, search_v1
 from src.channels import channels_create_v2, channels_list_v2
 from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2
 from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1
@@ -258,23 +258,39 @@ def dmInvite():
 def dmLeave():
     inputData = request.get_json()
     dm_leave_v1(inputData["token"], inputData["dm_id"])
+    saveData()
     return {}
 
 @APP.route("/dm/remove/v1", methods=["DELETE"])
 def dmRemove():
     inputData = request.get_json()
     dm_remove_v1(inputData["token"], inputData["dm_id"])
+    saveData()
     return {}
 
 # DM_DETAILS WRAPPING HERE
 
 
-# ##############################################################################
+# #############################################################################
+#                                                                             #
+#                           OTHER FUNCTIONS                                   #
+#                                                                             #
+# #############################################################################
 
 @APP.route("/clear/v1", methods=["DELETE"])
 def clearAll():
     clear_v1()
     return {}
+
+@APP.route("/search/v2", methods=["GET"])
+def searchv2():
+    inputToken = request.args.get("token")
+    inputQuery = request.args.get("query_str")
+    returnData = search_v1(inputToken, inputQuery)
+    return dumps(returnData)
+
+
+# ########################################################################
 
 # Example
 @APP.route("/echo", methods=['GET'])
@@ -285,7 +301,6 @@ def echo():
     return dumps({
         'data': data
     })
-
 
 if __name__ == "__main__":
     APP.run(port=config.port) # Do not edit this port
