@@ -1206,6 +1206,135 @@ def test_http_dm_details_dm_does_not_exist():
     }
     qData = urllib.parse.urlencode(inputData)
     dmDetails = requests.get(config.url + funcURL + "?" + qData)
-    dmDetails = json.loads(dmDetails.text)
+    dmDetailsR = json.loads(dmDetails.text)
     
-    assert dmDetails["code"] == 400
+    assert dmDetailsR["code"] == 400
+
+def test_http_dm_details_user_not_member_of_dm():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test3@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user3 = requests.post(config.url + funcURL, json=inputData)
+    user3R = json.loads(user3.text)
+    # ----------------------------------
+    # Creating DM-----------------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(userR["auth_user_id"])
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text) 
+    # ---------------------------
+    # checking details -----------
+    funcURL = "dm/details/v1"
+    inputData ={
+        "token": user3R['token'],
+        "dm_id": dmR["dm_id"]
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmDetails = requests.get(config.url + funcURL + "?" + qData)
+    dmDetailsR = json.loads(dmDetails.text)
+    
+    assert dmDetailsR["code"] == 403
+
+def test_http_dm_details_valid():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email@gmai.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+    # ----------------------------
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "email2@gmail.com",
+        "password": "password1",
+        "name_first": "Name",
+        "name_last": "Lastname",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+    # ----------------------------
+     # Creating DM-----------------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(userR["auth_user_id"])
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text) 
+    # ---------------------------
+    # checking details -----------
+    funcURL = "dm/details/v1"
+    inputData ={
+        "token": user1R['token'],
+        "dm_id": dmR["dm_id"]
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmDetails = requests.get(config.url + funcURL + "?" + qData)
+    dmDetailsR = json.loads(dmDetails.text)
+
+    assert dmDetailsR == {
+                            'name': 'namelastname,namelastname0',
+                            'members': [
+                            {
+                                'u_id': user1["auth_user_id"],
+                                'email': 'email@gmail.com',
+                                'name_first': 'Name',
+                                'name_last': 'Lastname',
+                                'handle_str': 'namelastname',
+                                
+                            },
+                            {
+                                'u_id': user2["auth_user_id"],
+                                'email': 'email2@gmail.com',
+                                'name_first': 'Name',
+                                'name_last': 'Lastname',
+                                'handle_str': 'namelastname0',   
+                            }
+                            ],
+                        }
