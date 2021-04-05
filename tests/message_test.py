@@ -3,7 +3,6 @@ import jwt
 from src.other import clear_v1
 from src.auth import auth_register_v2
 from src.error import InputError, AccessError
-from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
 from src.database import data, secretSauce
 from src.channel import channel_join_v2
@@ -28,15 +27,15 @@ def testsend_long_message():
         message_send_v2(user["token"], channel["channel_id"], temp)
 
 
-# invalid  token ID
+# invalid token ID
 def testsend_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
-    invalid_token = jwt.encode({"sessionId": 2}, secretSauce, algorithm = "HS256")
+    invalid_token = jwt.encode({"sessionId": 1234324234}, secretSauce, algorithm = "HS256")
 
-    with pytest.raises(AccessError):
-        message_send_v2(invalid_token, channel["channel_id"], "This is a messsage from Thomas Chen")    
+    with pytest.raises(AccessError):    
+        message_send_v2(invalid_token, channel["channel_id"], "This is a messsage from Thomas Chen")   
 
 
 # invalid channel id
@@ -123,8 +122,6 @@ def testedit_edited_from_another():
     channel = channels_create_v2(user["token"], "testchannel", True)
     message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
     m_id = message1.get('message_id')
-    print(m_id)
-
 
     with pytest.raises(AccessError):
         message_edit_v2(user2["token"], m_id, 'Russell Westbrook')
@@ -144,7 +141,7 @@ def testedit_notedited_by_owner():
         message_edit_v2(user2["token"], m_id, 'Russell Westbrook')
 
 
-# a valid test, a work in progress *************************  COLIN LOOK HERE
+# a valid test
 def testedit_valid_case():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
@@ -158,6 +155,25 @@ def testedit_valid_case():
         assert msg["message_id"] == 1
         assert msg["message"] == 'lmfao'
         assert msg["u_id"] == user1["auth_user_id"]
+
+
+# more in depth
+def testedit_indepth_validtesting():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+    message_info = message_send_v2(user2["token"], channel["channel_id"], "lol")
+    m_id = message_info.get("message_id")
+    message_edit_v2(user1["token"], m_id, "lmfao")
+
+    messages1 = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'lmfao'
+        assert msg["u_id"] == user2["auth_user_id"]
 
 
 
@@ -225,6 +241,24 @@ def testremove_valid_case():
         assert msg["message"] == ''
         assert msg["u_id"] == user1["auth_user_id"]
 
+
+# Comprehensive Testing Case
+def testremove_comprehensive():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+    message_info = message_send_v2(user2["token"], channel["channel_id"], "lol")
+    m_id = message_info.get("message_id")
+    message_remove_v1(user1["token"], m_id)
+
+    messages1 = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == ""
+        assert msg["u_id"] == user2["auth_user_id"]    
 
 
 
