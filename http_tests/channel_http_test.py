@@ -7,7 +7,7 @@ from src import config
 from src.other import clear_v1
 import src.database as database
 
-# CHANNEL JOIN TESTING
+# CHANNEL JOIN TESTING ---------------------------------------------------------------
 
 # Invalid Channel ID
 def testjoin_invalid_channelID():
@@ -346,7 +346,8 @@ def testjoin_valid_case():
                                             }
                                         ]
 
-# ADD OWNER TESTING
+
+# ADD OWNER TESTING -----------------------------------------------------------------
 
 # Invalid Token
 def testaddowner_invalid_tokenn():
@@ -771,3 +772,4 @@ def testaddowner_valid_case():
                                                 
                                             }
                                             ]
+
