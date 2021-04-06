@@ -43,7 +43,7 @@ def test_http_user_profile_working():
         'name_last': "nameLast",
         'handle_str': "namefirstnamelast",
     }
-    assert respD == expectedOutput
+    assert respD == {"user": expectedOutput}
 
 def test_http_user_profile_v2_nonexistant_user():
     requests.delete(config.url + "clear/v1")
@@ -122,7 +122,7 @@ def test_user_profile_setname_working():
         'handle_str': "namefirstnamelast",
     }
 
-    assert respD == expectedOutput
+    assert respD == {"user": expectedOutput}
     # ----------------------------
 def test_http_user_profile_setname_short_first():
     requests.delete(config.url + "clear/v1")
@@ -292,7 +292,7 @@ def test_http_user_profile_setemail_working():
     }
     # ----------------------------
 
-    assert respD == expectedOutput
+    assert respD == {"user": expectedOutput}
 
 def test_http_user_profile_setemail_invalid_email():
     requests.delete(config.url + "clear/v1")
@@ -416,7 +416,7 @@ def test_http_user_profile_sethandle_working():
     }
     # ----------------------------
 
-    assert respD == expectedOutput
+    assert respD == {"user": expectedOutput}
 
 def test_http_user_profile_sethandle_short_handle():
     requests.delete(config.url + "clear/v1")
@@ -573,6 +573,6 @@ def test_http_users_all_working():
         }
     ]
 
-    assert respD == expectedOutput
+    assert respD == {"users": expectedOutput}
  
 # ------------------------------------------------------------------------------
