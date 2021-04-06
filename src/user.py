@@ -31,7 +31,7 @@ def user_profile_v2(token, u_id):
     if search_user(u_id):
         for user in database.data["userProfiles"]:
             if user["u_id"] == u_id:
-                return user
+                return {"user": user}
     else:
         raise InputError(description="User does not exist")
 
@@ -161,4 +161,4 @@ Return Value:
 def users_all_v1(token):
     _ = get_user_id_from_token(token)
     
-    return database.data["userProfiles"] 
+    return {"user": database.data["userProfiles"]}
