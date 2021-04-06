@@ -161,4 +161,4 @@ Return Value:
 def users_all_v1(token):
     _ = get_user_id_from_token(token)
     
-    return {"user": database.data["userProfiles"]}
+    return {"users": database.data["userProfiles"]}
