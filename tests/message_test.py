@@ -615,7 +615,7 @@ def testsendlaterdm_invalid_DM():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+    _ = dm_create_v1(user["token"], [user2["auth_user_id"]])
 
     time = int(datetime.timestamp(datetime.now()) + 2)
 
@@ -624,7 +624,7 @@ def testsendlaterdm_invalid_DM():
 
 
 # Empty Message
-def testsendlaterdm_invalid_message():
+def testsendlaterdm_empty_message():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -651,7 +651,7 @@ def testsendlaterdm_user_not_in_dm():
 
 
 # Time set in the past
-def testsendlaterdm_user_not_in_dm():
+def testsendlaterdm_time_in_past():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -659,12 +659,12 @@ def testsendlaterdm_user_not_in_dm():
 
     time = int(datetime.timestamp(datetime.now()) - 2)
 
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         message_sendlaterdm_v1(user["token"], dm["dm_id"], "Imagine Trump saying Jonathan", time)
 
 
 # Valid Case Testing
-def testsendlaterdm_user_not_in_dm():
+def testsendlaterdm_valid_case():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
