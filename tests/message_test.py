@@ -6,10 +6,10 @@ from src.error import InputError, AccessError
 from src.channels import channels_create_v2
 import src.database as database
 from src.channel import channel_join_v2
-from src.channel import channel_messages_v2
-from src.message import message_send_v2, message_edit_v2
-from src.message import message_senddm_v1, message_share_v1, message_remove_v1, message_sendlater_v1, message_sendlaterdm_v1
-from src.dm import dm_create_v1, dm_messages_v1
+from src.channel import channel_messages_v2, channel_leave_v1, channel_addowner_v1
+from src.message import message_send_v2, message_edit_v2, message_unreact_v1, message_pin_v1, message_unpin_v1
+from src.message import message_senddm_v1, message_share_v1, message_remove_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1
+from src.dm import dm_create_v1, dm_messages_v1, dm_leave_v1
 from datetime import datetime
 from time import sleep
 
@@ -545,6 +545,7 @@ def testsendlater_user_not_in_channel():
         message_sendlater_v1(user2["token"], channel["channel_id"], "Thomas Chen lmfao", time)
 
 
+
 # Message sent in past
 def testsendlater_invalid_time():
     clear_v1()
@@ -686,3 +687,612 @@ def testsendlaterdm_valid_case():
             assert dms["message"] == "Imagine Trump saying Jonathan"
             assert dms["time_created"] == time
         
+
+# MESSAGE REACT TESTING -----------------
+
+# Invalid Token
+def testreact_invalid_token():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+    invalid_token = jwt.encode({"sessionId": 2}, database.secretSauce, algorithm = "HS256")
+
+    with pytest.raises(AccessError):
+        message_react_v1(invalid_token, m_id, 1)
+
+
+# Invalid Message ID
+def testreact_invalid_message_ID():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    _ = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+
+    with pytest.raises(InputError):
+        message_react_v1(user["token"], "invalid_mid", 1)
+
+
+# Invalid React ID
+def testreact_invalid_react_ID():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(InputError):
+        message_react_v1(user["token"], m_id, "invalid_reactID")
+
+
+# User not in channel
+def testreact_not_in_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(AccessError):
+        message_react_v1(user2["token"], m_id, 1)
+
+
+# User not in DM
+def testreact_not_in_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    message1 = message_senddm_v1(user["token"], dm["dm_id"], "Jonathan Chen")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(AccessError):
+        message_react_v1(user3["token"], m_id, 1)
+
+
+# Message already reacted
+def testreact_already_reacted():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_react_v1(user["token"], m_id, 1)    
+
+    with pytest.raises(InputError):
+        message_react_v1(user["token"], m_id, 1)    
+
+
+# Valid Case for Channel Message React
+def testreact_valid_case_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_react_v1(user["token"], m_id, 1)    
+
+    message_info = channel_messages_v2(user["token"], channel["channel_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user["auth_user_id"]:
+            assert msg["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [user["auth_user_id"]],
+                "is_this_user_reacted": True,
+            }]
+
+# Valid Case for DM Message React
+def testreact_valid_case_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
+    message_react_v1(user["token"], message1["message_id"], 1)
+
+    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [user["auth_user_id"]],
+                "is_this_user_reacted": False,
+            }]
+
+
+# MESSAGE UNREACT TESTING -----------------
+
+# Invalid Token
+def testunreact_invalid_token():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_react_v1(user["token"], m_id, 1) 
+    invalid_token = jwt.encode({"sessionId": 32132}, database.secretSauce, algorithm = "HS256")
+
+    with pytest.raises(AccessError):
+        message_unreact_v1(invalid_token, m_id, 1)
+
+
+# Invalid Message ID
+def testunreact_message_id():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_react_v1(user["token"], m_id, 1) 
+
+    with pytest.raises(InputError):
+        message_unreact_v1(user["token"], "invalid_mID", 1)
+
+
+# Invalid React ID
+def testunreact_react_id():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_react_v1(user["token"], m_id, 1) 
+
+    with pytest.raises(InputError):
+        message_unreact_v1(user["token"], m_id, "invalid_reactID")
+
+
+# Message does not contain an active react
+def testunreact_no_reacts_unreact():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(InputError):
+        message_unreact_v1(user["token"], m_id, 1)
+
+
+# Unreacting an already unreacted message
+def testunreact_unreacting_unreacted_msg():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_react_v1(user["token"], m_id, 1) 
+    message_unreact_v1(user["token"], m_id, 1)
+
+    with pytest.raises(InputError):
+        message_unreact_v1(user["token"], m_id, 1)
+
+
+# User not in channel to unreact
+def testunreact_user_not_in_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+
+    channel_join_v2(user2["token"], channel["channel_id"])
+ 
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+    message_react_v1(user2["token"], m_id, 1) 
+
+    channel_leave_v1(user2["token"], channel["channel_id"])
+
+    with pytest.raises(AccessError):
+        message_unreact_v1(user2["token"], m_id, 1)
+
+
+# User not in dm to unreact
+def testunreact_user_not_in_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"], user3["auth_user_id"]])
+
+    message1 = message_senddm_v1(user["token"], dm["dm_id"], "omg it's thomas chen")
+    m_id = message1.get('message_id')
+    message_react_v1(user3["token"], m_id, 1) 
+
+    dm_leave_v1(user3["token"], dm["dm_id"])
+
+    with pytest.raises(AccessError):
+        message_unreact_v1(user3["token"], m_id, 1)
+
+
+# Valid case for Channel
+def testunreact_valid_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_react_v1(user["token"], m_id, 1)    
+
+    message_info = channel_messages_v2(user["token"], channel["channel_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user["auth_user_id"]:
+            assert msg["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [user["auth_user_id"]],
+                "is_this_user_reacted": True,
+            }]
+
+    message_unreact_v1(user["token"], m_id, 1)
+
+    message_info_later = channel_messages_v2(user["token"], channel["channel_id"], 0)
+
+    for msg in message_info_later["messages"]:
+        if msg["u_id"] is user["auth_user_id"]:
+            assert msg["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False,
+            }]
+
+
+# Valid Case for DM
+def testunreact_valid_case_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
+    message_react_v1(user["token"], message1["message_id"], 1)
+
+    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [user["auth_user_id"]],
+                "is_this_user_reacted": False,
+            }]
+
+    message_unreact_v1(user["token"], message1["message_id"], 1)
+
+    message_info_later = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info_later["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False,
+            }]
+
+
+
+
+# MESSAGE PIN TESTING -----------------
+
+# Invalid Token
+def testpin_invalid_token():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    invalid_token = jwt.encode({"sessionId": 32132}, database.secretSauce, algorithm = "HS256")
+
+    with pytest.raises(AccessError):
+        message_pin_v1(invalid_token, m_id)
+
+
+# Invalid Message ID
+def testpin_invalid_message_id():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    _ = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+
+    with pytest.raises(InputError):
+        message_pin_v1(user["token"], "invalid_mID")
+
+
+# Message already pinned
+def testpin_already_pinned():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+
+    with pytest.raises(InputError):
+        message_pin_v1(user["token"], m_id)
+
+
+# User not in channel
+def testpin_user_not_in_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(AccessError):
+        message_pin_v1(user2["token"], m_id)
+
+
+# User not in dm
+def testpin_user_not_in_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "omg it's jonathan qiu")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(AccessError):
+        message_pin_v1(user3["token"], m_id)
+
+
+# User is not an owner of the channel
+def testpin_user_not_owner_of_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(AccessError):
+        message_pin_v1(user2["token"], m_id)
+
+
+# User not owner of dm
+def testpin_user_not_owner_of_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"], user3["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "omg it's jonathan qiu")
+    m_id = message1.get('message_id')
+
+    with pytest.raises(AccessError):
+        message_pin_v1(user3["token"], m_id)
+
+
+# Valid Case for Channel
+def testpin_valid_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user2["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+
+    message_info = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == True
+
+
+# Valid Case for DM
+def testpin_valid_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
+    message_pin_v1(user["token"], message1["message_id"])
+
+    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == True
+
+
+
+
+# MESSAGE UNPIN TESTING -----------------
+
+# Invalid Token
+def testunpin_invalid_token():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+
+    invalid_token = jwt.encode({"sessionId": 32132}, database.secretSauce, algorithm = "HS256")
+
+    with pytest.raises(AccessError):
+        message_unpin_v1(invalid_token, m_id)
+
+
+# Invalid Message ID
+def testunpin_invalid_message_id():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+
+    message_pin_v1(user["token"], message1["message_id"])
+
+    with pytest.raises(InputError):
+        message_unpin_v1(user["token"], "invalid_mID")
+
+
+# Message already unpinned
+def testunpin_already_unpinned():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+
+    message_unpin_v1(user["token"], m_id)
+
+    with pytest.raises(InputError):
+        message_unpin_v1(user["token"], m_id)
+
+
+# User not in channel
+def testunpin_user_not_in_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+    channel_addowner_v1(user["token"], channel["channel_id"], user2["auth_user_id"])
+
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user2["token"], m_id)
+
+    channel_leave_v1(user2["token"], channel["channel_id"])
+
+    with pytest.raises(AccessError):
+        message_unpin_v1(user2["token"], m_id)
+  
+
+# User not in dm
+def testunpin_user_not_in_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "omg it's jonathan qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+
+    with pytest.raises(AccessError):
+        message_unpin_v1(user3["token"], m_id)
+
+
+# User is not an owner of the channel
+def testunpin_user_not_owner_of_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+    
+    with pytest.raises(AccessError):
+        message_unpin_v1(user2["token"], m_id)
+
+
+# User not owner of dm
+def testunpin_user_not_owner_of_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"], user3["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "omg it's jonathan qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+
+    with pytest.raises(AccessError):
+        message_unpin_v1(user2["token"], m_id)
+
+
+# Valid Case for Channel
+def testunpin_valid_channel():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user2["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+
+    message_info = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == True
+
+    message_unpin_v1(user["token"], m_id)
+
+    message_info_later = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in message_info_later["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == False
+
+
+# Valid Case for DM
+def testunpin_valid_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    message1 = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
+    message_pin_v1(user["token"], message1["message_id"])
+
+    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == True
+
+    message_unpin_v1(user["token"], message1["message_id"])
+
+    message_info_later = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for msg in message_info_later["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == False

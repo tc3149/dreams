@@ -12,6 +12,8 @@ from src.message import message_senddm_v1, message_share_v1
 from src.channel import channel_messages_v2, channel_join_v2
 from src.channels import channels_create_v2
 from src.dm import dm_create_v1, dm_messages_v1
+from datetime import datetime
+from time import sleep
 
 # MESSAGE_SEND TESTING
 
@@ -1705,3 +1707,429 @@ def test_http_message_share_no_optional_message_dm():
     messageShareR = json.loads(messageShare.text)
 
     assert messageShareR == {"shared_message_id": messageShareR["shared_message_id"]}
+
+
+# MESSAGE SENDLATER TESTING -----------------
+
+# Message too long (1k+ characters)
+def testsendlater_too_long():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message sendlater
+    funcURL = "message/sendlater/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    temp = 'x' * 2354
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": temp,
+        "time_sent": time,
+    }
+    messageSendlater = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterR = json.loads(messageSendlater.text)
+    assert messageSendlaterR["code"] == 400
+
+
+# Invalid Token
+def testsendlater_token_fail():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message sendlater
+    funcURL = "message/sendlater/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    invalid_token = jwt.encode({"sessionId": 9949}, database.secretSauce, algorithm = "HS256")
+    inputData = {
+        "token": invalid_token,
+        "channel_id": channelR["channel_id"],
+        "message": "Jonathan Chen and Thomas Qiu",
+        "time_sent": time,
+    }
+    messageSendlater = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterR = json.loads(messageSendlater.text)
+    assert messageSendlaterR["code"] == 403
+    
+
+# Invalid Channel ID
+def testsendlater_invalid_channel_id():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(channel.text)
+
+    # Message sendlater
+    funcURL = "message/sendlater/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": userR["token"],
+        "channel_id": "invalid_id",
+        "message": "Jonathan Chen and Thomas Qiu",
+        "time_sent": time,
+    }
+    messageSendlater = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterR = json.loads(messageSendlater.text)
+    assert messageSendlaterR["code"] == 400
+
+
+# Empty Message
+def testsendlater_empty_msg():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message sendlater
+    funcURL = "message/sendlater/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "",
+        "time_sent": time,
+    }
+    messageSendlater = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterR = json.loads(messageSendlater.text)
+    assert messageSendlaterR["code"] == 400
+
+
+# User not in channel
+def testsendlater_user_not_in_channel():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message sendlater
+    funcURL = "message/sendlater/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": user2R["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Jonathan Chen and Thomas Qiu",
+        "time_sent": time,
+    }
+    messageSendlater = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterR = json.loads(messageSendlater.text)
+    assert messageSendlaterR["code"] == 403
+
+
+# Message sent in past
+def testsendlater_past_time():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message sendlater 
+    funcURL = "message/sendlater/v1"
+    time = int(datetime.timestamp(datetime.now()) - 2)
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Chenergy",
+        "time_sent": time,
+    }
+    messageSendlater = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterR = json.loads(messageSendlater.text)
+    assert messageSendlaterR["code"] == 400
+
+
+# Valid Case Testing
+def testsendlater_valid():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message sendlater
+    funcURL = "message/sendlater/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Chenergy",
+        "time_sent": time,
+    }
+    messageSendlater = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageSendlater.text)
+
+     # Channel Message Info -------
+    funcURL = "channel/messages/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    channelMessages = requests.get(config.url + funcURL + "?" + qData)
+    channelMessagesR = json.loads(channelMessages.text)
+
+    assert len(channelMessagesR["messages"]) == 0
+
+    sleep(3)
+
+    # Channel Message Info v2 -------
+    funcURL = "channel/messages/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    channelMessages2 = requests.get(config.url + funcURL + "?" + qData)
+    channelMessages2R = json.loads(channelMessages2.text)
+
+    for msg in channelMessages2R["messages"]:
+        if msg["u_id"] is userR["auth_user_id"]:
+            assert msg["message"] == "Chenergy"
+            assert msg["time_created"] == time
+
+
+# MESSAGE SEND LATER DM TESTING --------------------------------
+
+# Message too long (over 1k)
+def testsendlaterdm_long_msg():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],  
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message sendlater
+    funcURL = "message/sendlaterdm/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    temp = 'x' * 2583
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "message": temp,
+        "time_sent": time,
+    }
+    messageSendlaterdm = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterdmR = json.loads(messageSendlaterdm.text)
+    assert messageSendlaterdmR["code"] == 400
+
+
+# Invalid Token ID
+def testsendlaterdm_wrong_token():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message sendlater
+    funcURL = "message/sendlaterdm/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    invalid_token = jwt.encode({"sessionId": 545999}, database.secretSauce, algorithm = "HS256")
+    inputData = {
+        "token": invalid_token,
+        "dm_id": dmR["dm_id"],
+        "message": "Thomas' DLore",
+        "time_sent": time,
+    }
+    messageSendlaterdm = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterdmR = json.loads(messageSendlaterdm.text)
+    assert messageSendlaterdmR["code"] == 403
+
+    

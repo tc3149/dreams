@@ -9,7 +9,7 @@ from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1
 from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
-from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1
+from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1
 from src.utils import saveData
 from src.other import clear_v1, search_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
@@ -159,6 +159,19 @@ def messageShare():
     saveData()
     return dumps(returnData)
 
+@APP.route("/message/sendlater/v1", methods=["POST"])
+def messageSendlater():
+    inputData = request.get_json()
+    returnData = message_sendlater_v1(inputData["token"], inputData["channel_id"], inputData["message"], inputData["time_sent"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/message/sendlaterdm/v1", methods=["POST"])
+def messageSendlaterDM():
+    inputData = request.get_json()
+    returnData = message_sendlaterdm_v1(inputData["token"], inputData["dm_id"], inputData["message"], inputData["time_sent"])
+    saveData()
+    return dumps(returnData)
 
 # #############################################################################
 #                                                                             #
