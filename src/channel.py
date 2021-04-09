@@ -6,12 +6,12 @@ from src.auth import auth_register_v2
 from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner
 
 '''
-channel_invite_v2 takes in an auth_user_id integer, a channel_id integer and u_id integer. 
-The function then checks if the channel_id is exists, if both users exists, if auth_user_id is already a member of the channel and if u_id is a member of the channel.
+channel_invite_v2 takes in a token, a channel_id integer and u_id integer. 
+The function then checks if the channel_id is exists, if both users exists, if the token is already a member of the channel and if u_id is a member of the channel.
 If all requirements are met the function then adds u_id to the channel and returns {}, otherwise it raises InputError or AccessError.
 
 Arguments:
-    auth_user_id (integer)      - Id of user who owns the channel
+    token (string)              - User's Authorisation Hash
     channel_id (integer)        - Id of channel
     u_id (integer)              - Id of user being added to the channel   
     ...
@@ -19,7 +19,7 @@ Arguments:
 Exceptions:
     InputError  - Occurs when given channel_id does not exist
     InputError  - Occurs when given u_id does not exist
-    InputError  - Occurs when given auth_user_id does not exist
+    AccessError  - Occurs when given token is invalid
     InputError  - Occurs when given u_id already a member of the channel they are being added to
     ValueError  - Occurs when given auth_user_id is not a member of the channel
 
@@ -40,20 +40,7 @@ def channel_invite_v2(token, channel_id, u_id):
     if channelExists is False:
         #channel does not exist
         raise InputError ("Channel does not exist")
-    
-    #check if auth_user_id exists 
-    auth_id_status = False
-    for user in database.data["accData"]:
-        if user.get("id") is auth_user_id:
-            #auth_user_id exists
-            auth_id_status = True
-            break
-   
-    if auth_id_status is False:
-        # auth_user_id does not exist
-        raise InputError (description="Inviting user does not exist")
-            
-    
+       
     #check if auth_user_id owner member of channel
     owner_status = False
     for user in database.data["channelList"][channel_id]['owner_ids']:   
@@ -95,18 +82,18 @@ def channel_invite_v2(token, channel_id, u_id):
     }
 
 '''
-channel_details_v2 takes in an auth_user_id integer and a channel_id integer. 
-The function then checks if the channel_id is exists, if auth_user_id exists and is already a member of the channel.
+channel_details_v2 takes in a token string and a channel_id integer. 
+The function then checks if the channel_id is exists, if token (into auth_user_id) exists and is already a member of the channel.
 If all requirements are met the function then returns the contents of the channel including the name, ownermembers and all members, otherwise it raises InputError or AccessError.
 
 Arguments:
-    auth_user_id (integer)      - Id of user who owns the channel
+    token (string)              - User's Authorisation Hash
     channel_id (integer)        - Id of channel 
     ...
 
 Exceptions:
     InputError  - Occurs when given channel_id does not exist
-    InputError  - Occurs when given auth_user_id does not exist
+    AccessError  - Occurs when given token does not exist
     ValueError  - Occurs when given auth_user_id is not a member of the channel
 
 Return Value:
@@ -148,19 +135,7 @@ def channel_details_v2(token, channel_id):
     if channelExists is False:
         #channel does not exist
         raise InputError ("Channel does not exist")
-
-    #check if auth_user_id exists 
-    auth_id_status = False
-    for user in database.data["accData"]:
-        if user.get("id") is auth_user_id:
-            #auth_user_id exists
-            auth_id_status = True
-            break
-   
-    if auth_id_status is False:
-        # auth_user_id does not exist
-        raise AccessError ("User does not exist")
-            
+  
     
     #check if auth_user_id owner member of channel
     member_status = False
@@ -219,7 +194,7 @@ def channel_details_v2(token, channel_id):
 
 
 '''
-channel_messages_v2 takes in a user id, a specific channel id, and a 'start' to
+channel_messages_v2 takes in a token, a specific channel id, and a 'start' to
 determine after what amount of messages to show, e.g. recent 5 messages have 
 already been seen, thus start would equal 5 to see later messages.
 The function first does security checks, then reverses the messages list, so
@@ -227,13 +202,13 @@ that the most recent messages are at the head of the list, then appends to a new
 list for return.
 
 Arguments:
-    auth_user_id (integer) - Unique user id created by auth_register_v1
+    token (string) - User's Authorisation Hash
     channel_id (integer) - Unique channel id created by channels_create_v2
     start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
     indexes relating to recent messages
 
 Exceptions:
-    AccessError - Occurs when auth_user_id is not valid (i.e. not created)
+    AccessError - Occurs when token is not valid
 
 Return Value:
     Most cases Returns:
@@ -250,9 +225,6 @@ Return Value:
 
 def channel_messages_v2(token, channel_id, start):
     auth_user_id = get_user_id_from_token(token)
-    # Check if user id is valid
-    if valid_userid(auth_user_id) is False:
-        raise AccessError(description="Error: Invalid user id")
 
     # Check if channel id is valid
     if valid_channelid(channel_id) is False:
@@ -309,14 +281,14 @@ and if the user is present, the user is removed from the list of member ids in c
 Otherwise, if the user is not present, an AccessError is raised.
 
 Arguments:
-    auth_user_id (integer) - Unique user id created by auth_register_v1
+    token (string) - User's Authorisation Hash
     channel_id (integer) - Unique channel id created by channels_create_v2
     start (integer) - Starts the message list from index start. So if start is 5, will skip the first 5 
     indexes relating to recent messages
 
 Exceptions:
     InputError - channel_id is invalid
-    AccessError - Occurs when auth_user_id is not valid (i.e. not created)
+    AccessError - Occurs when token is not valid
 
 Return Value:
     Most cases Returns:
@@ -326,6 +298,7 @@ Return Value:
 
 def channel_leave_v1(token, channel_id):
     auth_user_id = get_user_id_from_token(token)
+    
     #Checking if channel is valid
     if valid_channelid(channel_id) is False:
         raise InputError(description="Error: Channel ID is not a valid channel")

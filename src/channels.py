@@ -6,8 +6,7 @@ from src.error import InputError, AccessError
 from src.utils import get_user_id_from_token
 
 '''
-channels_list_v2 takes in a user_id string.
-The functions then checks if the user_id is valid.
+channels_list_v2 takes in a token, converted to auth_user_id.
 If the user_id is valid, the function then returns all the channels associated
 with the user_id in a list.
 Arguments:
@@ -19,14 +18,6 @@ Return Value:
 '''
 def channels_list_v2(token):
     auth_user_id = get_user_id_from_token(token)
-    id_status = False
-    for user in database.data["accData"]:
-        if user.get("id") is auth_user_id:
-            id_status = True
-            break
-    
-    if id_status is False:
-        raise AccessError(description="Error: Invalid user id")
 
     newchannelList = []
     for channel in database.data["channelList"]:
@@ -39,8 +30,7 @@ def channels_list_v2(token):
     return {'channels': newchannelList}
 
 '''
-channels_listall_v2 takes in a user_id string.
-The functions then checks if the user_id is valid.
+channels_listall_v2 takes in a token string converted to auth_user_id.
 If the user_id is valid, the function then returns all channels.
 Arguments:
     token (string) - ID of user
@@ -51,14 +41,6 @@ Return Value:
 '''
 def channels_listall_v2(token):
     auth_user_id = get_user_id_from_token(token)
-    id_status = False
-    for user in database.data["accData"]:
-        if user.get("id") is auth_user_id:
-            id_status = True
-            break
-    
-    if id_status is False:
-        raise AccessError(description="Error: Invalid user id")
 
     newchannelList = []
     for channel in database.data["channelList"]:
@@ -70,20 +52,20 @@ def channels_listall_v2(token):
     return {'channels': newchannelList}
 
 '''
-channels_create_v2 takes in a user id, a specified channel name, and a boolean for 
+channels_create_v2 takes in token (converted to auth_user_id), a specified channel name, and a boolean for 
 whether or not the channel is intended to be public. This function creates an empty channel dictionary 
 and appends the user id as an owner and member of the channel, then returns the newly created
 channel id.
 
 Arguments:
-    auth_user_id (integer) - User id created by auth_register_v1
+    token (string) - User's Authorisation Hash
     name (string) - Name of the channel
     is_public (boolean) - Either true or false, sets the channel to public or private
 
 Exceptions:
     InputError - Occurs when length of name is greater than 20 characters
     InputError - Occurs when length of name is less than 1 character (not listed on spec but added anyways)
-    AccessError - Occurs when auth_user_id is not valid
+    AccessError - Occurs when token is invalid
 
 Return Value:
     Returns channel_id | 'channel_id': channel_id,
@@ -102,17 +84,7 @@ def channels_create_v2(token, name, is_public):
 
     if len(name) < 1:
         raise InputError(description="Error: Name is less than 1 character")
-
-    # Check if valid user id
-    id_status = False
-    for user in database.data["accData"]:
-        if user.get("id") is auth_user_id:
-            id_status = True
-            break
-    
-    if id_status is False:
-        raise AccessError(description="Error: Invalid user id")
-    
+  
     channel_id = len(database.data["channelList"])
 
     channelData = {
