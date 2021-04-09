@@ -8,10 +8,12 @@ import src.database as database
 from src.channel import channel_join_v2
 from src.channel import channel_messages_v2
 from src.message import message_send_v2, message_edit_v2
-from src.message import message_senddm_v1, message_share_v1, message_remove_v1
+from src.message import message_senddm_v1, message_share_v1, message_remove_v1, message_sendlater_v1, message_sendlaterdm_v1
 from src.dm import dm_create_v1, dm_messages_v1
+from datetime import datetime
+from time import sleep
 
-# MESSAGE SEND TESTING
+# MESSAGE SEND TESTING ---------------------------------------------------------
 
 # empty message
 def testsend_empty_message():
@@ -80,7 +82,7 @@ def testsend_if_valid():
 
 
 
-# MESSAGE EDIT TESTING
+# MESSAGE EDIT TESTING --------------------------------------------------------------------
 
 # empty message
 
@@ -198,7 +200,7 @@ def testedit_indepth_validtesting():
 
 
 
-# MESSAGE REMOVE TESTING
+# MESSAGE REMOVE TESTING ------------------------------------------------------------------
 
 # invalid token ID
 def testremove_invalid_token():
@@ -282,7 +284,7 @@ def testremove_comprehensive():
 
 
 
-# MESSAGE SENDDM TESTING
+# MESSAGE SENDDM TESTING ------------------------------------------------------------------------
 
 # Empty Message
 def testsenddm_empty_message():
@@ -368,7 +370,7 @@ def testsenddm_valid():
             assert second["message"] == 'Thomas'
 
 
-# message share tests
+# MESSAGE SHARE TESTING ------------------------------------------------------------------------------------
 
 def test_user_not_member_of_channel_they_sharing_to():
     clear_v1()
@@ -476,3 +478,211 @@ def test_without_optional_message_dm():
     assert messages1["messages"][0]["message_id"] == 2
     assert messages1["messages"][0]["message"] == '\n\n"""\nThis is a message\n"""'
     assert messages1["messages"][0]["u_id"] == user1["auth_user_id"]
+
+
+# MESSAGE SEND LATER TESTING -------------------------------------------------------
+
+# Message too long (over 1k)
+def testsendlater_invalid_message():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    temp = 'x' * 2354
+
+    with pytest.raises(InputError):
+        message_sendlater_v1(user1["token"], channel["channel_id"], temp, time)
+
+
+# Invalid Token ID
+def testsendlater_invalid_token():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    invalid_token = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
+
+    with pytest.raises(AccessError):
+        message_sendlater_v1(invalid_token, channel["channel_id"], "Thomas Chen lmfao", time)
+
+
+# Invalid Channel ID
+def testsendlater_invalid_channel():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channels_create_v2(user1["token"], "testchannel", True)
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+
+    with pytest.raises(InputError):
+        message_sendlater_v1(user1["token"], "invalid_id", "Thomas Chen lmfao", time)
+
+
+# Empty Message
+def testsendlater_empty_message():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+
+    with pytest.raises(InputError):
+        message_sendlater_v1(user1["token"], channel["channel_id"], "", time)
+
+
+# User not in channel
+def testsendlater_user_not_in_channel():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+
+    with pytest.raises(AccessError):
+        message_sendlater_v1(user2["token"], channel["channel_id"], "Thomas Chen lmfao", time)
+
+
+# Message sent in past
+def testsendlater_invalid_time():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    time_set = int(datetime.timestamp(datetime.now()) - 2)
+
+    with pytest.raises(InputError):
+        message_sendlater_v1(user1["token"], channel["channel_id"], "Thomas Chen lmfao", time_set)
+
+
+# Valid Case Testing
+def testsendlater_valid_case():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    time_set = int(datetime.timestamp(datetime.now()) + 2)
+
+    message_sendlater_v1(user1["token"], channel["channel_id"], "i'll see you in the future", time_set)
+    
+    message_info = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+    assert len(message_info["messages"]) == 0
+
+    sleep(3)
+
+    message_info_later = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+    
+    for messages1 in message_info_later["messages"]:
+        if messages1["u_id"] is user1["auth_user_id"]:
+            assert messages1["message"] == "i'll see you in the future"
+            assert messages1["time_created"] == time_set
+
+
+# MESSAGE SEND LATER DM TESTING -------------------------------------------------------
+
+# Message too long (over 1k)
+def testsendlaterdm_invalid_message():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    temp = 'x' * 2354
+
+    with pytest.raises(InputError):
+        message_sendlaterdm_v1(user["token"], dm["dm_id"], temp, time)
+
+
+# Invalid Token ID
+def testsendlaterdm_invalid_token():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    invalid_token = jwt.encode({"sessionId": 999}, database.secretSauce, algorithm = "HS256")
+
+    with pytest.raises(AccessError):
+        message_sendlaterdm_v1(invalid_token, dm["dm_id"], "Imagine Trump saying Jonathan", time)
+
+
+# Invalid dm ID
+def testsendlaterdm_invalid_DM():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    _ = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+
+    with pytest.raises(InputError):
+        message_sendlaterdm_v1(user["token"], "invalid_id", "Imagine Trump saying Jonathan", time)
+
+
+# Empty Message
+def testsendlaterdm_empty_message():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+
+    with pytest.raises(InputError):
+        message_sendlaterdm_v1(user["token"], dm["dm_id"], "", time)
+
+
+# User not in DM
+def testsendlaterdm_user_not_in_dm():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+
+    with pytest.raises(AccessError):
+        message_sendlaterdm_v1(user3["token"], dm["dm_id"], "Imagine Trump saying Jonathan", time)
+
+
+# Time set in the past
+def testsendlaterdm_time_in_past():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    time = int(datetime.timestamp(datetime.now()) - 2)
+
+    with pytest.raises(InputError):
+        message_sendlaterdm_v1(user["token"], dm["dm_id"], "Imagine Trump saying Jonathan", time)
+
+
+# Valid Case Testing
+def testsendlaterdm_valid_case():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"]])
+
+    time = int(datetime.timestamp(datetime.now()) + 2)
+
+    message_sendlaterdm_v1(user2["token"], dm["dm_id"], "Imagine Trump saying Jonathan", time)
+
+    dm_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    assert len(dm_info["messages"]) == 0
+
+    sleep(3)
+
+    dm_info_later = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+
+    for dms in dm_info_later["messages"]:
+        if dms["u_id"] is user["auth_user_id"]:
+            assert dms["message"] == "Imagine Trump saying Jonathan"
+            assert dms["time_created"] == time
+        

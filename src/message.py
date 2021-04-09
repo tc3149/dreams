@@ -2,6 +2,9 @@ from src.error import InputError, AccessError
 from src.utils import valid_userid, valid_dmid, check_useralreadyindm, valid_channelid, check_useralreadyinchannel, check_messageid, get_user_id_from_token, getchannelID, checkOwner
 import src.database as database
 from datetime import datetime
+from threading import Timer
+from time import sleep
+
 
 '''
 message_send_v2 takes in the token of a user, a channel ID and a message the user wishes to send to the channel.
@@ -49,9 +52,7 @@ def message_send_v2(token, channel_id, message):
 
     # setting the time and date
 
-    temp = datetime.now()
-    remove_temp = temp.replace(microsecond = 0)
-    final_time = remove_temp.timestamp()
+    final_time = int(datetime.timestamp(datetime.now()))
     
     database.idData['messageId'] = database.idData["messageId"] + 1
     new_message_id = database.idData["messageId"]
@@ -225,9 +226,7 @@ def message_senddm_v1(token, dm_id, message):
     if check_useralreadyindm(u_id, dm_id) is False:
         raise AccessError(description="Error: User not in dm")
 
-    temp = datetime.now()
-    remove_temp = temp.replace(microsecond = 0)
-    final_time = remove_temp.timestamp()
+    final_time = int(datetime.timestamp(datetime.now()))
     
     database.idData['messageId'] = database.idData["messageId"] + 1
     new_message_id = database.idData['messageId']
@@ -337,3 +336,78 @@ def message_share_v1(token,og_message_id,message,channel_id,dm_id):
     return {
         "shared_message_id": shared_message_id
     }
+
+
+def message_sendlater_v1(token, channel_id, message, time_sent):
+
+    u_id = get_user_id_from_token(token)
+
+    length = len(message)
+
+    if length > 1000:
+        raise InputError(description="Message is more than 1000 characters")
+
+    if not message:
+        raise InputError(description="Error: Empty Message")
+
+    if valid_channelid(channel_id) is False:
+        raise InputError(description="Error: Invalid Channel ID")
+
+    if check_useralreadyinchannel(u_id, channel_id) is False:
+        raise AccessError(description="Error: User not in channel")
+
+    time_now = int(datetime.timestamp(datetime.now()))
+    time_difference = int(time_sent - time_now)
+
+    if time_difference < 0:
+        raise InputError(description="Error: Time is in the past")
+
+    timer_to_send = Timer(time_difference, message_send_v2, args=[token, channel_id, message])
+    timer_to_send.start()
+
+    for channels in database.data["channelList"]:
+        if channels["id"] is channel_id:
+            for messages_sent in channels['messages']:
+                if messages_sent["message"] == message:
+                        message_id_new = {
+                            "message_id": messages_sent["message_id"],
+                        }
+
+                        return message_id_new
+                     
+
+def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    u_id = get_user_id_from_token(token)
+
+    length = len(message)
+
+    if length > 1000:
+        raise InputError(description="Message is more than 1000 characters")
+
+    if not message:
+        raise InputError(description="Error: Empty Message")
+
+    if valid_dmid(dm_id) is False:
+        raise InputError(description="Error: Invalid dm ID")
+
+    if check_useralreadyindm(u_id, dm_id) is False:
+        raise AccessError(description="Error: User not in dm")
+
+    time_now = int(datetime.timestamp(datetime.now()))
+    time_difference = int(time_sent - time_now)
+
+    if time_difference < 0:
+        raise InputError(description="Error: Time is in the past")
+
+    timer_to_send = Timer(time_difference, message_senddm_v1, args=[token, dm_id, message])
+    timer_to_send.start()
+
+    for dmgroup in database.data["dmList"]:
+        if dmgroup["id"] is dm_id:
+            for messages_sent in dmgroup['messages']:
+                if messages_sent["message"] == message:
+                        message_id_new = {
+                            "message_id": messages_sent["message_id"],
+                        }
+
+                        return message_id_new
