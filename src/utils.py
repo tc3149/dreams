@@ -61,6 +61,14 @@ def check_messageid(message_id):
                 return False
     return True
 
+def check_messageid_in_DM(message_id):
+
+    for i in database.data["dmList"]:
+        for message1 in i["messages"]:
+            if message1.get("message_id") == message_id:
+                return False
+    return True
+
 def getchannelID(message_id):
 
     for i in database.data["channelList"]:
@@ -69,6 +77,14 @@ def getchannelID(message_id):
                 channel_id1 = i.get("id")
                 break
     return channel_id1
+
+def getdmID(message_id):
+    for i in database.data["dmList"]:
+        for message1 in i['messages']:
+            if message1["message_id"] is message_id:
+                dm_id1 = i.get("id")
+                break
+    return dm_id1
 
 def checkOwner(auth_user_id, channel_id):
 
@@ -79,6 +95,17 @@ def checkOwner(auth_user_id, channel_id):
                     return True
 
     return False
+
+def checkOwnerinDM(auth_user_id, dm_id):
+
+    for dm in database.data["dmList"]:
+        if dm["id"] is dm_id:
+            for users in dm["owner_ids"]:
+                if users is auth_user_id:
+                    return True
+    
+    return False
+
 
 def search_email(email):
     for items in database.data["accData"]:
