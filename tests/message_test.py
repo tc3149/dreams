@@ -708,7 +708,7 @@ def testreact_invalid_message_ID():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
-    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    _ = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
 
     with pytest.raises(InputError):
         message_react_v1(user["token"], "invalid_mid", 1)
@@ -1008,7 +1008,7 @@ def testpin_invalid_message_id():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user["token"], "testchannel", True)
-    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    _ = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
 
     with pytest.raises(InputError):
         message_pin_v1(user["token"], "invalid_mID")

@@ -40,7 +40,7 @@ Return Value:
     Returns list | {'channels': newchannelList}
 '''
 def channels_listall_v2(token):
-    auth_user_id = get_user_id_from_token(token)
+    _ = get_user_id_from_token(token)
 
     newchannelList = []
     for channel in database.data["channelList"]:

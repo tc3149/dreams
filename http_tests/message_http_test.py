@@ -1814,7 +1814,7 @@ def testsendlater_invalid_channel_id():
         "is_public": True,
     }
     channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
+    _ = json.loads(channel.text)
 
     # Message sendlater
     funcURL = "message/sendlater/v1"
@@ -1870,7 +1870,7 @@ def testsendlater_empty_msg():
 
 
 # User not in channel
-def testsendlater_valid():
+def testsendlater_user_not_in_channel():
     requests.delete(config.url + "clear/v1")
 
     # Register --------
@@ -1993,7 +1993,7 @@ def testsendlater_valid():
         "time_sent": time,
     }
     messageSendlater = requests.post(config.url + funcURL, json=inputData)
-    messageSendlaterR = json.loads(messageSendlater.text)
+    _ = json.loads(messageSendlater.text)
 
      # Channel Message Info -------
     funcURL = "channel/messages/v2"

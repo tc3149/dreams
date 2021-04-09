@@ -42,12 +42,7 @@ def channel_invite_v2(token, channel_id, u_id):
         raise InputError ("Channel does not exist")
        
     #check if auth_user_id owner member of channel
-    owner_status = False
-    for user in database.data["channelList"][channel_id]['owner_ids']:   
-        if auth_user_id in database.data["channelList"][channel_id]['owner_ids']:
-            #user is owner member of channel
-            owner_status = True
-            break
+    owner_status = check_useralreadyinchannel(auth_user_id, channel_id)
                
     if owner_status is False:
         #user does not have access
@@ -138,13 +133,7 @@ def channel_details_v2(token, channel_id):
   
     
     #check if auth_user_id owner member of channel
-    member_status = False
-    for user in database.data["channelList"][channel_id]['member_ids']:
-        
-        if auth_user_id in database.data["channelList"][channel_id]['member_ids']:
-            #user is owner member of channel
-            member_status = True
-            break
+    member_status = check_useralreadyinchannel(auth_user_id, channel_id)
                
     if member_status is False:
         #user does not have access
