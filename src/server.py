@@ -69,7 +69,7 @@ def authLogin():
 @APP.route("/auth/logout/v1", methods=["POST"])
 def authLogout():
     inputData = request.get_json()
-    returnData = auth_logout_v1(inputData)
+    returnData = auth_logout_v1(inputData["token"])
     saveData()
     return dumps(returnData)
 
