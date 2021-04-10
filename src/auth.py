@@ -126,6 +126,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "handle": userHandle, 
                 "sessions": [],
                 "permission": (1 if userID == 0 else 2),
+                "notifications": [],
             }
             newSessionId = new_session_id()
             sessionToken = create_session_token(newSessionId)

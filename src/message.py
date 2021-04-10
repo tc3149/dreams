@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.utils import valid_userid, valid_dmid, check_useralreadyindm, valid_channelid, check_useralreadyinchannel, check_messageid, get_user_id_from_token, getchannelID, checkOwner
-from src.utils import check_messageid_in_DM, getdmID, checkOwnerinDM
+from src.utils import check_messageid_in_DM, getdmID, checkOwnerinDM, checkTags
 import src.database as database
 from datetime import datetime
 from threading import Timer
@@ -50,7 +50,7 @@ def message_send_v2(token, channel_id, message):
     if check_useralreadyinchannel(u_id, channel_id) is False:
         raise AccessError(description="Error: User not in channel")
         
-
+    checkTags(u_id, message, channel_id, -1)
     # setting the time and date
 
     final_time = int(datetime.timestamp(datetime.now()))
@@ -235,6 +235,8 @@ def message_senddm_v1(token, dm_id, message):
 
     if check_useralreadyindm(u_id, dm_id) is False:
         raise AccessError(description="Error: User not in dm")
+
+    checkTags(u_id, message, -1, dm_id)
 
     final_time = int(datetime.timestamp(datetime.now()))
     

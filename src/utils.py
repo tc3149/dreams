@@ -198,4 +198,89 @@ def getUserAccData(u_id):
 def getUserProfileData(u_id):
     for user in database.data["userProfiles"]:
         if user["u_id"] == u_id:
-            return user
+            return user    
+
+def createAddNotification(channelId, dmId, notification_message, userId):
+    userNotification = {
+        "channel_id": channelId,
+        "dm_id": dmId,
+        "notification_message": notification_message,
+    }
+    for user in database.data["accData"]:
+        if user["id"] == userId:
+            user["notifications"].append(userNotification)
+            return
+    raise InputError(description="User ID not found")
+
+def inviteNotification(channelId, dmId, userId, userInviterId):
+    if channelId == -1 and dmId == -1:
+        raise InputError(description="Both ids cannot be -1")
+    if channelId != -1 and dmId != -1:
+        raise InputError(description="Both ids cannot be ! -1")
+
+    userInviterHandle = getHandleFromId(userInviterId)
+    if channelId == -1:
+        dmName = getDmNameFromId(dmId)
+        notiMessage = f"{userInviterHandle} added you to {dmName}."
+    elif dmId == -1:
+        channelName = getChannelNameFromId(channelId)
+        notiMessage = f"{userInviterHandle} added you to {channelName}"
+    createAddNotification(channelId, dmId, notiMessage, userId)
+
+def checkTags(userSendId, message, channel_id, dm_id):
+    if channel_id == -1 and dm_id == -1:
+        raise InputError(description="Both ids cannot be -1")
+    if channel_id != -1 and dm_id != -1:
+        raise InputError(description="Both ids cannot be ! -1")
+
+
+    if channel_id == -1:
+        checkDmExists = False
+        for dm in database.data["dmList"]:
+            if dm["id"] == dm_id:
+                checkDmExists = True
+                dmMems = dm["member_ids"]
+        if not checkDmExists:
+            raise AccessError(description="DM id does not exist")
+        for mem in dmMems:
+            memHandle = getHandleFromId(mem)
+            if "@" + memHandle in message:
+                userSendHandle = getHandleFromId(userSendId)
+                dmRoomName = getDmNameFromId(dm_id)
+                notiMessage = f"{userSendHandle} tagged you in {dmRoomName}: {message[:20]}"
+                createAddNotification(channel_id, dm_id, notiMessage, mem)
+                return
+    if dm_id == -1:
+        checkChannelExists = False
+        for channel in database.data["channelList"]:
+            if channel["id"] == channel_id:
+                checkChannelExists = True
+                channelMems = channel["member_ids"]
+        if not checkChannelExists:
+            raise AccessError(description="Channel id does not exist")
+        for mem in channelMems:
+            memHandle = getHandleFromId(mem)
+            if "@" + memHandle in message:
+                userSendHandle = getHandleFromId(userSendId)
+                channelName = getChannelNameFromId(channel_id)
+                notiMessage = f"{userSendHandle} tagged you in {channelName}: {message[:20]}"
+                createAddNotification(channel_id, dm_id, notiMessage, mem)
+                return
+
+def getHandleFromId(u_id):
+    for user in database.data["accData"]:
+        if user["id"] == u_id:
+            return user["handle"]
+    raise AccessError(description="User does not exist")
+
+def getDmNameFromId(dm_id):
+    for dm in database.data["dmList"]:
+        if dm["id"] == dm_id:
+            return dm["dm_name"]
+    raise AccessError(description="Dm room does not exist")
+
+def getChannelNameFromId(channel_id):
+    for channel in database.data["channelList"]:
+        if channel["id"] == channel_id:
+            return channel["name"]
+    raise AccessError(description="Channel room does not exist")

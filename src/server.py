@@ -16,6 +16,7 @@ from src.channels import channels_create_v2, channels_list_v2, channels_listall_
 from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2, channel_invite_v2
 from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1, dm_details_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
+from src.notifications import notifications_get_v1
 
 
 def defaultHandler(err):
@@ -335,6 +336,14 @@ def adminUserRemove():
 def adminUserpermissionChange():
     inputData = request.get_json()
     returnData = admin_userpermission_change_v1(inputData["token"], inputData["u_id"], inputData["permission_id"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/notifications/get/v1", methods=["GET"])
+def getNotifications():
+    inputToken = request.args.get("token")
+    returnData = notifications_get_v1(inputToken)
+    print(returnData)
     saveData()
     return dumps(returnData)
 
