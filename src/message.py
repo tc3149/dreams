@@ -383,15 +383,10 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     timer_to_send = Timer(time_difference, message_send_v2, args=[token, channel_id, message])
     timer_to_send.start()
 
-    for channels in database.data["channelList"]:
-        if channels["id"] is channel_id:
-            for messages_sent in channels['messages']:
-                if messages_sent["message"] == message:
-                        message_id_new = {
-                            "message_id": messages_sent["message_id"],
-                        }
 
-                        return message_id_new
+    return {
+        "message_id": database.idData["messageId"] + 1
+    }
                      
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
@@ -420,16 +415,9 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     timer_to_send = Timer(time_difference, message_senddm_v1, args=[token, dm_id, message])
     timer_to_send.start()
 
-    for dmgroup in database.data["dmList"]:
-        if dmgroup["id"] is dm_id:
-            for messages_sent in dmgroup['messages']:
-                if messages_sent["message"] == message:
-                        message_id_new = {
-                            "message_id": messages_sent["message_id"],
-                        }
-
-                        return message_id_new
-
+    return {
+        "message_id": database.idData["messageId"] + 1
+    }
 
 def message_react_v1(token, message_id, react_id):
 

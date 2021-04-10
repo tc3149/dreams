@@ -566,7 +566,7 @@ def testsendlater_valid_case():
 
     time_set = int(datetime.timestamp(datetime.now()) + 2)
 
-    message_sendlater_v1(user1["token"], channel["channel_id"], "i'll see you in the future", time_set)
+    m_id = message_sendlater_v1(user1["token"], channel["channel_id"], "i'll see you in the future", time_set)
     
     message_info = channel_messages_v2(user1["token"], channel["channel_id"], 0)
     assert len(message_info["messages"]) == 0
@@ -579,6 +579,7 @@ def testsendlater_valid_case():
         if messages1["u_id"] is user1["auth_user_id"]:
             assert messages1["message"] == "i'll see you in the future"
             assert messages1["time_created"] == time_set
+            assert messages1["message_id"] == m_id["message_id"]
 
 
 
@@ -674,19 +675,22 @@ def testsendlaterdm_valid_case():
 
     time = int(datetime.timestamp(datetime.now()) + 2)
 
-    message_sendlaterdm_v1(user2["token"], dm["dm_id"], "Imagine Trump saying Jonathan", time)
+    m_id = message_sendlaterdm_v1(user2["token"], dm["dm_id"], "Imagine Trump saying Jonathan", time)
 
     dm_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    
     assert len(dm_info["messages"]) == 0
-
+    
     sleep(3)
 
     dm_info_later = dm_messages_v1(user2["token"], dm["dm_id"], 0)
 
     for dms in dm_info_later["messages"]:
-        if dms["u_id"] is user["auth_user_id"]:
-            assert dms["message"] == "Imagine Trump saying Jonathanok"
+        if dms["u_id"] is user2["auth_user_id"]:
+            assert dms["message"] == "Imagine Trump saying Jonathan"
             assert dms["time_created"] == time
+            assert dms["message_id"] == m_id["message_id"]
+
         
 
 # MESSAGE REACT TESTING -----------------
