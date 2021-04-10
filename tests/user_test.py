@@ -26,7 +26,7 @@ def test_user_profile_v2_working():
         'name_last': "lastName",
         'handle_str': "firstnamelastname",
     }
-    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
+    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
 
 def test_user_profile_v2_invalid_u_id():
     clear_v1()
@@ -49,7 +49,7 @@ def test_user_profile_setname_v2_working():
         'name_last': "newLast",
         'handle_str': "firstnamelastname",
     }
-    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
+    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
 
 def test_user_profile_setname_v2_first_long():
     clear_v1()
@@ -108,7 +108,7 @@ def test_user_profile_sethandle_v1_working():
         'name_last': "lastName",
         'handle_str': "newHandle",
     }
-    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
+    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
 
 
 def test_user_profile_sethandle_v1_handle_taken():
@@ -125,7 +125,7 @@ def test_user_profile_sethandle_v1_handle_taken():
         'name_last': "lastName",
         'handle_str': "newHandle",
     }
-    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
+    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
 
     with pytest.raises(InputError):
         user_profile_sethandle_v1(user2["token"], "newHandle")
@@ -163,7 +163,7 @@ def test_user_profile_setemail_v2_working():
         'name_last': "lastName",
         'handle_str': "firstnamelastname",
     }
-    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == expectedOutput
+    assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
 
 
 def test_user_profile_setemail_v2_invalid_email():
@@ -209,7 +209,7 @@ def test_users_all_v1_working():
             'handle_str': "firstname2lastname2",
         }
     ]
-    assert users_all_v1(user1["token"]) == expectedOutput
+    assert users_all_v1(user1["token"]) == {"users": expectedOutput}
 
 def test_users_all_v1_invalid_token():
     clear_v1()
