@@ -188,7 +188,7 @@ def testedit_indepth_validtesting():
     channel_join_v2(user2["token"], channel["channel_id"])
     message_info = message_send_v2(user2["token"], channel["channel_id"], "lol")
     m_id = message_info.get("message_id")
-    message_edit_v2(user1["token"], m_id, "lmfao")
+    message_edit_v2(user2["token"], m_id, "lmfao")
 
     messages1 = channel_messages_v2(user2["token"], channel["channel_id"], 0)
 
@@ -581,6 +581,7 @@ def testsendlater_valid_case():
             assert messages1["time_created"] == time_set
 
 
+
 # MESSAGE SEND LATER DM TESTING -------------------------------------------------------
 
 # Message too long (over 1k)
@@ -684,7 +685,7 @@ def testsendlaterdm_valid_case():
 
     for dms in dm_info_later["messages"]:
         if dms["u_id"] is user["auth_user_id"]:
-            assert dms["message"] == "Imagine Trump saying Jonathan"
+            assert dms["message"] == "Imagine Trump saying Jonathanok"
             assert dms["time_created"] == time
         
 
