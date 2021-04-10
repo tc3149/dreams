@@ -231,9 +231,13 @@ def testremove_invalid_message_id():
 def testremove_removed_message():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    m_id = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+
+    message_remove_v1(user["token"], m_id["message_id"])
 
     with pytest.raises(InputError):
-        message_remove_v1(user["token"], "m_id")
+        message_remove_v1(user["token"], m_id["message_id"])
 
 # another user that is not owner/OP trying to remove
 def testremove_not_authorised():
