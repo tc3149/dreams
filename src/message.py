@@ -117,17 +117,31 @@ def message_remove_v1(token, message_id):
 
     channel_id = getchannelID(message_id)
 
-    for channels1 in database.data["channelList"]:
+    for channel in database.data["channelList"]:
+        for messages1 in channel["messages"]:
+            if messages1["message_id"] == message_id:
+                if checkOwner(u_id, channel_id) is True or messages1["u_id"] == u_id:
+                    if not messages1["message"]:
+                        raise InputError(description="Error: Message already removed")
+                    else:
+                        messages1["message"] = ""
+                else:
+                    raise AccessError(description="Error: Remover not an owner nor original poster")
+
+
+
+    """
+    for channels1 in database.data["channelLisSt"]:
         for message_info in channels1.get('messages'):
             if message_info.get("message_id") is message_id:
                 if checkOwner(u_id, channel_id) or message_info.get("u_id") is u_id:
-                    if message_info['message'] is None:
+                    if message_info['message'] is "":
                         raise InputError(description="Message already removed")
                     else:
-                        channels1['messages'].remove(message_info["message"])
+                        message_info["message"] == ""
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
-            
+    """
             
     return {}
 

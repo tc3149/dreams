@@ -264,7 +264,7 @@ def testremove_valid_case():
 
     for msg in messages1["messages"]:
         assert msg["message_id"] == 1
-        assert msg["message"] == ''
+        assert msg["message"] == ""
         assert msg["u_id"] == user1["auth_user_id"]
 
 
