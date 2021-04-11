@@ -16,7 +16,7 @@ from src.message import message_send_v2, message_senddm_v1
 
 def testadminremove_invalid_token():
     clear_v1()
-    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    _ = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     invalid_token = jwt.encode({"sessionId": 32132}, database.secretSauce, algorithm = "HS256")
 
@@ -93,7 +93,7 @@ def test_message_change_removed_user():
 
 def testadminpermission_invalid_token():
     clear_v1()
-    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    _ = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     invalid_token = jwt.encode({"sessionId": 321332}, database.secretSauce, algorithm = "HS256")
 
