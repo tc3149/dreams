@@ -124,7 +124,7 @@ def message_remove_v1(token, message_id):
                     if message_info['message'] is None:
                         raise InputError(description="Message already removed")
                     else:
-                        channels1['messages'].remove(message_info)
+                        channels1['messages'].remove(message_info["message"])
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
             
