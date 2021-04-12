@@ -30,7 +30,7 @@ def defaultHandler(err):
     response.content_type = 'application/json'
     return response
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path="/static/")
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -371,6 +371,10 @@ def searchv2():
     inputQuery = request.args.get("query_str")
     returnData = search_v1(inputToken, inputQuery)
     return dumps(returnData)
+
+@APP.route("/static/<path:filename>")
+def uploadImage(filename):
+    return send_from_directory("", filename)
 
 # ########################################################################
 

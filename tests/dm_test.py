@@ -1,5 +1,6 @@
 import pytest
 import jwt
+from src.config import url
 from src.other import clear_v1
 from src.dm import dm_create_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1, dm_details_v1
 from src.auth import auth_register_v2
@@ -482,6 +483,7 @@ def test_valid_input():
                                                     'email': 'email@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
+                                                    'profile_img_url': url + 'src/static/default.jpg',
                                                     'handle_str': 'namelastname',
                                                     
                                                 },
@@ -490,6 +492,7 @@ def test_valid_input():
                                                     'email': 'email2@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
+                                                    'profile_img_url': url + 'src/static/default.jpg',
                                                     'handle_str': 'namelastname0',   
                                                 }
                                             ],

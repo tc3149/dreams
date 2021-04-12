@@ -1,4 +1,5 @@
 import pytest
+from src.config import url
 from src.auth import auth_register_v2
 from src.auth import auth_login_v2
 from src.user import user_profile_v2
@@ -24,6 +25,7 @@ def test_user_profile_v2_working():
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': url + 'src/static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -47,6 +49,7 @@ def test_user_profile_setname_v2_working():
         'email': "testemail@hotmail.com",
         'name_first': "newFirst",
         'name_last': "newLast",
+        'profile_img_url': url + 'src/static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -106,6 +109,7 @@ def test_user_profile_sethandle_v1_working():
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': url + 'src/static/default.jpg',
         'handle_str': "newHandle",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -123,6 +127,7 @@ def test_user_profile_sethandle_v1_handle_taken():
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': url + 'src/static/default.jpg',
         'handle_str': "newHandle",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -161,6 +166,7 @@ def test_user_profile_setemail_v2_working():
         'email': "newEmail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': url + 'src/static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -199,6 +205,7 @@ def test_users_all_v1_working():
             'email': "testemail@hotmail.com",
             'name_first': "firstName",
             'name_last': "lastName",
+            'profile_img_url': url + 'src/static/default.jpg',
             'handle_str': "firstnamelastname",
         },
         {
@@ -206,6 +213,7 @@ def test_users_all_v1_working():
             'email': "testemail2@hotmail.com",
             'name_first': "firstName2",
             'name_last': "lastName2",
+            'profile_img_url': url + 'src/static/default.jpg',
             'handle_str': "firstname2lastname2",
         }
     ]
