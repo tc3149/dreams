@@ -117,23 +117,31 @@ def message_remove_v1(token, message_id):
 
     channel_id = getchannelID(message_id)
 
-    for channels1 in database.data["channelList"]:
-        for message_info in channels1.get('messages'):
-            if message_info.get("message_id") is message_id:
-                if checkOwner(u_id, channel_id):
-                    if message_info['message'] is None:
-                        raise InputError(description="Message already removed")
+    for channel in database.data["channelList"]:
+        for messages1 in channel["messages"]:
+            if messages1["message_id"] == message_id:
+                if checkOwner(u_id, channel_id) is True or messages1["u_id"] == u_id:
+                    if not messages1["message"]:
+                        raise InputError(description="Error: Message already removed")
                     else:
-                        channels1['messages'].remove(message_info)
-                
-                elif message_info.get("u_id") is u_id:
-                    if message_info['message'] is None:
-                        raise InputError(description="Message already removed")
-                    else:
-                        channels1['messages'].remove(message_info)
+                        messages1["message"] = ""
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
-            
+
+
+
+    """
+    for channels1 in database.data["channelLisSt"]:
+        for message_info in channels1.get('messages'):
+            if message_info.get("message_id") is message_id:
+                if checkOwner(u_id, channel_id) or message_info.get("u_id") is u_id:
+                    if message_info['message'] is "":
+                        raise InputError(description="Message already removed")
+                    else:
+                        message_info["message"] == ""
+                else:
+                    raise AccessError(description="Error: Remover not an owner nor original poster")
+    """
             
     return {}
 
@@ -385,15 +393,10 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     timer_to_send = Timer(time_difference, message_send_v2, args=[token, channel_id, message])
     timer_to_send.start()
 
-    for channels in database.data["channelList"]:
-        if channels["id"] is channel_id:
-            for messages_sent in channels['messages']:
-                if messages_sent["message"] == message:
-                        message_id_new = {
-                            "message_id": messages_sent["message_id"],
-                        }
 
-                        return message_id_new
+    return {
+        "message_id": database.idData["messageId"] + 1
+    }
                      
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
@@ -422,16 +425,9 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     timer_to_send = Timer(time_difference, message_senddm_v1, args=[token, dm_id, message])
     timer_to_send.start()
 
-    for dmgroup in database.data["dmList"]:
-        if dmgroup["id"] is dm_id:
-            for messages_sent in dmgroup['messages']:
-                if messages_sent["message"] == message:
-                        message_id_new = {
-                            "message_id": messages_sent["message_id"],
-                        }
-
-                        return message_id_new
-
+    return {
+        "message_id": database.idData["messageId"] + 1
+    }
 
 def message_react_v1(token, message_id, react_id):
 
@@ -446,45 +442,36 @@ def message_react_v1(token, message_id, react_id):
     if in_channel and in_dm is True:
         raise InputError(description="Error: Invalid message ID")
 
+
     if in_channel is False:
         channel_id = getchannelID(message_id)
 
         if check_useralreadyinchannel(u_id, channel_id) is False:
             raise AccessError(description="Error: User is not in channel")
-        
-        for channels in database.data["channelList"]:
-            for msg in channels["messages"]:
-                if msg["message_id"] == message_id:
-                    for react_info in msg["reacts"]:
-                        if u_id not in react_info["u_ids"]:
-                            react_info["u_ids"].append(u_id)
 
-                            if u_id == msg["u_id"]:
-                                react_info["is_this_user_reacted"] = True
-                        
-                        else:
-                            raise InputError(description="Error: User has already reacted to this message")
+        address = database.data["channelList"]
 
-    if in_dm is False:
+    elif in_dm is False:
         dm_id = getdmID(message_id)
 
         if check_useralreadyindm(u_id, dm_id) is False:
             raise AccessError(description="Error: User is not in dm")
+
+        address = database.data["dmList"]
         
-        for dms in database.data["dmList"]:
-            for msg in dms["messages"]:
-                if msg["message_id"] == message_id:
-                    for react_info in msg["reacts"]:
-                        if u_id not in react_info["u_ids"]:
-                            react_info["u_ids"].append(u_id)
+    
+    for channels in address:
+        for msg in channels["messages"]:
+            if msg["message_id"] == message_id:
+                for react_info in msg["reacts"]:
+                    if u_id not in react_info["u_ids"]:
+                        react_info["u_ids"].append(u_id)
 
-                            if u_id == msg["u_id"]:
-                                react_info["is_this_user_reacted"] = True
-                        
-                        else:
-                            raise InputError(description="Error: User has already reacted to this message")
-
-
+                        if u_id == msg["u_id"]:
+                            react_info["is_this_user_reacted"] = True
+                    
+                    else:
+                        raise InputError(description="Error: User has already reacted to this message")
 
     return {}
 
@@ -507,44 +494,31 @@ def message_unreact_v1(token, message_id, react_id):
 
         if check_useralreadyinchannel(u_id, channel_id) is False:
             raise AccessError(description="Error: User is not in channel")
-        
-        for channels in database.data["channelList"]:
-            for msg in channels["messages"]:
-                if msg["message_id"] == message_id:
 
-                    for react_info in msg["reacts"]:
+        address = database.data["channelList"]
 
-                        if u_id in react_info["u_ids"]:
-                            react_info["u_ids"].remove(u_id)
-
-                            if u_id == msg["u_id"]:
-                                react_info["is_this_user_reacted"] = False
-                        
-                        else:
-                            raise InputError(description="Error: User has already unreacted to this message")
-
-    if in_dm is False:
+    elif in_dm is False:
         dm_id = getdmID(message_id)
 
         if check_useralreadyindm(u_id, dm_id) is False:
             raise AccessError(description="Error: User is not in dm")
+
+        address = database.data["dmList"]
         
-        for dms in database.data["dmList"]:
-            for msg in dms["messages"]:
-                if msg["message_id"] == message_id:
+    for channels in address:
+        for msg in channels["messages"]:
+            if msg["message_id"] == message_id:
 
-                    for react_info in msg["reacts"]:
+                for react_info in msg["reacts"]:
 
-                        if u_id in react_info["u_ids"]:
-                            react_info["u_ids"].remove(u_id)
+                    if u_id in react_info["u_ids"]:
+                        react_info["u_ids"].remove(u_id)
 
-                            if u_id == msg["u_id"]:
-                                react_info["is_this_user_reacted"] = False
-                        
-                        else:
-                            raise InputError(description="Error: User has already unreacted to this message")
-
-
+                        if u_id == msg["u_id"]:
+                            react_info["is_this_user_reacted"] = False
+                    
+                    else:
+                        raise InputError(description="Error: User has already unreacted to this message")
 
     return {}
 
@@ -568,17 +542,10 @@ def message_pin_v1(token, message_id):
         if checkOwner(u_id, channel_id) is False:
             raise AccessError(description="Error: User is not authorised to do so")
 
-        for channels in database.data["channelList"]:
-            for msg in channels["messages"]:
-                if msg["message_id"] == message_id:
+        address = database.data["channelList"]
 
-                    if msg["is_pinned"] is True:
-                        raise InputError(description="Error: Message is already pinned")
-                    
-                    else:
-                        msg["is_pinned"] = True
 
-    if in_dm is False:
+    elif in_dm is False:
         dm_id = getdmID(message_id)
 
         if check_useralreadyindm(u_id, dm_id) is False:
@@ -587,16 +554,19 @@ def message_pin_v1(token, message_id):
         if checkOwnerinDM(u_id, dm_id) is False:
             raise AccessError(description="Error: User is not authorised to do so")
 
-        for dms in database.data["dmList"]:
-            for msg in dms["messages"]:
-                if msg["message_id"] == message_id:
-
-                    if msg["is_pinned"] is True:
-                        raise InputError(description="Error: Message is already pinned")
-                    
-                    else:
-                        msg["is_pinned"] = True
+        address = database.data["dmList"]
     
+
+    for channels in address:
+        for msg in channels["messages"]:
+            if msg["message_id"] == message_id:
+
+                if msg["is_pinned"] is True:
+                    raise InputError(description="Error: Message is already pinned")
+                
+                else:
+                    msg["is_pinned"] = True
+  
     return {}
 
 
@@ -619,17 +589,9 @@ def message_unpin_v1(token, message_id):
         if checkOwner(u_id, channel_id) is False:
             raise AccessError(description="Error: User is not authorised to do so")
 
-        for channels in database.data["channelList"]:
-            for msg in channels["messages"]:
-                if msg["message_id"] == message_id:
+        address = database.data["channelList"]
 
-                    if msg["is_pinned"] is False:
-                        raise InputError(description="Error: Message is already unpinned")
-                    
-                    else:
-                        msg["is_pinned"] = False
-
-    if in_dm is False:
+    elif in_dm is False:
         dm_id = getdmID(message_id)
 
         if check_useralreadyindm(u_id, dm_id) is False:
@@ -637,15 +599,18 @@ def message_unpin_v1(token, message_id):
 
         if checkOwnerinDM(u_id, dm_id) is False:
             raise AccessError(description="Error: User is not authorised to do so")
+        
+        address = database.data["dmList"]
 
-        for dms in database.data["dmList"]:
-            for msg in dms["messages"]:
-                if msg["message_id"] == message_id:
 
-                    if msg["is_pinned"] is False:
-                        raise InputError(description="Error: Message is already unpinned")
-                    
-                    else:
-                        msg["is_pinned"] = False
-    
+    for channels in address:
+        for msg in channels["messages"]:
+            if msg["message_id"] == message_id:
+
+                if msg["is_pinned"] is False:
+                    raise InputError(description="Error: Message is already unpinned")
+                
+                else:
+                    msg["is_pinned"] = False
+
     return {}

@@ -192,10 +192,6 @@ def dm_messages_v1(token, dm_id, start):
 
     auth_user_id = get_user_id_from_token(token)
 
-    # Check if user id is valid
-    if valid_userid(auth_user_id) is False:
-        raise AccessError(description="Error: Invalid user id")
-
     # Check if dm id is valid
     if valid_dmid(dm_id) is False:
         raise InputError(description="Error: Invalid dm")
