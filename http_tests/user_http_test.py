@@ -41,6 +41,7 @@ def test_http_user_profile_working():
         'email': "test@hotmail.com",
         'name_first': "nameFirst",
         'name_last': "nameLast",
+        'profile_img_url': config.url + 'src/static/default.jpg',
         'handle_str': "namefirstnamelast",
     }
     assert respD == {"user": expectedOutput}
@@ -119,7 +120,8 @@ def test_user_profile_setname_working():
         'email': "test@hotmail.com",
         'name_first': "newFirst",
         'name_last': "newLast",
-        'handle_str': "namefirstnamelast",
+
+'profile_img_url': config.url + 'src/static/default.jpg',        'handle_str': "namefirstnamelast",
     }
 
     assert respD == {"user": expectedOutput}
@@ -288,6 +290,7 @@ def test_http_user_profile_setemail_working():
         'email': "newEmail@hotmail.com",
         'name_first': "nameFirst",
         'name_last': "nameLast",
+        'profile_img_url': config.url + 'src/static/default.jpg',
         'handle_str': "namefirstnamelast",
     }
     # ----------------------------
@@ -562,6 +565,7 @@ def test_http_users_all_working():
             'email': "test@hotmail.com",
             'name_first': "nameFirst",
             'name_last': "nameLast",
+            'profile_img_url': config.url + 'src/static/default.jpg',
             'handle_str': "namefirstnamelast",
         },
         {

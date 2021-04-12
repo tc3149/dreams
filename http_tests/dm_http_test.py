@@ -1318,6 +1318,7 @@ def test_http_dm_details_valid():
                 'email': 'email@gmail.com',
                 'name_first': 'Name',
                 'name_last': 'Lastname',
+                'profile_img_url': config.url + 'src/static/default.jpg',
                 'handle_str': 'namelastname',
                 
             },
@@ -1326,6 +1327,7 @@ def test_http_dm_details_valid():
                 'email': 'email2@gmail.com',
                 'name_first': 'Name',
                 'name_last': 'Lastname',
+                'profile_img_url': config.url + 'src/static/default.jpg',
                 'handle_str': 'namelastname0',   
             }
         ]
