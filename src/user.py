@@ -1,6 +1,9 @@
 from src.error import InputError, AccessError
+from src.config import url
 import src.database as database
 from src.utils import get_user_id_from_token, search_email
+from PIL import Image
+import urllib.request
 from src.utils import search_handle, search_user
 from json import loads
 import re
@@ -162,3 +165,17 @@ def users_all_v1(token):
     _ = get_user_id_from_token(token)
     
     return {"users": database.data["userProfiles"]}
+
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    userId = get_user_id_from_token(token)
+    urllib.request.urlretrieve(img_url, f"src/static/{userId}.jpg")
+    imageObject = Image.open(f"src/static/{userId}.jpg")
+    croppedImage = imageObject.crop((x_start, y_start, x_end, y_end))
+    croppedImage.save(f"src/static/{userId}.jpg")
+    for user in database.data["userProfiles"]:
+        if user["u_id"] == userId:
+            user["profile_img_url"] = f"{url}static/{userId}.jpg"
+            break
+
+    return {}
+

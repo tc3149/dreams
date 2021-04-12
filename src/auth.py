@@ -2,6 +2,7 @@ import re
 import jwt
 import src.database as database
 from src.utils import is_valid_token_return_data
+from src.config import url
 from src.error import InputError, AccessError
 from hashlib import sha256
 from json import loads
@@ -140,6 +141,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "name_first": name_first,
                 "name_last": name_last,
                 "handle_str": userHandle,
+                "profile_img_url": url + "src/static/default.jpg"
             }
             database.data["userProfiles"].append(userProfile)
     else:

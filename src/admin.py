@@ -54,7 +54,7 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     #user does not exist
     if not valid_userid(u_id):
         # user_id does not exist
-        raise InputError ("User does not exist")
+        raise InputError(description="User does not exist")
     
     #if user is only owner and is trying to change their permission while being the only owner
     if auth_user_id == u_id:
@@ -64,7 +64,7 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
                 ownerCount += 1
         
         if ownerCount == 1:
-            raise InputError ('User is currently the only owner of Dreams')
+            raise InputError(description='User is currently the only owner of Dreams')
     
     #auth_user_id not an owner
     for user in database.data["accData"]:
