@@ -29,11 +29,19 @@ def admin_user_remove_v1(token, u_id):
     if permission_id != 1:
         raise AccessError(description="User is not an owner")
     
-    # Change all user message contents to "Remove User"
+    # Change all user message contents to "Remove User" in channel
     for channel in database.data['channelList']:
         for messages in channel['messages']:
             if messages['u_id'] == u_id:
                 messages['message'] = "Removed User"
+
+    # Change all user message contents to "Remove User" in DM
+    for dms in database.data["dmList"]:
+        for messages in dms["messages"]:
+            if messages["u_id"] == u_id:
+                messages["message"] = "Removed User"
+    
+
     # Change profile name to Removed User
     for user in database.data['userProfiles']:
         if user['u_id'] == u_id:

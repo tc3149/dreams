@@ -106,20 +106,12 @@ def checkOwnerinDM(auth_user_id, dm_id):
     
     return False
 
-
 def search_email(email):
     for items in database.data["accData"]:
         if items["email"] == email:
             return True
     return False
 
-def verify_password(email, password):
-    for items in database.data["accData"]:
-        if items["email"] == email:
-            if items["password"] == password:
-                return True
-            else:
-                return False
 
 def search_handle(currUserHandle):
     for items in database.data["accData"]:
@@ -127,29 +119,6 @@ def search_handle(currUserHandle):
             return True
     return False
 
-def get_user_id(email):
-    for items in database.data["accData"]:
-        if items["email"] == email:
-            userID = items["id"]
-            return userID
-
-def append_handle(currUserHandle):
-    # Check number of users with same handle
-    availableNumber = 0
-    while True:
-        testModCurrUserHandle = currUserHandle + str(availableNumber)
-        if search_handle(testModCurrUserHandle):
-            # Handle isnt avaiable, increment availableNumber
-            availableNumber += 1
-        else:
-            # Handle is available, return number
-            return testModCurrUserHandle
-
-def create_handle(first, last):
-    createUserHandle = first + last
-    createUserHandle = createUserHandle.lower()
-    createUserHandle = createUserHandle.replace("@", "")
-    return createUserHandle
 
 def search_user(user):
     for items in database.data["accData"]:
