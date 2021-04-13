@@ -2,6 +2,7 @@ from src.error import InputError, AccessError
 from src.config import url
 import src.database as database
 from src.utils import get_user_id_from_token, search_email
+from datetime import datetime
 from PIL import Image
 import urllib.request
 from src.utils import search_handle, search_user
@@ -179,3 +180,89 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     return {}
 
+def user_stats_v1(token):
+    userId = get_user_id_from_token(token)
+    funcCallDatetime = int(datetime.timestamp(datetime.now()))
+
+    numChannels = 0
+    for channel in database.data["channelList"]:
+        if userId in channel["member_ids"]:
+            numChannels += 1
+
+    numDms = 0
+    for dm in database.data["dmList"]:
+        if userId in dm["member_ids"]:
+            numDms +=1
+
+    numMessages = 0
+    for channel in database.data["channelList"]:
+        for message in channel["messages"]:
+            if message["u_id"] == userId:
+                numMessages += 1
+    
+    for dm in database.data["dmList"]:
+        for message in dm["messages"]:
+            if message["u_id"] == userId:
+                numMessages += 1
+
+    numerator = numChannels + numDms + numMessages
+    denominator = len(database.data["channelList"]) + len(database.data["dmList"]) + len(database.data["message_ids"])
+
+    involvementRate = numerator/denominator
+
+    userStats = {
+        "channels_joined": [{
+            "num_channels_joined": numChannels,
+            "time_stamp": funcCallDatetime,
+        }],
+        "dms_joined": [{
+            "num_dms_joined": numDms,
+            "time_stamp": funcCallDatetime,
+        }],
+        "messages_sent": [{
+            "num_messages_sent": numMessages,
+            "time_stamp": funcCallDatetime,
+        }],
+        "involvement_rate": involvementRate,
+    }
+
+    return {
+        "user_stats": userStats
+    }
+
+def users_stats_v1(token):
+    funcCallDatetime = int(datetime.timestamp(datetime.now()))
+
+    numUsers = 0
+    for user in database.data["accData"]:
+        userJoined = False
+        for channel in database.data["channelList"]:
+            if user["id"] in channel["member_ids"]:
+                userJoined = True
+        for dm in database.data["dmList"]:
+            if user["id"] in dm["member_ids"]:
+                userJoined = True
+        if userJoined is True:
+            numUsers += 1
+
+    utilisationRate = numUsers/len(database.data["accData"])
+
+    dreamsStats = {
+        "channels_exist": [{
+            "num_channels_exist": len(database.data["channelList"]),
+            "time_stamp": funcCallDatetime,
+            }],
+        "dms_exist": [{
+            "num_dms_exist": len(database.data["dmList"]), 
+            "time_stamp": funcCallDatetime,
+            }],
+        "messages_exist": [{
+            "num_messages_exist": len(database.data["message_ids"]), 
+            "time_stamp": funcCallDatetime,
+            }],
+        "utilization_rate": utilisationRate,
+    }
+
+    return {
+        "dreams_stats": dreamsStats
+    }
