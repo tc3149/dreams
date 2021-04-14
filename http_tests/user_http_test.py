@@ -580,7 +580,7 @@ def test_http_users_all_working():
     ]
 
     assert respD == {"users": expectedOutput}
- 
+
 # ------------------------------------------------------------------------------
 # USER STATS FUNCTION TESTS
 def test_http_user_stats_working():

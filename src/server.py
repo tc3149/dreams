@@ -126,13 +126,13 @@ def uploadPhoto():
 
 @APP.route("/user/stats/v1", methods=["GET"])
 def userStats():
-    inputData = request.args.get["token"]
+    inputData = request.args.get("token")
     returnData = user_stats_v1(inputData)
     return dumps(returnData)
 
 @APP.route("/users/stats/v1", methods=["GET"])
 def usersStats():
-    inputData = request.args.get["token"]
+    inputData = request.args.get("token")
     returnData = users_stats_v1(inputData)
     return dumps(returnData)
 
