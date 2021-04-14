@@ -2,7 +2,7 @@ import jwt
 import pytest
 import re
 import src.database as database
-from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.channel import channel_details_v2, channel_join_v2
@@ -183,3 +183,30 @@ def test_auth_logout_v1_inactive_token():
 
 # ------------------------------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------------------------------
+# auth_passwordreset_request_v1
+def test_auth_passwordreset_request_v1_working():
+    clear_v1()
+
+    user1 = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    output = auth_passwordreset_request_v1("testemail@institute.com")
+    assert output == {}
+
+def test_auth_passwordreset_request_invalid_email():
+    clear_v1()
+
+    user1 = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    with pytest.raises(InputError):
+        auth_passwordreset_request_v1("invalid@institute.com")
+# ------------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------------
+# auth_passwordreset_reset_v1
+def test_auth_passwordreset_reset_v1_not_working():
+    clear_v1()
+
+    user1 = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    output = auth_passwordreset_request_v1("testemail@institute.com")
+    with pytest.raises(InputError):
+        auth_passwordreset_reset_v1("invalidcode", "newpassword")
+# ------------------------------------------------------------------------------------------------------
