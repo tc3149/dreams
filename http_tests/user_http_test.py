@@ -584,6 +584,8 @@ def test_http_users_all_working():
 # ------------------------------------------------------------------------------
 # USER STATS FUNCTION TESTS
 def test_http_user_stats_working():
+    requests.delete(config.url + "clear/v1")
+
     # Register--------------------
     funcURL = "auth/register/v2"
     inputData = {
@@ -648,6 +650,8 @@ def test_http_user_stats_working():
 # ------------------------------------------------------------------------------
 # USERS STATS FUNCTION TESTS
 def test_http_users_stats_working():
+    requests.delete(config.url + "clear/v1")
+
  # Register--------------------
     funcURL = "auth/register/v2"
     inputData = {
