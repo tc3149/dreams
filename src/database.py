@@ -29,6 +29,16 @@ dmData = {
     'owner_ids': [auth_user_id],
 }
 dmList is list of dmData of the above format
+
+userProfile = {
+                "u_id": userID,
+                "email": email,
+                "name_first": name_first,
+                "name_last": name_last,
+                "handle_str": userHandle,
+                "profile_img_url": url + "src/static/default.jpg"
+            }
+userProfiles is list of userProfile of the above format
 '''
 data = {
     "accData": [],
