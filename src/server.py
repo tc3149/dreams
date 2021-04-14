@@ -6,7 +6,7 @@ from src.error import InputError, AccessError
 from src import config
 import src.database as database
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1
+from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1, user_stats_v1, users_stats_v1
 from src.user import user_profile_setname_v2, user_profile_sethandle_v1, user_profile_uploadphoto_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1
@@ -122,6 +122,18 @@ def uploadPhoto():
     inputData = request.get_json()
     returnData = user_profile_uploadphoto_v1(inputData["token"], inputData["img_url"], \
             inputData["x_start"], inputData["y_start"], inputData["x_end"], inputData["y_end"])
+    return dumps(returnData)
+
+@APP.route("/user/stats/v1", methods=["GET"])
+def userStats():
+    inputData = request.args.get["token"]
+    returnData = user_stats_v1(inputData)
+    return dumps(returnData)
+
+@APP.route("/users/stats/v1", methods=["GET"])
+def usersStats():
+    inputData = request.args.get["token"]
+    returnData = users_stats_v1(inputData)
     return dumps(returnData)
 
 
