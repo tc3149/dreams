@@ -169,8 +169,20 @@ def users_all_v1(token):
 
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     userId = get_user_id_from_token(token)
-    urllib.request.urlretrieve(img_url, f"src/static/{userId}.jpg")
+    respCode = urllib.request.urlopen(img_url)
+    if respCode.getcode() != 200:
+        print(respCode)
+        raise InputError(description="URL did not return a success")
+    _ = urllib.request.urlretrieve(img_url, f"src/static/{userId}.jpg")
     imageObject = Image.open(f"src/static/{userId}.jpg")
+    imageW, imageH = imageObject.size
+    imageType = imageObject.format
+    if imageType != "JPEG":
+        print(imageType)
+        raise InputError(description="Image is not of type JPEG")
+    if (x_start not in range(0, imageW + 1) or x_end not in range(0, imageW + 1)) or (
+            y_start not in range(0, imageH + 1) or y_end not in range(0, imageH + 1)):
+        raise InputError(description="Dimesions are not within image bounds")
     croppedImage = imageObject.crop((x_start, y_start, x_end, y_end))
     croppedImage.save(f"src/static/{userId}.jpg")
     for user in database.data["userProfiles"]:
