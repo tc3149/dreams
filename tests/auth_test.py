@@ -188,14 +188,14 @@ def test_auth_logout_v1_inactive_token():
 def test_auth_passwordreset_request_v1_working():
     clear_v1()
 
-    user1 = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
     output = auth_passwordreset_request_v1("testemail@institute.com")
     assert output == {}
 
 def test_auth_passwordreset_request_invalid_email():
     clear_v1()
 
-    user1 = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
     with pytest.raises(InputError):
         auth_passwordreset_request_v1("invalid@institute.com")
 # ------------------------------------------------------------------------------------------------------
@@ -205,8 +205,8 @@ def test_auth_passwordreset_request_invalid_email():
 def test_auth_passwordreset_reset_v1_not_working():
     clear_v1()
 
-    user1 = auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
-    output = auth_passwordreset_request_v1("testemail@institute.com")
+    auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    auth_passwordreset_request_v1("testemail@institute.com")
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1("invalidcode", "newpassword")
 # ------------------------------------------------------------------------------------------------------
