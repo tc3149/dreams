@@ -222,24 +222,27 @@ def user_stats_v1(token):
 
     involvementRate = numerator/denominator
 
-    userStats = {
-        "channels_joined": [{
-            "num_channels_joined": numChannels,
-            "time_stamp": funcCallDatetime,
-        }],
-        "dms_joined": [{
-            "num_dms_joined": numDms,
-            "time_stamp": funcCallDatetime,
-        }],
-        "messages_sent": [{
-            "num_messages_sent": numMessages,
-            "time_stamp": funcCallDatetime,
-        }],
-        "involvement_rate": involvementRate,
+    channels_joined = {
+        "num_channels_joined": numChannels,
+        "time_stamp": funcCallDatetime,
     }
 
+    dms_joined = {
+        "num_dms_joined": numDms,
+        "time_stamp": funcCallDatetime,
+    }
+
+    messages_sent = {
+        "num_messages_sent": numMessages,
+        "time_stamp": funcCallDatetime,
+    }
+    database.userAnalytics["channels_joined"].append(channels_joined)
+    database.userAnalytics["dms_joined"].append(dms_joined)
+    database.userAnalytics["messages_sent"].append(messages_sent)
+    database.userAnalytics["involvement_rate"] = involvementRate
+
     return {
-        "user_stats": userStats
+        "user_stats": database.userAnalytics
     }
 
 def users_stats_v1(token):
@@ -259,22 +262,23 @@ def users_stats_v1(token):
 
     utilisationRate = numUsers/len(database.data["accData"])
 
-    dreamsStats = {
-        "channels_exist": [{
-            "num_channels_exist": len(database.data["channelList"]),
-            "time_stamp": funcCallDatetime,
-            }],
-        "dms_exist": [{
-            "num_dms_exist": len(database.data["dmList"]), 
-            "time_stamp": funcCallDatetime,
-            }],
-        "messages_exist": [{
-            "num_messages_exist": len(database.data["message_ids"]), 
-            "time_stamp": funcCallDatetime,
-            }],
-        "utilization_rate": utilisationRate,
+    channels_exist = {
+        "num_channels_exist": len(database.data["channelList"]),
+        "time_stamp": funcCallDatetime,
     }
+    dms_exist = {
+        "num_dms_exist": len(database.data["dmList"]), 
+        "time_stamp": funcCallDatetime,
+    }
+    messages_exist = {
+        "num_messages_exist": len(database.data["message_ids"]), 
+        "time_stamp": funcCallDatetime,
+    }
+    database.dreamsAnalytics["channels_exist"].append(channels_exist)
+    database.dreamsAnalytics["dms_exist"].append(dms_exist)
+    database.dreamsAnalytics["messages_exist"].append(messages_exist)
+    database.dreamsAnalytics["utilization_rate"] = utilisationRate
 
     return {
-        "dreams_stats": dreamsStats
+        "dreams_stats": database.dreamsAnalytics
     }

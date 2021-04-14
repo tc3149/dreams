@@ -250,7 +250,7 @@ def test_user_stats_working():
             "num_messages_sent": 0,
             "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
         }],
-        "involvement_rate": 1,
+        "involvement_rate": 1.0,
     }
     assert userStats["user_stats"] == expectedOutput
 
@@ -274,7 +274,7 @@ def test_users_stats_working():
             "num_messages_exist": 0, 
             "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
             }],
-        "utilization_rate": 1,
+        "utilization_rate": 1.0,
     }
 
     assert dreamsStats["dreams_stats"] == expectedOutput

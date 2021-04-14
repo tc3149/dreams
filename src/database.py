@@ -55,5 +55,19 @@ idData = {
     "messageId": 0,     # starts from 1
 }
 
+userAnalytics = {
+    "channels_joined": [],
+    "dms_joined": [],
+    "messages_sent": [],
+    "involvement_rate": 0,
+}
+
+dreamsAnalytics = {
+    "channels_exist": [],
+    "dms_exist": [],
+    "messages_exist": [],
+    "utilization_rate": 0,
+}
+
 secretSauce = "placeholder"
 
