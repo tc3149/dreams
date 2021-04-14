@@ -372,3 +372,25 @@ def test_http_passwordreset_reset_invalid_code():
     rawResponseData  = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 400
+
+def test_http_passwordreset_reset_invalid_password():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # Reset--------------------
+    funcURL = "auth/passwordreset/reset/v1"
+    inputData = {
+        "reset_code": "validcode",
+        "new_password": "pass",
+    }
+    rawResponseData  = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD["code"] == 400

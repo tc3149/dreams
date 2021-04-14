@@ -221,12 +221,12 @@ Return Value:
     Returns {}
 '''
 def auth_passwordreset_reset_v1(reset_code, new_password):
-    #Checking validity of code
-    if check_reset_code(reset_code) is False:
-        raise InputError(description="Code is invalid")
     #Checking length of password
     if len(new_password) < 6:
         raise InputError(description="Password needs to be at least 6 characters")
+    #Checking validity of code
+    if check_reset_code(reset_code) is False:
+        raise InputError(description="Code is invalid")
     #Retrieving the email of user
     reset_email = find_reset_email(reset_code)
     #Assigning the new password

@@ -202,11 +202,19 @@ def test_auth_passwordreset_request_invalid_email():
 
 # ------------------------------------------------------------------------------------------------------
 # auth_passwordreset_reset_v1
-def test_auth_passwordreset_reset_v1_not_working():
+def test_auth_passwordreset_reset_v1_invalid_code():
     clear_v1()
 
     auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
     auth_passwordreset_request_v1("testemail@institute.com")
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1("invalidcode", "newpassword")
+
+def test_auth_passwordreset_reset_v1_invalid_password():
+    clear_v1()
+
+    auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
+    auth_passwordreset_request_v1("testemail@institute.com")
+    with pytest.raises(InputError):
+        auth_passwordreset_reset_v1("validcode", "pass")
 # ------------------------------------------------------------------------------------------------------
