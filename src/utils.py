@@ -168,3 +168,16 @@ def getUserProfileData(u_id):
     for user in database.data["userProfiles"]:
         if user["u_id"] == u_id:
             return user
+
+def check_reset_code(reset_code):
+    status = False
+    for resetData in database.data["resetdataList"]:
+        if reset_code == resetData["reset_code"]:
+            status = True
+    return status
+
+def find_reset_email(reset_code):
+    for resetData in database.data["resetdataList"]:
+        if reset_code == resetData["reset_code"]:
+            reset_email = resetData["email"]
+    return reset_email

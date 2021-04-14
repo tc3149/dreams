@@ -71,6 +71,7 @@ def test_http_clear_channel():
         "channelList": [],
         "message_ids": [],
         "dmList": [],
+        "resetdataList": [],
         "userProfiles": [],
     }
 
@@ -124,6 +125,7 @@ def test_http_clear_dm():
         "channelList": [],
         "message_ids": [],
         "dmList": [],
+        "resetdataList": [],
         "userProfiles": [],
     }
 

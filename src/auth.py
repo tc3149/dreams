@@ -1,7 +1,9 @@
 import re
+import random
+import string
 import jwt
 import src.database as database
-from src.utils import is_valid_token_return_data
+from src.utils import is_valid_token_return_data, check_reset_code, find_reset_email
 from src.error import InputError, AccessError
 from hashlib import sha256
 from json import loads
@@ -176,6 +178,66 @@ def auth_logout_v1(token):
                 }
     raise AccessError(description="Session doesn't exist")
 
+'''
+auth_passwordreset_request_v1 takes in an email.
+The function then checks if the email is valid and if a user exists for that email.
+The function then creates a reset code that is emailed to the user's email if the email is valid.
+Returns an empty dictionary, otherwise raises an InputError.
+
+Arguments:
+    email (string)    - Email of user
+
+Exceptions:
+    InputError  - Occurs when given email is not registered
+
+Return Value:
+    Returns {}
+'''
+def auth_passwordreset_request_v1(email):
+    resetData = {
+        "reset_code": None,
+        "email": email
+    }
+    for user in database.data["accData"]:
+        if user["email"] == email:
+            reset_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for characters in range(5))
+            resetData["reset_code"] = reset_code
+            database.data["resetdataList"].append(resetData)
+            return {}
+    raise InputError(description="Email doesn't exist")
+'''
+auth_passwordreset_request_v1 takes in an email.
+The function then checks if the email is valid and if a user exists for that email.
+The function then creates a reset code that is emailed to the user's email if the email is valid.
+Returns an empty dictionary, otherwise raises an InputError.
+
+Arguments:
+    email (string)    - Email of user
+
+Exceptions:
+    InputError  - Occurs when given email is not registered
+
+Return Value:
+    Returns {}
+'''
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    #Checking validity of code
+    if check_reset_code(reset_code) is False:
+        raise InputError(description="Code is invalid")
+    #Checking length of password
+    if len(new_password) < 6:
+        raise InputError(description="Password needs to be at least 6 characters")
+    #Retrieving the email of user
+    reset_email = find_reset_email(reset_code)
+    #Assigning the new password
+    for user in database.data["accData"]:
+        if user["email"] == reset_email:
+            user["password"] = new_password
+    #Removing the token
+    for resetData in database.data["resetdataList"]:
+        if resetData["reset_code"] == reset_code:
+            del resetData
+            return {}
 
 # util functions
 def search_email(email):
