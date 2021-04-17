@@ -1,5 +1,7 @@
 import src.database as database
 from src.error import InputError, AccessError
+import string
+import random
 from json import dumps
 import jwt
 
@@ -156,7 +158,7 @@ def make_dm_name(u_ids):
 
 # Save to data file
 def saveData():
-    with open("serverDatabase.json", "w") as dataFile:
+    with open("src/serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
 
 def getUserAccData(u_id):
@@ -253,3 +255,11 @@ def getChannelNameFromId(channel_id):
         if channel["id"] == channel_id:
             return channel["name"]
     raise AccessError(description="Channel room does not exist")
+
+def createImageName():
+    
+    # Create imageName
+    lowercase = string.ascii_lowercase
+    pImageName = ("".join(random.choice(lowercase) for _ in range(5)))
+
+    return pImageName

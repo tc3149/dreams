@@ -1,7 +1,8 @@
 from src.error import InputError, AccessError
 from src.config import url
 import src.database as database
-from src.utils import get_user_id_from_token, search_email
+from flask import request
+from src.utils import get_user_id_from_token, search_email, createImageName
 from datetime import datetime
 from PIL import Image
 import urllib.request
@@ -185,9 +186,12 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="Dimesions are not within image bounds")
     croppedImage = imageObject.crop((x_start, y_start, x_end, y_end))
     croppedImage.save(f"src/static/{userId}.jpg")
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
+    imageName = createImageName()
     for user in database.data["userProfiles"]:
         if user["u_id"] == userId:
-            user["profile_img_url"] = f"{url}static/{userId}.jpg"
+            user["profile_img_url"] = f"{urlRoot}static/{imageName}.jpg"
             break
 
     return {}

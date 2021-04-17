@@ -1,6 +1,9 @@
 import re
 import jwt
+import string
+import random
 import src.database as database
+from flask import request
 from src.utils import is_valid_token_return_data
 from src.config import url
 from src.error import InputError, AccessError
@@ -128,11 +131,17 @@ def auth_register_v2(email, password, name_first, name_last):
                 "sessions": [],
                 "permission": (1 if userID == 0 else 2),
                 "notifications": [],
+                "imageName": "default",
             }
             newSessionId = new_session_id()
             sessionToken = create_session_token(newSessionId)
             userData["sessions"].append(newSessionId)
             database.data["accData"].append(userData)
+
+            if database.onlineURL:
+                urlRoot = database.onlineURL
+            else:
+                urlRoot = url
 
             # Create profile
             userProfile = {
@@ -141,7 +150,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "name_first": name_first,
                 "name_last": name_last,
                 "handle_str": userHandle,
-                "profile_img_url": url + "src/static/default.jpg"
+                "profile_img_url": f"{urlRoot}static/default.jpg",
             }
             database.data["userProfiles"].append(userProfile)
     else:

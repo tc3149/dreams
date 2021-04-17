@@ -21,12 +21,14 @@ def test_user_profile_v2_working():
     clear_v1()
     
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
-        'profile_img_url': url + 'src/static/default.jpg',
+        'profile_img_url': urlRoot + 'static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -45,12 +47,14 @@ def test_user_profile_setname_v2_working():
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     _ = user_profile_setname_v2(user1["token"], "newFirst", "newLast")
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "newFirst",
         'name_last': "newLast",
-        'profile_img_url': url + 'src/static/default.jpg',
+        'profile_img_url': urlRoot + 'static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -105,12 +109,14 @@ def test_user_profile_sethandle_v1_working():
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
 
     _ = user_profile_sethandle_v1(user1["token"], "newHandle")
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
-        'profile_img_url': url + 'src/static/default.jpg',
+        'profile_img_url': urlRoot + 'static/default.jpg',
         'handle_str': "newHandle",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -123,12 +129,14 @@ def test_user_profile_sethandle_v1_handle_taken():
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
     _ = user_profile_sethandle_v1(user1["token"], "newHandle")
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
-        'profile_img_url': url + 'src/static/default.jpg',
+        'profile_img_url': urlRoot + 'static/default.jpg',
         'handle_str': "newHandle",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -161,13 +169,14 @@ def test_user_profile_setemail_v2_working():
     _ = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
     user_profile_setemail_v2(user1["token"], "newEmail@hotmail.com")
+    urlRoot = url if not database.onlineURL else database.onlineURL 
 
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "newEmail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
-        'profile_img_url': url + 'src/static/default.jpg',
+        'profile_img_url': urlRoot + 'static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -199,6 +208,8 @@ def test_users_all_v1_working():
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
 
     expectedOutput = [
         {
@@ -206,7 +217,7 @@ def test_users_all_v1_working():
             'email': "testemail@hotmail.com",
             'name_first': "firstName",
             'name_last': "lastName",
-            'profile_img_url': url + 'src/static/default.jpg',
+            'profile_img_url': urlRoot + 'static/default.jpg',
             'handle_str': "firstnamelastname",
         },
         {
@@ -214,7 +225,7 @@ def test_users_all_v1_working():
             'email': "testemail2@hotmail.com",
             'name_first': "firstName2",
             'name_last': "lastName2",
-            'profile_img_url': url + 'src/static/default.jpg',
+            'profile_img_url': urlRoot + 'static/default.jpg',
             'handle_str': "firstname2lastname2",
         }
     ]
@@ -287,23 +298,27 @@ def test_user_profile_uploadphoto_working():
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     profileURL = "https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg"
     user1Profile = user_profile_v2(user1["token"], user1["auth_user_id"])
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
     expectedOutput = {
         "u_id": user1["auth_user_id"],
         "email": "testemail@hotmail.com",
         "name_first": "firstName",
         "name_last": "lastName",
         "handle_str": "firstnamelastname",
-        "profile_img_url": url + "src/static/default.jpg"
+        "profile_img_url": urlRoot + "static/default.jpg"
     }
     assert user1Profile["user"] == expectedOutput
     _ = user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 500, 500)
+    urlRoot = url if not database.onlineURL else database.onlineURL 
+
     expectedOutput = {
         "u_id": user1["auth_user_id"],
         "email": "testemail@hotmail.com",
         "name_first": "firstName",
         "name_last": "lastName",
         "handle_str": "firstnamelastname",
-        "profile_img_url": url + "src/static/0.jpg"
+        "profile_img_url": urlRoot + "static/0.jpg"
     }
     assert user1Profile["user"] == expectedOutput
 '''

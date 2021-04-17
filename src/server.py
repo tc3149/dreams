@@ -41,7 +41,7 @@ APP.register_error_handler(Exception, defaultHandler)
 
 # Load database
 
-with open("serverDatabase.json", "r") as dataFile:
+with open("src/serverDatabase.json", "r") as dataFile:
     database.data = loads(dataFile.read())
 
 
@@ -117,7 +117,7 @@ def usersAll():
     saveData()
     return dumps(returnData)
 
-@APP.route("/user/profile/uploadphoto", methods=["POST"])
+@APP.route("/user/profile/uploadphoto/v1", methods=["POST"])
 def uploadPhoto():
     inputData = request.get_json()
     returnData = user_profile_uploadphoto_v1(inputData["token"], inputData["img_url"], \
@@ -387,6 +387,10 @@ def searchv2():
 @APP.route("/static/<path:filename>")
 def uploadImage(filename):
     return send_from_directory("", filename)
+
+@APP.before_first_request
+def getURL():
+    database.onlineURL = request.url_root
 
 # ########################################################################
 

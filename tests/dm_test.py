@@ -1,6 +1,7 @@
 import pytest
 import jwt
 from src.config import url
+from flask import request
 from src.other import clear_v1
 from src.dm import dm_create_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1, dm_details_v1
 from src.auth import auth_register_v2
@@ -473,6 +474,7 @@ def test_valid_input():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    urlRoot = url if not database.onlineURL else database.onlineURL 
     
 
     assert dm_details_v1(user1['token'], dm['dm_id']) == {
@@ -483,7 +485,7 @@ def test_valid_input():
                                                     'email': 'email@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
-                                                    'profile_img_url': url + 'src/static/default.jpg',
+                                                    'profile_img_url': f"{urlRoot}static/default.jpg",
                                                     'handle_str': 'namelastname',
                                                     
                                                 },
@@ -492,7 +494,7 @@ def test_valid_input():
                                                     'email': 'email2@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
-                                                    'profile_img_url': url + 'src/static/default.jpg',
+                                                    'profile_img_url': f"{urlRoot}static/default.jpg",
                                                     'handle_str': 'namelastname0',   
                                                 }
                                             ],

@@ -7,6 +7,7 @@ from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
 import src.database as database
 from json import dumps, loads
+import os
 from src.utils import saveData, get_user_id_from_token
 
 '''
@@ -21,20 +22,34 @@ Return Value:
     N/A
 '''
 def clear_v1():
+    if database.data["accData"]:
+        for userId in database.data["userProfiles"]:
+            pImageName = userId["profile_img_url"][-9:]
+            if os.path.exists(f"static/{pImageName}"):
+                os.remove(f"static/{pImageName}")
 
     database.idData["sessionId"] = 0
     database.idData["userId"] = 0
     database.idData["dmId"] = 0
     database.idData["messageId"] = 0
-
-
     database.data["accData"].clear() 
     database.data["channelList"].clear() 
     database.data["message_ids"].clear()
     database.data["dmList"].clear()
     database.data["userProfiles"].clear()
+    database.dreamsAnalytics["channels_exist"].clear()
+    database.dreamsAnalytics["dms_exist"].clear()
+    database.dreamsAnalytics["messages_exist"].clear()
+    database.dreamsAnalytics["utilization_rate"] = 0
 
-    with open("serverDatabase.json", "w") as dataFile:
+    database.userAnalytics["channels_joined"].clear()
+    database.userAnalytics["dms_joined"].clear()
+    database.userAnalytics["messages_sent"].clear()
+    database.userAnalytics["involvement_rate"] = 0
+
+    database.onlineURL = ""
+
+    with open("src/serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
 
 '''
