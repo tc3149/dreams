@@ -473,9 +473,7 @@ def test_valid_input():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
-    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
-    urlRoot = url if not database.onlineURL else database.onlineURL 
-    
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])    
 
     assert dm_details_v1(user1['token'], dm['dm_id']) == {
                                             'name': 'namelastname,namelastname0',
@@ -485,7 +483,7 @@ def test_valid_input():
                                                     'email': 'email@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
-                                                    'profile_img_url': f"{urlRoot}static/default.jpg",
+                                                    'profile_img_url': f"{url}static/default.jpg",
                                                     'handle_str': 'namelastname',
                                                     
                                                 },
@@ -494,7 +492,7 @@ def test_valid_input():
                                                     'email': 'email2@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
-                                                    'profile_img_url': f"{urlRoot}static/default.jpg",
+                                                    'profile_img_url': f"{url}static/default.jpg",
                                                     'handle_str': 'namelastname0',   
                                                 }
                                             ],
