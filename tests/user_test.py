@@ -266,8 +266,8 @@ def test_user_stats_channel_dm():
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName", "lastName")
     channel1 = channels_create_v2(user1["token"], "NewChannel", True)
     dm1 = dm_create_v1(user1["token"], [user2["auth_user_id"]])
-    _ = message_send_v2(user1["token"], channel1["id"], "Test")
-    _ = message_senddm_v1(user1["token"], dm1["id"], "Test")
+    _ = message_send_v2(user1["token"], channel1["channel_id"], "Test")
+    _ = message_senddm_v1(user1["token"], dm1["dm_id"], "Test")
 
     userStats = user_stats_v1(user1["token"])
     expectedOutput = {
@@ -317,8 +317,8 @@ def test_users_stats_channel_dm():
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName", "lastName")
     channel1 = channels_create_v2(user1["token"], "NewChannel", True)
     dm1 = dm_create_v1(user1["token"], [user2["auth_user_id"]])
-    _ = message_send_v2(user1["token"], channel1["id"], "Test")
-    _ = message_senddm_v1(user1["token"], dm1["id"], "Test")
+    _ = message_send_v2(user1["token"], channel1["channel_id"], "Test")
+    _ = message_senddm_v1(user1["token"], dm1["dm_id"], "Test")
     dreamsStats = users_stats_v1(user1["token"])
     expectedOutput = {
         "channels_exist": [{

@@ -358,9 +358,12 @@ def test_dm_remove_multiple():
     id_list = []
     id_list.append(user2["auth_user_id"])
 
+    id_list2 = []
+    id_list2.append(user["auth_user_id"])
+
     dm = dm_create_v1(user["token"], id_list)
 
-    dm2 = dm_create_v1(user2["token"], id_list)
+    dm2 = dm_create_v1(user2["token"], id_list2)
 
     dm_remove_v1(user["token"], dm["dm_id"])
     dm_remove_v1(user2["token"], dm2["dm_id"])

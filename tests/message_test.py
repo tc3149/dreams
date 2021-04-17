@@ -396,7 +396,6 @@ def test_user_not_member_of_dm_they_sharing_to():
     user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
     id_list = []
-    id_list.append(user1["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm = dm_create_v1(user1["token"], id_list)
