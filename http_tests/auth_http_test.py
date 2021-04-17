@@ -329,6 +329,28 @@ def test_http_logout_nonexistant_user():
 
 # ------------------------------------------------------------------------------
 # RESET REQUEST TEST FUNCTIONS
+def test_http_passwordreset_request_working():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # Reset--------------------
+    funcURL = "auth/passwordreset/request/v1"
+    inputData = {
+        "email": "test@hotmail.com",
+    }
+    rawResponseData  = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD == {}
+
+
 def test_http_passwordreset_request_invalid_email():
     requests.delete(config.url + "clear/v1")
 

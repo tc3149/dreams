@@ -1,6 +1,7 @@
 import sys
 from json import dumps, loads
 from flask import Flask, request, abort
+from flask_mail import Mail, Message
 from flask_cors import CORS
 from src.error import InputError, AccessError
 from src import config
@@ -28,12 +29,24 @@ def defaultHandler(err):
     })
     response.content_type = 'application/json'
     return response
-
+# Server Flask
 APP = Flask(__name__)
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
+
+# Mail Flask
+APP.config['MAIL_SERVER']='smtp.gmail.com'
+APP.config['MAIL_PORT'] = 465
+APP.config["MAIL_USE_TLS"] = False
+APP.config['MAIL_USE_SSL'] = True
+APP.config['MAIL_USERNAME'] = 'projectecho1531@gmail.com'
+APP.config['MAIL_PASSWORD'] = '!echo1531'
+APP.config['MAIL_DEFAULT_SENDER'] = 'projectecho1531@gmail.com'
+
+mail = Mail(APP)
+
 
 # ##############################################################################
 # DATABASE FUNCTIONS
@@ -77,8 +90,9 @@ def authLogout():
 def authpasswordRequest():
     inputData = request.get_json()
     returnData = auth_passwordreset_request_v1(inputData['email'])
+    mail.send(returnData)
     saveData()
-    return dumps(returnData)
+    return {}
 
 @APP.route("/auth/passwordreset/reset/v1", methods=["POST"])
 def authpasswordReset():

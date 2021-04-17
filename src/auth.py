@@ -7,6 +7,8 @@ from src.utils import is_valid_token_return_data, check_reset_code, find_reset_e
 from src.error import InputError, AccessError
 from hashlib import sha256
 from json import loads
+from flask import Flask, current_app
+from flask_mail import Mail, Message
 
 
 
@@ -194,17 +196,26 @@ Return Value:
     Returns {}
 '''
 def auth_passwordreset_request_v1(email):
+    # Creating the resetData 
     resetData = {
         "reset_code": None,
         "email": email
     }
+    # Creating a randomized 5 character code
+    reset_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for characters in range(5))
+    # Appending the Data
     for user in database.data["accData"]:
         if user["email"] == email:
-            reset_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for characters in range(5))
             resetData["reset_code"] = reset_code
             database.data["resetdataList"].append(resetData)
-            return {}
-    raise InputError(description="Email doesn't exist")
+        else:
+            raise InputError(description="Email doesn't exist")
+    # Setting mail contents and sending
+    msg = Message('Your reset code for Dream Server',
+                recipients = [email]
+               )
+    msg.body = "Hello,\nThis is your reset code: {}".format(reset_code)
+    return msg
 '''
 auth_passwordreset_request_v1 takes in an email.
 The function then checks if the email is valid and if a user exists for that email.

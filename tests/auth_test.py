@@ -2,6 +2,7 @@ import jwt
 import pytest
 import re
 import src.database as database
+from flask import current_app
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
@@ -185,13 +186,6 @@ def test_auth_logout_v1_inactive_token():
 
 # ------------------------------------------------------------------------------------------------------
 # auth_passwordreset_request_v1
-def test_auth_passwordreset_request_v1_working():
-    clear_v1()
-
-    auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
-    output = auth_passwordreset_request_v1("testemail@institute.com")
-    assert output == {}
-
 def test_auth_passwordreset_request_invalid_email():
     clear_v1()
 
@@ -206,7 +200,6 @@ def test_auth_passwordreset_reset_v1_invalid_code():
     clear_v1()
 
     auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
-    auth_passwordreset_request_v1("testemail@institute.com")
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1("invalidcode", "newpassword")
 
@@ -214,7 +207,6 @@ def test_auth_passwordreset_reset_v1_invalid_password():
     clear_v1()
 
     auth_register_v2("testemail@institute.com", "testPassword", "John", "Doe")
-    auth_passwordreset_request_v1("testemail@institute.com")
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1("validcode", "pass")
 # ------------------------------------------------------------------------------------------------------
