@@ -22,12 +22,13 @@ Return Value:
     N/A
 '''
 def clear_v1():
+    '''
     if database.data["accData"]:
         for userId in database.data["userProfiles"]:
             pImageName = userId["profile_img_url"][-9:]
             if os.path.exists(f"static/{pImageName}"):
                 os.remove(f"static/{pImageName}")
-
+'''
     database.idData["sessionId"] = 0
     database.idData["userId"] = 0
     database.idData["dmId"] = 0
