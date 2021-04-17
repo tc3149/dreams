@@ -268,9 +268,9 @@ Then the fuction checks if the dm_id or channel_id exist depending on the intend
 If all requirements are met the function then shares the og_message combined with the optional message, and returns the id of the shared function(shared_messag-id).
 
 Arguments:
-    token (integer)             - Users authorisation Hash
-    og_message_id(integre)      -Id of the message being shared
-    message                     -String a user may add to the original message    
+    token (string)              - Users authorisation Hash
+    og_message_id (integer)     - Id of the message being shared
+    message                     - String a user may add to the original message    
     channel_id (integer)        - Id of channel
     dm_id (integer)             - Id of dm  
     ...
@@ -349,6 +349,35 @@ def message_share_v1(token,og_message_id,message,channel_id,dm_id):
     }
 
 
+'''
+message_sendlater_v1 takes in a token, channel_id, message and when the user wants the message to be sent. 
+The function then checks if the token is valid, the length is of appropriate size (less than 1k), if it is an empty message, if the channel id is valid and if the user is in the channel.
+If all requirements are met, the function sends the message in the desired time slot, using a Timer to activate the function.
+The function returns a dictionary containing the message_id.
+If conditions are breached, it raises an InputError or AccessError.
+
+Arguments:
+    token (integer)             - Users authorisation Hash
+    channel_id (integer)        - Channel's ID
+    message (string)            - User's desired message
+    time_sent (integer)         - User's desired time for the message to send
+    ...
+
+Exceptions:
+    AccessError  - Occurs when given token is invalid
+    InputError   - Occurs when message is over 1000 characters
+    InputError   - Occurs when message is empty
+    InputError   - Occurs when channel ID is invalid
+    AccessError  - Occurs when given token is not a member of the channel
+    InputError   - Occurs when time given is in the past
+
+
+Return Value:
+    Returns {
+        'message_id': new_message_id (which is the dictionary of the message ID)
+    }
+
+'''
 def message_sendlater_v1(token, channel_id, message, time_sent):
 
     u_id = get_user_id_from_token(token)
@@ -382,6 +411,36 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     }
                      
 
+'''
+message_sendlaterdm_v1 takes in a token, dm_id, message and when the user wants the message to be sent. 
+The function then checks if the token is valid, the length is of appropriate size (less than 1k), if it is an empty message, if the dm id is valid and if the user is in the channel.
+If all requirements are met, the function sends the message in the desired time slot, using a Timer to activate the function.
+The function returns a dictionary containing the message_id.
+If conditions are breached, it raises an InputError or AccessError.
+
+Arguments:
+    token (integer)             - Users authorisation Hash
+    dm_id (integer)             - DM's ID
+    message (string)            - User's desired message
+    time_sent (integer)         - User's desired time for the message to send
+    
+
+Exceptions:
+    AccessError  - Occurs when given token is invalid
+    InputError   - Occurs when message is over 1000 characters
+    InputError   - Occurs when message is empty
+    InputError   - Occurs when dm ID is invalid
+    AccessError  - Occurs when given token is not a member of the dm
+    InputError   - Occurs when time given is in the past
+
+
+Return Value:
+    Returns {
+        'message_id': new_message_id (which is the dictionary of the message ID)
+    }
+    
+'''
+
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     u_id = get_user_id_from_token(token)
 
@@ -411,6 +470,34 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     return {
         "message_id": database.idData["messageId"] + 1
     }
+
+
+'''
+message_react_v1 takes in a token, message_id and react_id.
+The function then checks if the token is valid, the react_id is valid, the message_id is valid, the user is in the channel/DM and if the user has already reacted to the message.
+If all requirements are met, the function adds a react to the message by adding the user in the dictionary of u_ids in reacts.
+The function returns nothing.
+If conditions are breached, it raises an InputError or AccessError.
+
+Arguments:
+    token (integer)             - Users authorisation Hash
+    message_id (integer)        - Message ID
+    react_id (integer)          - React ID
+    
+
+Exceptions:
+    AccessError  - Occurs when given token is invalid
+    InputError   - Occurs when message ID is invalid
+    AccessError  - Occurs when given token is not a member of the dm
+    AccessError  - Occurs when given token is not a member of the channel
+    InputError   - Occurs when user has already reacted to the message
+
+
+Return Value:
+    Returns {
+    }
+    
+'''
 
 def message_react_v1(token, message_id, react_id):
 
@@ -459,6 +546,33 @@ def message_react_v1(token, message_id, react_id):
     return {}
 
 
+'''
+message_unreact_v1 takes in a token, message_id and react_id.
+The function then checks if the token is valid, the react_id is valid, the message_id is valid, the user is in the channel/DM and if the user has already unreacted to the message.
+If all requirements are met, the function removes a react to the message by removing the user in the dictionary of u_ids in reacts.
+The function returns nothing.
+If conditions are breached, it raises an InputError or AccessError.
+
+Arguments:
+    token (integer)             - Users authorisation Hash
+    message_id (integer)        - Message ID
+    react_id (integer)          - React ID
+    
+
+Exceptions:
+    AccessError  - Occurs when given token is invalid
+    InputError   - Occurs when message ID is invalid
+    AccessError  - Occurs when given token is not a member of the dm
+    AccessError  - Occurs when given token is not a member of the channel
+    InputError   - Occurs when user has already unreacted to the message
+
+
+Return Value:
+    Returns {
+    }
+    
+'''
+
 def message_unreact_v1(token, message_id, react_id):
 
     u_id = get_user_id_from_token(token)
@@ -506,6 +620,34 @@ def message_unreact_v1(token, message_id, react_id):
     return {}
 
 
+'''
+message_pin_v1 takes in a token and a message_id.
+The function then checks if the token is valid, the message_id is valid, the user is in the channel/DM and they are an owner of that channel/DM and if the message is already pinned.
+If all requirements are met, the function pins the message by changing the boolean of "is_pinned" to True.
+The function returns nothing.
+If conditions are breached, it raises an InputError or AccessError.
+
+Arguments:
+    token (integer)             - Users authorisation Hash
+    message_id (integer)        - Message ID
+    
+
+Exceptions:
+    AccessError  - Occurs when given token is invalid
+    InputError   - Occurs when message ID is invalid
+    AccessError  - Occurs when given token is not a member of the dm
+    AccessError  - Occurs when given token is the an owner of that dm
+    AccessError  - Occurs when given token is not a member of the channel
+    AccessError  - Occurs when given token is the an owner of that channel
+    InputError   - Occurs when the message is already pinned
+
+
+Return Value:
+    Returns {
+    }
+    
+'''
+
 def message_pin_v1(token, message_id):
     u_id = get_user_id_from_token(token)
 
@@ -552,6 +694,34 @@ def message_pin_v1(token, message_id):
   
     return {}
 
+
+'''
+message_unpin_v1 takes in a token and a message_id.
+The function then checks if the token is valid, the message_id is valid, the user is in the channel/DM and they are an owner of that channel/DM and if the message is already unpinned.
+If all requirements are met, the function unpins the message by changing the boolean of "is_pinned" to False.
+The function returns nothing.
+If conditions are breached, it raises an InputError or AccessError.
+
+Arguments:
+    token (integer)             - Users authorisation Hash
+    message_id (integer)        - Message ID
+    
+
+Exceptions:
+    AccessError  - Occurs when given token is invalid
+    InputError   - Occurs when message ID is invalid
+    AccessError  - Occurs when given token is not a member of the dm
+    AccessError  - Occurs when given token is the an owner of that dm
+    AccessError  - Occurs when given token is not a member of the channel
+    AccessError  - Occurs when given token is the an owner of that channel
+    InputError   - Occurs when the message is already unpinned
+
+
+Return Value:
+    Returns {
+    }
+    
+'''
 
 def message_unpin_v1(token, message_id):
     u_id = get_user_id_from_token(token)
