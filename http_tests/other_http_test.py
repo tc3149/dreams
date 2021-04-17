@@ -104,7 +104,6 @@ def test_http_clear_dm():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],

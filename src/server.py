@@ -1,14 +1,14 @@
 import sys
 from json import dumps, loads
-from flask import Flask, request, abort
+from flask import Flask, request, abort, send_from_directory
 from flask_mail import Mail, Message
 from flask_cors import CORS
 from src.error import InputError, AccessError
-from src import config
+import src.config as config
 import src.database as database
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1, auth_passwordreset_reset_v1, auth_passwordreset_request_v1
-from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1
-from src.user import user_profile_setname_v2, user_profile_sethandle_v1
+from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1, user_stats_v1, users_stats_v1
+from src.user import user_profile_setname_v2, user_profile_sethandle_v1, user_profile_uploadphoto_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.utils import saveData
@@ -17,6 +17,7 @@ from src.channels import channels_create_v2, channels_list_v2, channels_listall_
 from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, channel_details_v2, channel_invite_v2
 from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1, dm_details_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
+from src.notifications import notifications_get_v1
 
 
 def defaultHandler(err):
@@ -29,8 +30,8 @@ def defaultHandler(err):
     })
     response.content_type = 'application/json'
     return response
-# Server Flask
-APP = Flask(__name__)
+
+APP = Flask(__name__, static_url_path="/static/")
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -53,7 +54,7 @@ mail = Mail(APP)
 
 # Load database
 
-with open("serverDatabase.json", "r") as dataFile:
+with open("src/serverDatabase.json", "r") as dataFile:
     database.data = loads(dataFile.read())
 
 
@@ -81,7 +82,7 @@ def authLogin():
 @APP.route("/auth/logout/v1", methods=["POST"])
 def authLogout():
     inputData = request.get_json()
-    returnData = auth_logout_v1(inputData)
+    returnData = auth_logout_v1(inputData["token"])
     saveData()
     return dumps(returnData)
 
@@ -145,6 +146,24 @@ def usersAll():
     saveData()
     return dumps(returnData)
 
+@APP.route("/user/profile/uploadphoto/v1", methods=["POST"])
+def uploadPhoto():
+    inputData = request.get_json()
+    returnData = user_profile_uploadphoto_v1(inputData["token"], inputData["img_url"], \
+            inputData["x_start"], inputData["y_start"], inputData["x_end"], inputData["y_end"])
+    return dumps(returnData)
+
+@APP.route("/user/stats/v1", methods=["GET"])
+def userStats():
+    inputData = request.args.get("token")
+    returnData = user_stats_v1(inputData)
+    return dumps(returnData)
+
+@APP.route("/users/stats/v1", methods=["GET"])
+def usersStats():
+    inputData = request.args.get("token")
+    returnData = users_stats_v1(inputData)
+    return dumps(returnData)
 
 
 # #############################################################################
@@ -397,6 +416,13 @@ def adminUserpermissionChange():
     saveData()
     return dumps(returnData)
 
+@APP.route("/notifications/get/v1", methods=["GET"])
+def getNotifications():
+    inputToken = request.args.get("token")
+    returnData = notifications_get_v1(inputToken)
+    saveData()
+    return dumps(returnData)
+
 
 # #############################################################################
 #                                                                             #
@@ -416,6 +442,13 @@ def searchv2():
     returnData = search_v1(inputToken, inputQuery)
     return dumps(returnData)
 
+@APP.route("/static/<path:filename>")
+def uploadImage(filename):
+    return send_from_directory("", filename)
+
+@APP.before_first_request
+def getURL():
+    config.url = request.url_root
 
 # ########################################################################
 

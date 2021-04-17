@@ -1,10 +1,14 @@
 import pytest
+import src.config as config
 from src.auth import auth_register_v2
 from src.auth import auth_login_v2
-from src.user import user_profile_v2
-from src.user import user_profile_setname_v2
+from src.user import user_profile_v2, users_stats_v1
+from src.user import user_profile_setname_v2, user_profile_uploadphoto_v1
 from src.user import user_profile_sethandle_v1
-from src.user import user_profile_setemail_v2
+from src.user import user_profile_setemail_v2, user_stats_v1
+from src.message import message_send_v2, message_senddm_v1
+from src.channels import channels_create_v2
+from src.dm import dm_create_v1
 from src.user import users_all_v1
 from src.other import clear_v1
 from src.error import InputError
@@ -19,11 +23,13 @@ def test_user_profile_v2_working():
     clear_v1()
     
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -42,11 +48,13 @@ def test_user_profile_setname_v2_working():
 
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     _ = user_profile_setname_v2(user1["token"], "newFirst", "newLast")
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "newFirst",
         'name_last': "newLast",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -101,11 +109,13 @@ def test_user_profile_sethandle_v1_working():
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
 
     _ = user_profile_sethandle_v1(user1["token"], "newHandle")
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "newHandle",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -118,11 +128,13 @@ def test_user_profile_sethandle_v1_handle_taken():
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
     _ = user_profile_sethandle_v1(user1["token"], "newHandle")
+
     expectedOutput = {
         'u_id': user1["auth_user_id"],
         'email': "testemail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "newHandle",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -161,6 +173,7 @@ def test_user_profile_setemail_v2_working():
         'email': "newEmail@hotmail.com",
         'name_first': "firstName",
         'name_last': "lastName",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "firstnamelastname",
     }
     assert user_profile_v2(user1["token"], user1["auth_user_id"]) == {"user": expectedOutput}
@@ -193,12 +206,14 @@ def test_users_all_v1_working():
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
     user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName2", "lastName2")
 
+
     expectedOutput = [
         {
             'u_id': user1["auth_user_id"],
             'email': "testemail@hotmail.com",
             'name_first': "firstName",
             'name_last': "lastName",
+            'profile_img_url': config.url + 'static/default.jpg',
             'handle_str': "firstnamelastname",
         },
         {
@@ -206,6 +221,7 @@ def test_users_all_v1_working():
             'email': "testemail2@hotmail.com",
             'name_first': "firstName2",
             'name_last': "lastName2",
+            'profile_img_url': config.url + 'static/default.jpg',
             'handle_str': "firstname2lastname2",
         }
     ]
@@ -222,3 +238,134 @@ def test_users_all_v1_invalid_token():
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////  
+# user_stats_v1 TESTS
+def test_user_stats_no_channel_no_dm():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    userStats = user_stats_v1(user1["token"])
+    expectedOutput = {
+        "channels_joined": [{
+            "num_channels_joined": 0,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "dms_joined": [{
+            "num_dms_joined": 0,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "messages_sent": [{
+            "num_messages_sent": 0,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "involvement_rate": 0,
+    }
+    assert userStats["user_stats"] == expectedOutput
+
+def test_user_stats_channel_dm():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName", "lastName")
+    channel1 = channels_create_v2(user1["token"], "NewChannel", True)
+    dm1 = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    _ = message_send_v2(user1["token"], channel1["channel_id"], "Test")
+    _ = message_senddm_v1(user1["token"], dm1["dm_id"], "Test")
+
+    userStats = user_stats_v1(user1["token"])
+    expectedOutput = {
+        "channels_joined": [{
+            "num_channels_joined": 1,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "dms_joined": [{
+            "num_dms_joined": 1,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "messages_sent": [{
+            "num_messages_sent": 2,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "involvement_rate": 1.0,
+    }
+    assert userStats["user_stats"] == expectedOutput
+
+# /////////////////////////////////////////////////////////////////////////////////////////////  
+# users_stats_v1
+def test_users_stats_no_channel_no_dm():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    dreamsStats = users_stats_v1(user1["token"])
+    expectedOutput = {
+        "channels_exist": [{
+            "num_channels_exist": 0,
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "dms_exist": [{
+            "num_dms_exist": 0, 
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "messages_exist": [{
+            "num_messages_exist": 0, 
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "utilization_rate": 0,
+    }
+
+    assert dreamsStats["dreams_stats"] == expectedOutput
+
+def test_users_stats_channel_dm():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName", "lastName")
+    channel1 = channels_create_v2(user1["token"], "NewChannel", True)
+    dm1 = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    _ = message_send_v2(user1["token"], channel1["channel_id"], "Test")
+    _ = message_senddm_v1(user1["token"], dm1["dm_id"], "Test")
+    dreamsStats = users_stats_v1(user1["token"])
+    expectedOutput = {
+        "channels_exist": [{
+            "num_channels_exist": 1,
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "dms_exist": [{
+            "num_dms_exist": 1, 
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "messages_exist": [{
+            "num_messages_exist": 2, 
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "utilization_rate": 1.0,
+    }
+
+    assert dreamsStats["dreams_stats"] == expectedOutput
+
+# /////////////////////////////////////////////////////////////////////////////////////////////  
+# user_profile_uploadphoto_v1 TESTS
+# Test requires http connection
+'''
+def test_user_profile_uploadphoto_working():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    profileURL = "https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg"
+    user1Profile = user_profile_v2(user1["token"], user1["auth_user_id"])
+
+    expectedOutput = {
+        "u_id": user1["auth_user_id"],
+        "email": "testemail@hotmail.com",
+        "name_first": "firstName",
+        "name_last": "lastName",
+        "handle_str": "firstnamelastname",
+        "profile_img_url": config.url + "static/default.jpg"
+    }
+    assert user1Profile["user"] == expectedOutput
+    _ = user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 500, 500)
+
+    expectedOutput = {
+        "u_id": user1["auth_user_id"],
+        "email": "testemail@hotmail.com",
+        "name_first": "firstName",
+        "name_last": "lastName",
+        "handle_str": "firstnamelastname",
+        "profile_img_url": user1Profile["user"]["profile_img_url"],
+    }
+    assert user1Profile["user"] == expectedOutput
+'''

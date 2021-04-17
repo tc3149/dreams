@@ -41,6 +41,7 @@ def test_http_user_profile_working():
         'email': "test@hotmail.com",
         'name_first': "nameFirst",
         'name_last': "nameLast",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "namefirstnamelast",
     }
     assert respD == {"user": expectedOutput}
@@ -119,6 +120,7 @@ def test_user_profile_setname_working():
         'email': "test@hotmail.com",
         'name_first': "newFirst",
         'name_last': "newLast",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "namefirstnamelast",
     }
 
@@ -288,6 +290,7 @@ def test_http_user_profile_setemail_working():
         'email': "newEmail@hotmail.com",
         'name_first': "nameFirst",
         'name_last': "nameLast",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "namefirstnamelast",
     }
     # ----------------------------
@@ -412,6 +415,7 @@ def test_http_user_profile_sethandle_working():
         'email': "test@hotmail.com",
         'name_first': "nameFirst",
         'name_last': "nameLast",
+        'profile_img_url': config.url + 'static/default.jpg',
         'handle_str': "newHandle",
     }
     # ----------------------------
@@ -562,6 +566,7 @@ def test_http_users_all_working():
             'email': "test@hotmail.com",
             'name_first': "nameFirst",
             'name_last': "nameLast",
+            'profile_img_url': config.url + 'static/default.jpg',
             'handle_str': "namefirstnamelast",
         },
         {
@@ -569,10 +574,202 @@ def test_http_users_all_working():
             'email': "test2@hotmail.com",
             'name_first': "name2First",
             'name_last': "name2Last",
+            'profile_img_url': config.url + 'static/default.jpg',
             'handle_str': "name2firstname2last",
         }
     ]
 
     assert respD == {"users": expectedOutput}
- 
+
 # ------------------------------------------------------------------------------
+# USER STATS FUNCTION TESTS
+def test_http_user_stats_working():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    u_id1 = respD["auth_user_id"]
+    token1 = respD["token"]
+    # ----------------------------
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": token1,
+        "name": "testchannel",
+        "is_public": True,
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    # ----------------------------
+
+    # User Profile ---------------
+    funcURL = "user/profile/v2"
+    inputData = {
+        "token": token1,
+        "u_id": u_id1
+    }
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
+    respD = json.loads(rawResponseData.text)
+    #-----------------------------
+    funcURL = "user/stats/v1"
+    inputData = {
+        "token": token1
+    }
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
+    respD = json.loads(rawResponseData.text)
+
+    expectedOutput = {
+        "channels_joined": [{
+            "num_channels_joined": 1,
+            "time_stamp": respD["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "dms_joined": [{
+            "num_dms_joined": 0,
+            "time_stamp": respD["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "messages_sent": [{
+            "num_messages_sent": 0,
+            "time_stamp": respD["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "involvement_rate": 1.0,
+    }
+
+    assert respD["user_stats"] == expectedOutput
+
+# ------------------------------------------------------------------------------
+# USERS STATS FUNCTION TESTS
+def test_http_users_stats_working():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    u_id1 = respD["auth_user_id"]
+    token1 = respD["token"]
+    # ----------------------------
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": token1,
+        "name": "testchannel",
+        "is_public": True,
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    # ----------------------------
+
+    # User Profile ---------------
+    funcURL = "user/profile/v2"
+    inputData = {
+        "token": token1,
+        "u_id": u_id1
+    }
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
+    respD = json.loads(rawResponseData.text)
+    #-----------------------------
+
+    funcURL = "users/stats/v1"
+    inputData = {
+        "token": token1,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
+    respD = json.loads(rawResponseData.text)
+
+    expectedOutput = {
+        "channels_exist": [{
+            "num_channels_exist": 1,
+            "time_stamp": respD["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "dms_exist": [{
+            "num_dms_exist": 0, 
+            "time_stamp": respD["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "messages_exist": [{
+            "num_messages_exist": 0, 
+            "time_stamp": respD["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "utilization_rate": 1.0,
+    }
+
+    assert respD["dreams_stats"] == expectedOutput
+
+
+# ------------------------------------------------------------------------------
+# USER UPLOAD PHOTO FUNCTION TESTS
+# Test requires http connection
+'''
+def test_http_uploadPhoto_working():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    u_id1 = respD["auth_user_id"]
+    token1 = respD["token"]
+    # ----------------------------
+
+    funcURL = "user/profile/uploadphoto/v1"
+    imageURL = "https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg"
+    inputData = {
+        "token": token1,
+        "img_url": imageURL,
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 500,
+        "y_end": 500,
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+
+    assert respD == {}
+
+    # User Profile ---------------
+    funcURL = "user/profile/v2"
+    inputData = {
+        "token": token1,
+        "u_id": u_id1
+    }
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
+    respD = json.loads(rawResponseData.text)
+    #-----------------------------
+
+    expectedOutput = {
+        "u_id": u_id1,
+        "email": "test@hotmail.com",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+        "handle_str": "namefirstnamelast",
+        "profile_img_url": f"{config.url}static/default.jpg"
+    }
+
+    assert respD["user"] == expectedOutput
+'''

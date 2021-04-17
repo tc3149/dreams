@@ -2,8 +2,12 @@ import re
 import random
 import string
 import jwt
+import string
+import random
 import src.database as database
+from flask import request
 from src.utils import is_valid_token_return_data, check_reset_code, find_reset_email
+import src.config as config
 from src.error import InputError, AccessError
 from hashlib import sha256
 from json import loads
@@ -130,6 +134,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "handle": userHandle, 
                 "sessions": [],
                 "permission": (1 if userID == 0 else 2),
+                "notifications": [],
             }
             newSessionId = new_session_id()
             sessionToken = create_session_token(newSessionId)
@@ -143,6 +148,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "name_first": name_first,
                 "name_last": name_last,
                 "handle_str": userHandle,
+                "profile_img_url": f"{config.url}static/default.jpg",
             }
             database.data["userProfiles"].append(userProfile)
     else:

@@ -1,6 +1,5 @@
 import re
 import src.database as database
-
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.error import InputError, AccessError
 from src.utils import get_user_id_from_token

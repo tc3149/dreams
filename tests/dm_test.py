@@ -1,5 +1,7 @@
 import pytest
 import jwt
+import src.config as config
+from flask import request
 from src.other import clear_v1
 from src.dm import dm_create_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1, dm_details_v1
 from src.auth import auth_register_v2
@@ -181,7 +183,6 @@ def test_dm_messages():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
 
@@ -194,7 +195,6 @@ def test_dm_messages_invalid_userid():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
     
@@ -208,7 +208,6 @@ def test_dm_messages_invalid_dmid():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     dm_create_v1(user["token"], id_list)
     
@@ -222,7 +221,6 @@ def test_dm_messages_unauthorised_user():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
     
@@ -235,7 +233,6 @@ def test_dm_messages_startgreater():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
 
@@ -248,7 +245,6 @@ def test_dm_messages_endnegativeone():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
 
@@ -265,7 +261,6 @@ def test_dm_leave():
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     dm = dm_create_v1(user["token"], id_list)
 
@@ -283,7 +278,6 @@ def test_dm_leave_multiple():
     user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
     user4 = auth_register_v2("email4@gmail.com", "password", "Name", "Lastname")
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
     id_list.append(user3["auth_user_id"])
     id_list.append(user4["auth_user_id"])
@@ -308,7 +302,6 @@ def test_dm_leave_invalid_dm():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm = dm_create_v1(user["token"], id_list)
@@ -326,7 +319,6 @@ def test_dm_leave_invalid_dm():
     user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm = dm_create_v1(user["token"], id_list)
@@ -347,7 +339,6 @@ def test_dm_remove():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm = dm_create_v1(user["token"], id_list)
@@ -365,12 +356,14 @@ def test_dm_remove_multiple():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
+
+    id_list2 = []
+    id_list2.append(user["auth_user_id"])
 
     dm = dm_create_v1(user["token"], id_list)
 
-    dm2 = dm_create_v1(user2["token"], id_list)
+    dm2 = dm_create_v1(user2["token"], id_list2)
 
     dm_remove_v1(user["token"], dm["dm_id"])
     dm_remove_v1(user2["token"], dm2["dm_id"])
@@ -387,7 +380,6 @@ def test_dm_remove_not_owner():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm = dm_create_v1(user["token"], id_list)
@@ -405,7 +397,6 @@ def test_dm_remove_invalid_dm():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm_create_v1(user["token"], id_list)
@@ -422,7 +413,6 @@ def test_dm_remove_invalid_token():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm = dm_create_v1(user["token"], id_list)
@@ -441,7 +431,6 @@ def test_dm_does_not_exist():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user1["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     _ = dm_create_v1(user1["token"], id_list)
@@ -456,7 +445,6 @@ def test_user_not_member_of_dm():
     user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
 
     id_list = []
-    id_list.append(user1["auth_user_id"])
     id_list.append(user2["auth_user_id"])
 
     dm = dm_create_v1(user1["token"], id_list)
@@ -471,8 +459,7 @@ def test_valid_input():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
-    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
-    
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])    
 
     assert dm_details_v1(user1['token'], dm['dm_id']) == {
                                             'name': 'namelastname,namelastname0',
@@ -482,6 +469,7 @@ def test_valid_input():
                                                     'email': 'email@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
+                                                    'profile_img_url': f"{config.url}static/default.jpg",
                                                     'handle_str': 'namelastname',
                                                     
                                                 },
@@ -490,6 +478,7 @@ def test_valid_input():
                                                     'email': 'email2@gmail.com',
                                                     'name_first': 'Name',
                                                     'name_last': 'Lastname',
+                                                    'profile_img_url': f"{config.url}static/default.jpg",
                                                     'handle_str': 'namelastname0',   
                                                 }
                                             ],
