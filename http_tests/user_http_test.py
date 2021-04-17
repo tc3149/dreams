@@ -652,7 +652,7 @@ def test_http_user_stats_working():
 def test_http_users_stats_working():
     requests.delete(config.url + "clear/v1")
 
- # Register--------------------
+    # Register--------------------
     funcURL = "auth/register/v2"
     inputData = {
         "email": "test@hotmail.com",
@@ -713,3 +713,63 @@ def test_http_users_stats_working():
     }
 
     assert respD["dreams_stats"] == expectedOutput
+
+
+# ------------------------------------------------------------------------------
+# USER UPLOAD PHOTO FUNCTION TESTS
+# Test requires http connection
+'''
+def test_http_uploadPhoto_working():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    u_id1 = respD["auth_user_id"]
+    token1 = respD["token"]
+    # ----------------------------
+
+    funcURL = "user/profile/uploadphoto/v1"
+    imageURL = "https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg"
+    inputData = {
+        "token": token1,
+        "img_url": imageURL,
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 500,
+        "y_end": 500,
+    }
+    rawResponseData = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+
+    assert respD == {}
+
+    # User Profile ---------------
+    funcURL = "user/profile/v2"
+    inputData = {
+        "token": token1,
+        "u_id": u_id1
+    }
+    qData = urllib.parse.urlencode(inputData)
+    rawResponseData = requests.get(config.url + funcURL + "?" + qData)
+    respD = json.loads(rawResponseData.text)
+    #-----------------------------
+
+    expectedOutput = {
+        "u_id": u_id1,
+        "email": "test@hotmail.com",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+        "handle_str": "namefirstnamelast",
+        "profile_img_url": f"{config.url}static/default.jpg"
+    }
+
+    assert respD["user"] == expectedOutput
+'''
