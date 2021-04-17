@@ -7,7 +7,7 @@ from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
 import src.database as database
 from json import dumps, loads
-import os
+#import os
 from src.utils import saveData, get_user_id_from_token
 
 '''
