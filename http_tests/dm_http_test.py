@@ -35,7 +35,6 @@ def test_http_dm_create_working():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -77,7 +76,6 @@ def test_http_dm_create_invalid_user():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     userList.append(7)
     inputData = {
@@ -444,7 +442,6 @@ def test_http_dm_leave_working():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -499,7 +496,6 @@ def test_http_dm_leave_invalid_dm():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -558,7 +554,6 @@ def test_http_dm_leave_unauthorized_user():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -607,7 +602,6 @@ def test_http_dm_leave_invalid_token():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -658,7 +652,6 @@ def test_http_dm_remove_working():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -723,7 +716,6 @@ def test_http_dm_remove_invalid_id():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -771,7 +763,6 @@ def test_http_dm_remove_not_owner():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -820,7 +811,6 @@ def test_http_dm_remove_invalid_token():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -870,7 +860,6 @@ def test_http_dm_message_working():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -921,7 +910,6 @@ def test_http_dm_message_invalid_user():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -972,7 +960,6 @@ def test_http_dm_message_invalid_dm():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -1033,7 +1020,6 @@ def test_http_dm_message_unauthorised_user():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -1084,7 +1070,6 @@ def test_http_dm_message_startgreater():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -1135,7 +1120,6 @@ def test_http_dm_message_endnegativeone():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -1188,7 +1172,6 @@ def test_http_dm_details_dm_does_not_exist():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
