@@ -244,16 +244,17 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
     #Checking validity of code
     if check_reset_code(reset_code) is False:
         raise InputError(description="Code is invalid")
+    hashedPass = sha256(new_password.encode()).hexdigest()
     #Retrieving the email of user
     reset_email = find_reset_email(reset_code)
     #Assigning the new password
     for user in database.data["accData"]:
         if user["email"] == reset_email:
-            user["password"] = new_password
+            user["password"] = hashedPass
     #Removing the token
     for resetData in database.data["resetdataList"]:
         if resetData["reset_code"] == reset_code:
-            del resetData
+            database.data["resetdataList"].remove(resetData)
             return {}
 
 # util functions
