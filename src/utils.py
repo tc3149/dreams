@@ -138,7 +138,10 @@ def get_user_id_from_token(token):
     raise AccessError(description="Token does not exist")
 
 def is_valid_token_return_data(token):
-    tokenData = jwt.decode(token, database.secretSauce, algorithms="HS256")
+    try:
+        tokenData = jwt.decode(token, database.secretSauce, algorithms="HS256")
+    except jwt.exceptions.InvalidSignatureError as e:
+        raise AccessError(description="Invalid signature") from e
     if not isinstance(tokenData, dict):
         raise AccessError(description="Invalid type")
 

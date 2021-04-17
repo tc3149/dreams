@@ -1,5 +1,5 @@
 import src.database as database
-from src.error import InputError
+from src.error import AccessError
 from src.utils import get_user_id_from_token
 
 
@@ -10,4 +10,4 @@ def notifications_get_v1(token):
             notificationList = user["notifications"].copy()
             notificationList.reverse()
             return {"notifications": notificationList[:20]}
-    raise InputError(description="User not found")
+    raise AccessError(description="User not found")

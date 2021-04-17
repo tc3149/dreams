@@ -391,7 +391,6 @@ def adminUserpermissionChange():
 def getNotifications():
     inputToken = request.args.get("token")
     returnData = notifications_get_v1(inputToken)
-    print(returnData)
     saveData()
     return dumps(returnData)
 
