@@ -3,7 +3,7 @@ from src.error import InputError, AccessError
 import src.config as config
 import src.database as database
 from flask import request
-from src.utils import get_user_id_from_token, search_email, createImageName
+from src.utils import get_user_id_from_token, search_email, createImageName, getUserProfileData
 from datetime import datetime
 from PIL import Image
 import urllib.request
@@ -170,8 +170,13 @@ def users_all_v1(token):
     return {"users": database.data["userProfiles"]}
 
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
-    imageName = createImageName()
     userId = get_user_id_from_token(token)
+    user = getUserProfileData(userId)
+
+    imageName = createImageName()
+    while imageName == user["profile_img_url"][-9:]:
+        imageName = createImageName()
+    
     respCode = urllib.request.urlopen(img_url)
     if respCode.getcode() != 200:
         print(respCode)
@@ -189,13 +194,11 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     croppedImage = imageObject.crop((x_start, y_start, x_end, y_end))
     croppedImage.save(f"src/static/{imageName}.jpg")
 
-    for user in database.data["userProfiles"]:
-        if user["u_id"] == userId:
-            if user["profile_img_url"][-11:] != "default.jpg":
-                pImageName = user["profile_img_url"][-9:]
-                os.remove(f"src/static/{pImageName}")
-            user["profile_img_url"] = f"{config.url}static/{imageName}.jpg"
-            break
+    if user["profile_img_url"][-11:] != "default.jpg":
+        pImageName = user["profile_img_url"][-9:]
+        os.remove(f"src/static/{pImageName}")
+    user["profile_img_url"] = f"{config.url}static/{imageName}.jpg"
+
 
     return {}
 

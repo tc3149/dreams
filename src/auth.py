@@ -137,13 +137,6 @@ def auth_register_v2(email, password, name_first, name_last):
             userData["sessions"].append(newSessionId)
             database.data["accData"].append(userData)
 
-            '''
-            if database.onlineURL:
-                urlRoot = database.onlineURL
-            else:
-                urlRoot = url
-            '''
-
             # Create profile
             userProfile = {
                 "u_id": userID,
