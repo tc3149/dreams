@@ -186,12 +186,12 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="Dimesions are not within image bounds")
     croppedImage = imageObject.crop((x_start, y_start, x_end, y_end))
     croppedImage.save(f"src/static/{userId}.jpg")
-    urlRoot = url if not database.onlineURL else database.onlineURL 
+    #urlRoot = url if not database.onlineURL else database.onlineURL 
 
     imageName = createImageName()
     for user in database.data["userProfiles"]:
         if user["u_id"] == userId:
-            user["profile_img_url"] = f"{urlRoot}static/{imageName}.jpg"
+            user["profile_img_url"] = f"{url}static/{imageName}.jpg"
             break
 
     return {}

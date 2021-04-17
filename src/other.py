@@ -2,12 +2,13 @@ import pytest
 import re
 from json import dumps
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src import config
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
 import src.database as database
 from json import dumps, loads
-#import os
+import os
 from src.utils import saveData, get_user_id_from_token
 
 '''
@@ -22,13 +23,15 @@ Return Value:
     N/A
 '''
 def clear_v1():
-    '''
+
     if database.data["accData"]:
         for userId in database.data["userProfiles"]:
             pImageName = userId["profile_img_url"][-9:]
             if os.path.exists(f"static/{pImageName}"):
                 os.remove(f"static/{pImageName}")
-'''
+
+    config.url = f"http://localhost:{config.port}/"
+
     database.idData["sessionId"] = 0
     database.idData["userId"] = 0
     database.idData["dmId"] = 0
