@@ -286,7 +286,7 @@ def test_users_stats_working():
 
 # /////////////////////////////////////////////////////////////////////////////////////////////  
 # user_profile_uploadphoto_v1 TESTS
-'''
+
 def test_user_profile_uploadphoto_working():
     clear_v1()
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
@@ -310,7 +310,7 @@ def test_user_profile_uploadphoto_working():
         "name_first": "firstName",
         "name_last": "lastName",
         "handle_str": "firstnamelastname",
-        "profile_img_url": config.url + "static/0.jpg"
+        "profile_img_url": user1Profile["user"]["profile_img_url"],
     }
     assert user1Profile["user"] == expectedOutput
-'''
+
