@@ -31,6 +31,9 @@ def dm_create_v1(token, u_ids):
     #Obtain user id of creator from token
     auth_user_id = get_user_id_from_token(token)
 
+    if auth_user_id in u_ids:
+        raise InputError(description="DM owner is in member list")
+
     # Check if u_ids are valid
     for u_id in u_ids:
         if valid_userid(u_id) is False:

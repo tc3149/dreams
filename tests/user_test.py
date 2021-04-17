@@ -6,7 +6,9 @@ from src.user import user_profile_v2, users_stats_v1
 from src.user import user_profile_setname_v2, user_profile_uploadphoto_v1
 from src.user import user_profile_sethandle_v1
 from src.user import user_profile_setemail_v2, user_stats_v1
+from src.message import message_send_v2, message_senddm_v1
 from src.channels import channels_create_v2
+from src.dm import dm_create_v1
 from src.user import users_all_v1
 from src.other import clear_v1
 from src.error import InputError
@@ -237,14 +239,13 @@ def test_users_all_v1_invalid_token():
 
 # /////////////////////////////////////////////////////////////////////////////////////////////  
 # user_stats_v1 TESTS
-def test_user_stats_working():
+def test_user_stats_no_channel_no_dm():
     clear_v1()
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
-    _ = channels_create_v2(user1["token"], "NewChannel", True)
     userStats = user_stats_v1(user1["token"])
     expectedOutput = {
         "channels_joined": [{
-            "num_channels_joined": 1,
+            "num_channels_joined": 0,
             "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
         }],
         "dms_joined": [{
@@ -255,20 +256,46 @@ def test_user_stats_working():
             "num_messages_sent": 0,
             "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
         }],
+        "involvement_rate": 0,
+    }
+    assert userStats["user_stats"] == expectedOutput
+
+def test_user_stats_channel_dm():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName", "lastName")
+    channel1 = channels_create_v2(user1["token"], "NewChannel", True)
+    dm1 = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    _ = message_send_v2(user1["token"], channel1["id"], "Test")
+    _ = message_senddm_v1(user1["token"], dm1["id"], "Test")
+
+    userStats = user_stats_v1(user1["token"])
+    expectedOutput = {
+        "channels_joined": [{
+            "num_channels_joined": 1,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "dms_joined": [{
+            "num_dms_joined": 1,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
+        "messages_sent": [{
+            "num_messages_sent": 2,
+            "time_stamp": userStats["user_stats"]["channels_joined"][0]["time_stamp"],
+        }],
         "involvement_rate": 1.0,
     }
     assert userStats["user_stats"] == expectedOutput
 
 # /////////////////////////////////////////////////////////////////////////////////////////////  
 # users_stats_v1
-def test_users_stats_working():
+def test_users_stats_no_channel_no_dm():
     clear_v1()
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
-    _ = channels_create_v2(user1["token"], "NewChannel", True)
     dreamsStats = users_stats_v1(user1["token"])
     expectedOutput = {
         "channels_exist": [{
-            "num_channels_exist": 1,
+            "num_channels_exist": 0,
             "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
             }],
         "dms_exist": [{
@@ -277,6 +304,33 @@ def test_users_stats_working():
             }],
         "messages_exist": [{
             "num_messages_exist": 0, 
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "utilization_rate": 0,
+    }
+
+    assert dreamsStats["dreams_stats"] == expectedOutput
+
+def test_users_stats_channel_dm():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    user2 = auth_register_v2("testemail2@hotmail.com", "password2", "firstName", "lastName")
+    channel1 = channels_create_v2(user1["token"], "NewChannel", True)
+    dm1 = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    _ = message_send_v2(user1["token"], channel1["id"], "Test")
+    _ = message_senddm_v1(user1["token"], dm1["id"], "Test")
+    dreamsStats = users_stats_v1(user1["token"])
+    expectedOutput = {
+        "channels_exist": [{
+            "num_channels_exist": 1,
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "dms_exist": [{
+            "num_dms_exist": 1, 
+            "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
+            }],
+        "messages_exist": [{
+            "num_messages_exist": 2, 
             "time_stamp": dreamsStats["dreams_stats"]["channels_exist"][0]["time_stamp"],
             }],
         "utilization_rate": 1.0,
