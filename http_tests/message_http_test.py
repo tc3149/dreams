@@ -2168,7 +2168,7 @@ def testsendlaterdm_wrong_dm_ID():
         "u_ids": userList,
     }
     dm = requests.post(config.url + funcURL, json=inputData)
-    dmR = json.loads(dm.text)
+    _ = json.loads(dm.text)
 
     # Message sendlater
     funcURL = "message/sendlaterdm/v1"
@@ -2477,7 +2477,7 @@ def testreact_reacted_already():
         "react_id": 1,
     }
     messageReact = requests.post(config.url + funcURL, json=inputData)
-    messageReactR = json.loads(messageReact.text)
+    _ = json.loads(messageReact.text)
 
 
     # Message React 2 ----
@@ -2547,7 +2547,7 @@ def testreact_dm_valid():
         "react_id": 1,
     }
     messageReact = requests.post(config.url + funcURL, json=inputData)
-    messageReactR = json.loads(messageReact.text)
+    _ = json.loads(messageReact.text)
 
     # DM Message Info -------
     funcURL = "dm/messages/v1"
@@ -2615,7 +2615,7 @@ def testunreact_unreacted_message():
         "react_id": 1,
     }
     messageReact = requests.post(config.url + funcURL, json=inputData)
-    messageReactR = json.loads(messageReact.text)
+    _ = json.loads(messageReact.text)
 
     # Message Unreact -----
     funcURL = "message/unreact/v1"
@@ -2625,7 +2625,7 @@ def testunreact_unreacted_message():
         "react_id": 1,
     }
     messageUnreact = requests.post(config.url + funcURL, json=inputData)
-    messageUnreactR = json.loads(messageUnreact.text)
+    _ = json.loads(messageUnreact.text)
 
     # Message Unreact 2 -----
     funcURL = "message/unreact/v1"
@@ -2694,7 +2694,7 @@ def testunreact_valid_dm():
         "react_id": 1,
     }
     messageReact = requests.post(config.url + funcURL, json=inputData)
-    messageReactR = json.loads(messageReact.text)
+    _ = json.loads(messageReact.text)
 
     # DM Message Info -------
     funcURL = "dm/messages/v1"
@@ -2724,7 +2724,7 @@ def testunreact_valid_dm():
         "react_id": 1,
     }
     messageUnreact = requests.post(config.url + funcURL, json=inputData)
-    messageUnreactR = json.loads(messageUnreact.text)
+    _ = json.loads(messageUnreact.text)
 
     # DM Message Info 2 -------
     funcURL = "dm/messages/v1"
@@ -2790,7 +2790,7 @@ def testpin_pinned_already():
         "message_id": messageSendR["message_id"],
     }
     messagePin = requests.post(config.url + funcURL, json=inputData)
-    messagePinR = json.loads(messagePin.text)
+    _ = json.loads(messagePin.text)
 
     # Message Pin --------
     funcURL = "message/pin/v1"
@@ -2857,7 +2857,7 @@ def testpin_dm_valid():
         "message_id": messageSendDMR["message_id"],
     }
     messagePin = requests.post(config.url + funcURL, json=inputData)
-    messagePinR = json.loads(messagePin.text)
+    _ = json.loads(messagePin.text)
     
     # DM Message Info -------
     funcURL = "dm/messages/v1"
@@ -2918,7 +2918,7 @@ def testunpin_unpinned_already():
         "message_id": messageSendR["message_id"],
     }
     messagePin = requests.post(config.url + funcURL, json=inputData)
-    messagePinR = json.loads(messagePin.text)
+    _ = json.loads(messagePin.text)
 
     # Message Unpin --------
     funcURL = "message/unpin/v1"
@@ -2994,7 +2994,7 @@ def testunpin_dm_valid():
         "message_id": messageSendDMR["message_id"],
     }
     messagePin = requests.post(config.url + funcURL, json=inputData)
-    messagePinR = json.loads(messagePin.text)
+    _ = json.loads(messagePin.text)
     
     # DM Message Info -------
     funcURL = "dm/messages/v1"
@@ -3019,7 +3019,7 @@ def testunpin_dm_valid():
         "message_id": messageSendDMR["message_id"],
     }
     messageUnpin = requests.post(config.url + funcURL, json=inputData)
-    messageUnpinR = json.loads(messageUnpin.text)
+    _ = json.loads(messageUnpin.text)
 
     # DM Message Info -------
     funcURL = "dm/messages/v1"
