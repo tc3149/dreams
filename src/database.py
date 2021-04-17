@@ -45,6 +45,7 @@ data = {
     "channelList": [],
     "message_ids": [],
     "dmList": [],
+    "resetdataList": [],
     "userProfiles": [],
 }
 

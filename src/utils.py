@@ -260,9 +260,21 @@ def getChannelNameFromId(channel_id):
     raise AccessError(description="Channel room does not exist")
 
 def createImageName():
-    
     # Create imageName
     lowercase = string.ascii_lowercase
     pImageName = ("".join(random.choice(lowercase) for _ in range(5)))
 
     return pImageName
+
+def check_reset_code(reset_code):
+    status = False
+    for resetData in database.data["resetdataList"]:
+        if reset_code == resetData["reset_code"]:
+            status = True
+    return status
+
+def find_reset_email(reset_code):
+    for resetData in database.data["resetdataList"]:
+        if reset_code == resetData["reset_code"]:
+            reset_email = resetData["email"]
+    return reset_email

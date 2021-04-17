@@ -1,11 +1,12 @@
 import sys
 from json import dumps, loads
 from flask import Flask, request, abort, send_from_directory
+from flask_mail import Mail, Message
 from flask_cors import CORS
 from src.error import InputError, AccessError
 import src.config as config
 import src.database as database
-from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1, auth_passwordreset_reset_v1, auth_passwordreset_request_v1
 from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1, user_stats_v1, users_stats_v1
 from src.user import user_profile_setname_v2, user_profile_sethandle_v1, user_profile_uploadphoto_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
@@ -35,6 +36,18 @@ CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
+
+# Mail Flask
+APP.config['MAIL_SERVER']='smtp.gmail.com'
+APP.config['MAIL_PORT'] = 465
+APP.config["MAIL_USE_TLS"] = False
+APP.config['MAIL_USE_SSL'] = True
+APP.config['MAIL_USERNAME'] = 'projectecho1531@gmail.com'
+APP.config['MAIL_PASSWORD'] = '!echo1531'
+APP.config['MAIL_DEFAULT_SENDER'] = 'projectecho1531@gmail.com'
+
+mail = Mail(APP)
+
 
 # ##############################################################################
 # DATABASE FUNCTIONS
@@ -70,6 +83,22 @@ def authLogin():
 def authLogout():
     inputData = request.get_json()
     returnData = auth_logout_v1(inputData["token"])
+    saveData()
+    return dumps(returnData)
+
+
+@APP.route("/auth/passwordreset/request/v1", methods=["POST"])
+def authpasswordRequest():
+    inputData = request.get_json()
+    returnData = auth_passwordreset_request_v1(inputData['email'])
+    mail.send(returnData)
+    saveData()
+    return {}
+
+@APP.route("/auth/passwordreset/reset/v1", methods=["POST"])
+def authpasswordReset():
+    inputData = request.get_json()
+    returnData = auth_passwordreset_reset_v1(inputData["reset_code"], inputData["new_password"])
     saveData()
     return dumps(returnData)
 

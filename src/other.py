@@ -50,6 +50,7 @@ def clear_v1():
     database.userAnalytics["involvement_rate"] = 0
 
     database.onlineURL = ""
+    database.data["resetdataList"].clear()
 
     with open("src/serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
