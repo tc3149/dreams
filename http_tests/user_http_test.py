@@ -9,7 +9,7 @@ from src.other import clear_v1
 
 # ------------------------------------------------------------------------------
 # USER PROFILE TEST FUNCTIONS
-'''
+
 def test_http_user_profile_working():
     requests.delete(config.url + "clear/v1")
 
@@ -580,8 +580,6 @@ def test_http_users_all_working():
     ]
 
     assert respD == {"users": expectedOutput}
-
-'''
 
 # ------------------------------------------------------------------------------
 # USER STATS FUNCTION TESTS

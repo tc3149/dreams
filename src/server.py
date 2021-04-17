@@ -387,11 +387,11 @@ def searchv2():
 @APP.route("/static/<path:filename>")
 def uploadImage(filename):
     return send_from_directory("", filename)
-
+'''
 @APP.before_first_request
 def getURL():
     database.onlineURL = request.url_root
-
+'''
 # ########################################################################
 
 # Example
