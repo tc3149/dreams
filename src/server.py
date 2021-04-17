@@ -9,7 +9,7 @@ from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1
 from src.user import user_profile_setname_v2, user_profile_sethandle_v1
 from src.channel import channel_addowner_v1, channel_removeowner_v1
-from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1
+from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_senddm_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.utils import saveData
 from src.other import clear_v1, search_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
@@ -172,6 +172,36 @@ def messageSendlaterDM():
     returnData = message_sendlaterdm_v1(inputData["token"], inputData["dm_id"], inputData["message"], inputData["time_sent"])
     saveData()
     return dumps(returnData)
+
+@APP.route("/message/react/v1", methods=["POST"])
+def messageReact():
+    inputData = request.get_json()
+    returnData = message_react_v1(inputData["token"], inputData["message_id"], inputData["react_id"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/message/unreact/v1", methods=["POST"])
+def messageUnreact():
+    inputData = request.get_json()
+    returnData = message_unreact_v1(inputData["token"], inputData["message_id"], inputData["react_id"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/message/pin/v1", methods=["POST"])
+def messagePin():
+    inputData = request.get_json()
+    returnData = message_pin_v1(inputData["token"], inputData["message_id"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/message/unpin/v1", methods=["POST"])
+def messageUnpin():
+    inputData = request.get_json()
+    returnData = message_unpin_v1(inputData["token"], inputData["message_id"])
+    saveData()
+    return dumps(returnData)
+
+
 
 # #############################################################################
 #                                                                             #
