@@ -3,7 +3,7 @@ from json import dumps, loads
 from flask import Flask, request, abort, send_from_directory
 from flask_cors import CORS
 from src.error import InputError, AccessError
-from src import config
+import src.config as config
 import src.database as database
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v2, user_profile_setemail_v2, users_all_v1, user_stats_v1, users_stats_v1

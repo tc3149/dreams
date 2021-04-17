@@ -1,5 +1,6 @@
+import os
 from src.error import InputError, AccessError
-from src.config import url
+import src.config as config
 import src.database as database
 from flask import request
 from src.utils import get_user_id_from_token, search_email, createImageName
@@ -169,13 +170,14 @@ def users_all_v1(token):
     return {"users": database.data["userProfiles"]}
 
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    imageName = createImageName()
     userId = get_user_id_from_token(token)
     respCode = urllib.request.urlopen(img_url)
     if respCode.getcode() != 200:
         print(respCode)
         raise InputError(description="URL did not return a success")
-    _ = urllib.request.urlretrieve(img_url, f"src/static/{userId}.jpg")
-    imageObject = Image.open(f"src/static/{userId}.jpg")
+    _ = urllib.request.urlretrieve(img_url, f"src/static/{imageName}.jpg")
+    imageObject = Image.open(f"src/static/{imageName}.jpg")
     imageW, imageH = imageObject.size
     imageType = imageObject.format
     if imageType != "JPEG":
@@ -185,13 +187,15 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
             y_start not in range(0, imageH + 1) or y_end not in range(0, imageH + 1)):
         raise InputError(description="Dimesions are not within image bounds")
     croppedImage = imageObject.crop((x_start, y_start, x_end, y_end))
-    croppedImage.save(f"src/static/{userId}.jpg")
+    croppedImage.save(f"src/static/{imageName}.jpg")
     #urlRoot = url if not database.onlineURL else database.onlineURL 
 
-    imageName = createImageName()
     for user in database.data["userProfiles"]:
         if user["u_id"] == userId:
-            user["profile_img_url"] = f"{url}static/{imageName}.jpg"
+            if user["profile_img_url"][-11:] != "default.jpg":
+                pImageName = user["profile_img_url"][-9:]
+                os.remove(f"src/static/{pImageName}")
+            user["profile_img_url"] = f"{config.url}static/{imageName}.jpg"
             break
 
     return {}
@@ -201,30 +205,40 @@ def user_stats_v1(token):
     funcCallDatetime = int(datetime.timestamp(datetime.now()))
 
     numChannels = 0
-    for channel in database.data["channelList"]:
-        if userId in channel["member_ids"]:
-            numChannels += 1
+    if database.data["channelList"]:
+        for channel in database.data["channelList"]:
+            if userId in channel["member_ids"]:
+                numChannels += 1
 
     numDms = 0
-    for dm in database.data["dmList"]:
-        if userId in dm["member_ids"]:
-            numDms +=1
+    if database.data["dmList"]:
+        for dm in database.data["dmList"]:
+            if userId in dm["member_ids"]:
+                numDms +=1
 
     numMessages = 0
-    for channel in database.data["channelList"]:
-        for message in channel["messages"]:
-            if message["u_id"] == userId:
-                numMessages += 1
+    if database.data["channelList"]:
+        for channel in database.data["channelList"]:
+            if channel["messages"]:
+                for message in channel["messages"]:
+                    if message["u_id"] == userId:
+                        numMessages += 1
     
-    for dm in database.data["dmList"]:
-        for message in dm["messages"]:
-            if message["u_id"] == userId:
-                numMessages += 1
+    if database.data["dmList"]:
+        for dm in database.data["dmList"]:
+            if dm["messages"]:
+                for message in dm["messages"]:
+                    if message["u_id"] == userId:
+                        numMessages += 1
 
     numerator = numChannels + numDms + numMessages
-    denominator = len(database.data["channelList"]) + len(database.data["dmList"]) + len(database.data["message_ids"])
+    totalChannels = 0 if not len(database.data["channelList"]) else len(database.data["channelList"])
+    totalDms = 0 if not len(database.data["dmList"]) else len(database.data["dmList"])
+    totalMessages = 0 if not len(database.data["message_ids"]) else len(database.data["message_ids"])
+    denominator = totalChannels + totalDms + totalMessages
 
-    involvementRate = numerator/denominator
+    
+    involvementRate = 0 if denominator == 0 else numerator/denominator
 
     channels_joined = {
         "num_channels_joined": numChannels,
@@ -255,27 +269,34 @@ def users_stats_v1(token):
     numUsers = 0
     for user in database.data["accData"]:
         userJoined = False
-        for channel in database.data["channelList"]:
-            if user["id"] in channel["member_ids"]:
-                userJoined = True
-        for dm in database.data["dmList"]:
-            if user["id"] in dm["member_ids"]:
-                userJoined = True
+        if not userJoined and database.data["channelList"]:
+            for channel in database.data["channelList"]:
+                if user["id"] in channel["member_ids"]:
+                    userJoined = True
+        if not userJoined and database.data["dmList"]:
+            for dm in database.data["dmList"]:
+                if user["id"] in dm["member_ids"]:
+                    userJoined = True
         if userJoined is True:
             numUsers += 1
 
-    utilisationRate = numUsers/len(database.data["accData"])
+    numerator = numUsers
+    denominator = 0 if not len(database.data["accData"]) else len(database.data["accData"]) 
+    utilisationRate = 0 if denominator == 0 else numerator/denominator
+    numChannels = 0 if not len(database.data["channelList"]) else len(database.data["channelList"])
+    numDms = 0 if not len(database.data["dmList"]) else len(database.data["dmList"])
+    numMessages = 0 if not len(database.data["message_ids"]) else len(database.data["message_ids"])
 
     channels_exist = {
-        "num_channels_exist": len(database.data["channelList"]),
+        "num_channels_exist": numChannels,
         "time_stamp": funcCallDatetime,
     }
     dms_exist = {
-        "num_dms_exist": len(database.data["dmList"]), 
+        "num_dms_exist": numDms, 
         "time_stamp": funcCallDatetime,
     }
     messages_exist = {
-        "num_messages_exist": len(database.data["message_ids"]), 
+        "num_messages_exist": numMessages, 
         "time_stamp": funcCallDatetime,
     }
     database.dreamsAnalytics["channels_exist"].append(channels_exist)

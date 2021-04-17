@@ -25,8 +25,8 @@ dmData = {
     'dm_name': dm_name,
     'id': dm_id,
     'messages': [],
-    'member_ids': total_ids,
-    'owner_ids': [auth_user_id],
+    'member_ids': [],
+    'owner_ids': [],
 }
 dmList is list of dmData of the above format
 

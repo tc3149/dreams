@@ -2,7 +2,7 @@ import pytest
 import re
 from json import dumps
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from src import config
+import src.config as config
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
@@ -27,10 +27,8 @@ def clear_v1():
     if database.data["accData"]:
         for userId in database.data["userProfiles"]:
             pImageName = userId["profile_img_url"][-9:]
-            if os.path.exists(f"static/{pImageName}"):
-                os.remove(f"static/{pImageName}")
-
-    config.url = f"http://localhost:{config.port}/"
+            if os.path.exists(f"src/static/{pImageName}"):
+                os.remove(f"src/static/{pImageName}")
 
     database.idData["sessionId"] = 0
     database.idData["userId"] = 0
