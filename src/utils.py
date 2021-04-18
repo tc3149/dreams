@@ -60,7 +60,8 @@ def check_messageid(message_id):
     for i in database.data["channelList"]:
         for message1 in i['messages']:
             if message1.get('message_id') == message_id:
-                return False
+                if message1["message"] is not "":
+                    return False
     return True
 
 def check_messageid_in_DM(message_id):
@@ -68,7 +69,8 @@ def check_messageid_in_DM(message_id):
     for i in database.data["dmList"]:
         for message1 in i["messages"]:
             if message1.get("message_id") == message_id:
-                return False
+                    if message1["message"] is not "":
+                        return False
     return True
 
 def getchannelID(message_id):
@@ -278,3 +280,62 @@ def find_reset_email(reset_code):
         if reset_code == resetData["reset_code"]:
             reset_email = resetData["email"]
     return reset_email
+
+
+# Helper Functions for message send later channel
+def message_send_sendlater_channel(token, channel_id, message, message_id):
+    u_id = get_user_id_from_token(token)
+   
+    checkTags(u_id, message, channel_id, -1)
+
+    final_time = int(datetime.timestamp(datetime.now()))
+
+    react_dictionary = [{
+        "react_id": 1,
+        "u_ids": [],
+        "is_this_user_reacted": False,
+    }]
+    
+    message_final = {
+        'message': message,
+        'message_id': message_id,
+        'u_id': u_id,
+        'time_created': final_time,
+        "reacts": react_dictionary,
+        "is_pinned": False,
+    }
+
+    for right_channel in database.data["channelList"]:
+        if right_channel["id"] is channel_id:
+            right_channel['messages'].append(message_final)
+    
+    return {}
+
+# Helper function for message send later DM
+def message_send_sendlater_dm(token, dm_id, message, message_id):
+    u_id = get_user_id_from_token(token)
+
+    checkTags(u_id, message, -1, dm_id)
+
+    final_time = int(datetime.timestamp(datetime.now()))
+
+    react_dictionary = [{
+        "react_id": 1,
+        "u_ids": [],
+        "is_this_user_reacted": False
+    }]
+
+    message_final = {
+        'message': message,
+        'message_id': message_id,
+        'u_id': u_id,
+        'time_created': final_time,
+        "reacts": react_dictionary,
+        "is_pinned": False,
+    }
+
+    for right_dm in database.data["dmList"]:
+        if right_dm["id"] is dm_id:
+            right_dm['messages'].append(message_final)
+    
+    return {}
