@@ -2519,7 +2519,7 @@ def testreact_dm_valid():
             assert dms["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [userR["auth_user_id"]],
-                "is_this_user_reacted": False,
+                "is_this_user_reacted": True,
             }]
 
 
@@ -2666,7 +2666,7 @@ def testunreact_valid_dm():
             assert dms["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [userR["auth_user_id"]],
-                "is_this_user_reacted": False,
+                "is_this_user_reacted": True,
             }]
 
     # Message Unreact 2 -----
