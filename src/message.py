@@ -121,10 +121,7 @@ def message_remove_v1(token, message_id):
         for messages1 in channel["messages"]:
             if messages1["message_id"] == message_id:
                 if checkOwner(u_id, channel_id) is True or messages1["u_id"] == u_id:
-                    if not messages1["message"]:
-                        raise InputError(description="Error: Message already removed")
-                    else:
-                        messages1["message"] = ""
+                    messages1["message"] = ""
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
     
