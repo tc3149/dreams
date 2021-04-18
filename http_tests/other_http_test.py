@@ -72,6 +72,7 @@ def test_http_clear_channel():
         "message_ids": [],
         "dmList": [],
         "userProfiles": [],
+        "standupList": [],
     }
 
 def test_http_clear_dm():
@@ -125,6 +126,7 @@ def test_http_clear_dm():
         "message_ids": [],
         "dmList": [],
         "userProfiles": [],
+        "standupList": [],
     }
 
 # SEARCH TEST #################################################
