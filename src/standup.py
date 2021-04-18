@@ -81,6 +81,9 @@ def standup_active_v1(token, channel_id):
     if valid_channelid(channel_id) is False:
         raise InputError(description="Error: Invalid channel ID")
 
+    if check_useralreadyinchannel(auth_user_id, channel_id) is False:
+        raise AccessError(description="User is not a member of the channel")
+
     is_active = False
     time_finish = None
 
