@@ -6,7 +6,7 @@ import string
 import random
 import src.database as database
 from flask import request
-from src.utils import is_valid_token_return_data, check_reset_code, find_reset_email
+from src.utils import is_valid_token_return_data, check_reset_code, find_reset_email, getUserAccData
 import src.config as config
 from src.error import InputError, AccessError
 from hashlib import sha256
@@ -204,7 +204,7 @@ Return Value:
 def auth_passwordreset_request_v1(email):
     # Creating the resetData 
     resetData = {
-        "reset_code": None,
+        "reset_code": "",
         "email": email
     }
     # Creating a randomized 5 character code
@@ -214,8 +214,8 @@ def auth_passwordreset_request_v1(email):
         if user["email"] == email:
             resetData["reset_code"] = reset_code
             database.data["resetdataList"].append(resetData)
-        else:
-            raise InputError(description="Email doesn't exist")
+    if not resetData["reset_code"]:
+        raise InputError(description="Email doesn't exist")
     # Setting mail contents and sending
     msg = Message('Your reset code for Dream Server',
                 recipients = [email]
