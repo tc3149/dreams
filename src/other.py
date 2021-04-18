@@ -33,6 +33,7 @@ def clear_v1():
     database.data["message_ids"].clear()
     database.data["dmList"].clear()
     database.data["userProfiles"].clear()
+    database.data["standupList"].clear()
 
     with open("serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
