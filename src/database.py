@@ -17,6 +17,7 @@ data = {
     "message_ids": [],
     "dmList": [],
     "userProfiles": [],
+    "standupList": [],
 }
 
 idData = {
