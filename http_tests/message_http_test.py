@@ -2506,7 +2506,7 @@ def testreact_dm_valid():
     funcURL = "dm/messages/v1"
 
     inputData = {
-        "token": user2R["token"],
+        "token": userR["token"],
         "dm_id": dmR["dm_id"],
         "start": 0,
     }
@@ -2515,7 +2515,7 @@ def testreact_dm_valid():
     dmMessagesR = json.loads(dmMessages.text)
 
     for dms in dmMessagesR["messages"]:
-        if dms["u_id"] is user2R["auth_user_id"]:
+        if dms["u_id"] is userR["auth_user_id"]:
             assert dms["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [userR["auth_user_id"]],
@@ -2653,7 +2653,7 @@ def testunreact_valid_dm():
     funcURL = "dm/messages/v1"
 
     inputData = {
-        "token": user2R["token"],
+        "token": userR["token"],
         "dm_id": dmR["dm_id"],
         "start": 0,
     }
@@ -2662,7 +2662,7 @@ def testunreact_valid_dm():
     dmMessagesR = json.loads(dmMessages.text)
 
     for dms in dmMessagesR["messages"]:
-        if dms["u_id"] is user2R["auth_user_id"]:
+        if dms["u_id"] is userR["auth_user_id"]:
             assert dms["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [userR["auth_user_id"]],
@@ -2682,7 +2682,7 @@ def testunreact_valid_dm():
     # DM Message Info 2 -------
     funcURL = "dm/messages/v1"
     inputData = {
-        "token": user2R["token"],
+        "token": userR["token"],
         "dm_id": dmR["dm_id"],
         "start": 0,
     }
@@ -2691,7 +2691,7 @@ def testunreact_valid_dm():
     dmMessages2R = json.loads(dmMessages2.text)
 
     for dms in dmMessages2R["messages"]:
-        if dms["u_id"] is user2R["auth_user_id"]:
+        if dms["u_id"] is userR["auth_user_id"]:
             assert dms["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [],

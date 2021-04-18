@@ -621,12 +621,9 @@ def message_unreact_v1(token, message_id, react_id):
     for channels in address:
         for msg in channels["messages"]:
             if msg["message_id"] == message_id:
-
                 for react_info in msg["reacts"]:
-
                     if u_id in react_info["u_ids"]:
                         react_info["u_ids"].remove(u_id)
-
                         if not react_info["u_ids"]:
                             react_info["is_this_user_reacted"] = False
                    
