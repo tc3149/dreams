@@ -12,7 +12,7 @@ from src.error import InputError, AccessError
 from hashlib import sha256
 from json import loads
 from flask import Flask, current_app
-#from flask_mail import Mail, Message
+from flask_mail import Mail, Message
 
 
 
