@@ -9,7 +9,7 @@ from src.other import clear_v1
 
 # ------------------------------------------------------------------------------
 # USER PROFILE TEST FUNCTIONS
-
+'''
 def test_http_user_profile_working():
     requests.delete(config.url + "clear/v1")
 
@@ -737,14 +737,14 @@ def test_http_uploadPhoto_working():
     # ----------------------------
 
     funcURL = "user/profile/uploadphoto/v1"
-    imageURL = "https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg"
+    imageURL = "http://personal.psu.edu/xqz5228/jpg.jpg"
     inputData = {
         "token": token1,
         "img_url": imageURL,
         "x_start": 0,
         "y_start": 0,
-        "x_end": 500,
-        "y_end": 500,
+        "x_end": 300,
+        "y_end": 300,
     }
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
@@ -768,8 +768,7 @@ def test_http_uploadPhoto_working():
         "name_first": "nameFirst",
         "name_last": "nameLast",
         "handle_str": "namefirstnamelast",
-        "profile_img_url": f"{config.url}static/default.jpg"
+        "profile_img_url": respD["user"]["profile_img_url"]
     }
 
     assert respD["user"] == expectedOutput
-'''
