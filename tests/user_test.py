@@ -15,7 +15,7 @@ from src.error import InputError
 from src.error import AccessError
 import src.database as database
 import jwt
-'''
+
 
 # /////////////////////////////////////////////////////////////////////////////////////////////        
 # user_profile_v2 TESTS
@@ -337,7 +337,7 @@ def test_users_stats_channel_dm():
     }
 
     assert dreamsStats["dreams_stats"] == expectedOutput
-'''
+
 # /////////////////////////////////////////////////////////////////////////////////////////////  
 # user_profile_uploadphoto_v1 TESTS
 # Test requires http connection
