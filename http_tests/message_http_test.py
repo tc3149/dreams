@@ -270,53 +270,6 @@ def testsend_valid_case():
 
 # MESSAGE EDIT TESTING
 
-# Empty Message
-def testedit_empty():
-    requests.delete(config.url + "clear/v1")
-
-    # Register --------
-    funcURL = "auth/register/v2"
-    inputData = {
-        "email": "test@hotmail.com",
-        "password": "password1",
-        "name_first": "nameFirst",
-        "name_last": "nameLast",
-    }
-    user = requests.post(config.url + funcURL, json=inputData)
-    userR = json.loads(user.text)
-
-    # Channel Create -------
-    funcURL = "channels/create/v2"
-    inputData = {
-        "token": userR["token"],
-        "name": "testchannel",
-        "is_public": True,
-    }
-    channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
-
-    # Message Send
-    funcURL = "message/send/v2"
-    inputData = {
-        "token": userR["token"],
-        "channel_id": channelR["channel_id"],
-        "message": "Thomas Chen and Jonathan Qiu",
-    }
-    messageSend = requests.post(config.url + funcURL, json=inputData)
-    messageSendR = json.loads(messageSend.text)
-    
-    # Message Edit
-    funcURL = "message/edit/v2"
-
-    inputData = {
-        "token": userR["token"],
-        "message_id": messageSendR["message_id"],
-        "message": '',
-    }
-    messageEdit = requests.put(config.url + funcURL, json=inputData)
-    messageEditR = json.loads(messageEdit.text)
-    assert messageEditR["code"] == 400
-
 # Invalid Long Message
 def testedit_invalid_long_msg():
     requests.delete(config.url + "clear/v1")
