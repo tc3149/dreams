@@ -882,7 +882,7 @@ def testreact_valid_case_dm():
             assert msg["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [user["auth_user_id"]],
-                "is_this_user_reacted": False,
+                "is_this_user_reacted": True,
             }]
 
 
@@ -1045,7 +1045,7 @@ def testunreact_valid_case_dm():
             assert msg["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [user["auth_user_id"]],
-                "is_this_user_reacted": False,
+                "is_this_user_reacted": True,
             }]
 
     message_unreact_v1(user["token"], message1["message_id"], 1)

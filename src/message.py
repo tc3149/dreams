@@ -557,10 +557,8 @@ def message_react_v1(token, message_id, react_id):
                 for react_info in msg["reacts"]:
                     if u_id not in react_info["u_ids"]:
                         react_info["u_ids"].append(u_id)
-
-                        if u_id == msg["u_id"]:
-                            react_info["is_this_user_reacted"] = True
-                    
+                        react_info["is_this_user_reacted"] = True
+           
                     else:
                         raise InputError(description="Error: User has already reacted to this message")
 
@@ -632,9 +630,9 @@ def message_unreact_v1(token, message_id, react_id):
                     if u_id in react_info["u_ids"]:
                         react_info["u_ids"].remove(u_id)
 
-                        if u_id == msg["u_id"]:
+                        if not react_info["u_ids"]:
                             react_info["is_this_user_reacted"] = False
-                    
+                   
                     else:
                         raise InputError(description="Error: User has already unreacted to this message")
 
