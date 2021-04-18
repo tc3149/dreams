@@ -50,7 +50,7 @@ def test_standup_working():
 
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v2("email2@gmail.com", "password", "Hayden", "Smith")
+    auth_register_v2("email2@gmail.com", "password", "Hayden", "Smith")
     channel = channels_create_v2(user.get("token"), "testchannel", True)
     standup = standup_start_v1(user.get("token"), channel["channel_id"], 1)
     # The current time is not a strict value (changes), therefore to test if standup by
@@ -103,17 +103,6 @@ def test_standup_active_is_active():
     assert active["is_active"] == True
     assert active["time_finish"] != None
 
-def test_standup_active_different_user():
-
-    # Spec doesnt specify whether or not any user can call the active function
-    clear_v1()
-    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v2(user.get("token"), "testchannel", True)
-    standup_start_v1(user.get("token"), channel["channel_id"], 1)
-    active = standup_active_v1(user2["token"], channel["channel_id"])
-    assert active["is_active"] == True
-    assert active["time_finish"] != None
 
 # STANDUP SEND TESTING ---------------------------------------------------------
 
