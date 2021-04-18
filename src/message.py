@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.utils import valid_userid, valid_dmid, check_useralreadyindm, valid_channelid, check_useralreadyinchannel, check_messageid, get_user_id_from_token, getchannelID, checkOwner
-from src.utils import check_messageid_in_DM, getdmID, checkOwnerinDM, checkTags
+from src.utils import check_messageid_in_DM, getdmID, checkOwnerinDM, checkTags, message_send_sendlater_channel, message_send_sendlater_dm
 import src.database as database
 from datetime import datetime
 from threading import Timer
@@ -164,25 +164,27 @@ def message_edit_v2(token, message_id, message):
 
     u_id = get_user_id_from_token(token)
 
-    if not message:
-        raise InputError(description="Error: Empty Message")
-
     if check_messageid(message_id) is True:
         raise InputError(description="Error: Invalid message ID")
 
-    channel_id = getchannelID(message_id)
 
-    for channels1 in database.data["channelList"]:
-        for message_info in channels1.get('messages'):
-            if message_info.get("message_id") is message_id:
-                if checkOwner(u_id, channel_id):
-                    message_info["message"] = message
-                
-                elif message_info.get("u_id") is u_id:
-                    message_info["message"] = message
-                
-                else:
-                    raise AccessError(description="Error: Editor not an owner nor original poster")
+    if not message:
+        message_remove_v1(token, message_id)
+
+    else: 
+        channel_id = getchannelID(message_id)
+
+        for channels1 in database.data["channelList"]:
+            for message_info in channels1.get('messages'):
+                if message_info.get("message_id") is message_id:
+                    if checkOwner(u_id, channel_id):
+                        message_info["message"] = message
+                    
+                    elif message_info.get("u_id") is u_id:
+                        message_info["message"] = message
+                    
+                    else:
+                        raise AccessError(description="Error: Editor not an owner nor original poster")
 
     return {}
 
@@ -404,12 +406,20 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     if time_difference < 0:
         raise InputError(description="Error: Time is in the past")
 
-    timer_to_send = Timer(time_difference, message_send_v2, args=[token, channel_id, message])
+    database.idData['messageId'] = database.idData["messageId"] + 1
+    message_id = database.idData['messageId']
+
+    new_message_id = {
+        'message_id': message_id,
+    }
+
+    database.data["message_ids"].append(new_message_id)
+
+    timer_to_send = Timer(time_difference, message_send_sendlater_channel, args=[token, channel_id, message, message_id])
     timer_to_send.start()
 
-
     return {
-        "message_id": database.idData["messageId"] + 1
+        "message_id": message_id,
     }
                      
 
@@ -466,11 +476,20 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     if time_difference < 0:
         raise InputError(description="Error: Time is in the past")
 
-    timer_to_send = Timer(time_difference, message_senddm_v1, args=[token, dm_id, message])
+    database.idData['messageId'] = database.idData["messageId"] + 1
+    message_id = database.idData['messageId']
+
+    new_message_id = {
+        'message_id': message_id,
+    }
+
+    database.data["message_ids"].append(new_message_id)
+
+    timer_to_send = Timer(time_difference, message_send_sendlater_dm, args=[token, dm_id, message, message_id])
     timer_to_send.start()
 
     return {
-        "message_id": database.idData["messageId"] + 1
+        "message_id": message_id,
     }
 
 

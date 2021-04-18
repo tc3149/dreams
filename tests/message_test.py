@@ -84,18 +84,6 @@ def testsend_if_valid():
 
 # MESSAGE EDIT TESTING --------------------------------------------------------------------
 
-# empty message
-
-def testedit_empty_message():
-    clear_v1()
-    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v2(user["token"], "testchannel", True)
-    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
-    m_id = message1.get('message_id')
-
-    with pytest.raises(InputError):
-        message_edit_v2(user["token"], m_id, '')
-
 
 # edited message over 1k words
 
@@ -197,6 +185,23 @@ def testedit_indepth_validtesting():
         assert msg["message"] == 'lmfao'
         assert msg["u_id"] == user2["auth_user_id"]
 
+
+# Empty message ("") should remove the message
+def testedit_empty_message():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    message1 = message_send_v2(user["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_edit_v2(user["token"], m_id, '')
+
+    messages1 = channel_messages_v2(user["token"], channel["channel_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == ''
+        assert msg["u_id"] == user["auth_user_id"]
 
 
 
@@ -585,6 +590,38 @@ def testsendlater_valid_case():
             assert messages1["message_id"] == m_id["message_id"]
 
 
+# Comprehensive Testing
+def testsendlater_valid_case_comprehensive():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    time_set = int(datetime.timestamp(datetime.now()) + 2)
+
+    m_id = message_sendlater_v1(user1["token"], channel["channel_id"], "i'll see you in the future", time_set)
+    assert m_id["message_id"] == 1
+
+    message_send_v2(user2["token"], channel["channel_id"], "lol i'll see you now")
+    
+    message_info = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+    assert len(message_info["messages"]) == 1
+
+    sleep(3)
+
+    message_info_later = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+    
+    for messages1 in message_info_later["messages"]:
+        if messages1["u_id"] is user1["auth_user_id"]:
+            assert messages1["message"] == "i'll see you in the future"
+            assert messages1["time_created"] == time_set
+            assert messages1["message_id"] == m_id["message_id"]
+        
+        if messages1["u_id"] is user2["auth_user_id"]:
+            assert messages1["message"] == "lol i'll see you now"
+            assert messages1["message_id"] == 2
+
 
 # MESSAGE SEND LATER DM TESTING -------------------------------------------------------
 
@@ -694,6 +731,37 @@ def testsendlaterdm_valid_case():
             assert dms["time_created"] == time
             assert dms["message_id"] == m_id["message_id"]
 
+
+# Comprehensive Case Testing
+def testsendlaterdm_valid_case_comprehensive():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+
+    time_set = int(datetime.timestamp(datetime.now()) + 2)
+
+    m_id = message_sendlaterdm_v1(user1["token"], dm["dm_id"], "i'll see you in the future", time_set)
+    assert m_id["message_id"] == 1
+
+    message_senddm_v1(user2["token"], dm["dm_id"], "lol i'll see you now")
+    
+    dm_info = dm_messages_v1(user2["token"], dm["dm_id"], 0) 
+    assert len(dm_info["messages"]) == 1
+
+    sleep(3)
+
+    dm_info_later = dm_messages_v1(user2["token"], dm["dm_id"], 0) 
+    
+    for messages1 in dm_info_later["messages"]:
+        if messages1["u_id"] is user1["auth_user_id"]:
+            assert messages1["message"] == "i'll see you in the future"
+            assert messages1["time_created"] == time_set
+            assert messages1["message_id"] == m_id["message_id"]
+        
+        if messages1["u_id"] is user2["auth_user_id"]:
+            assert messages1["message"] == "lol i'll see you now"
+            assert messages1["message_id"] == 2
         
 
 # MESSAGE REACT TESTING -----------------
