@@ -875,10 +875,10 @@ def testreact_valid_case_dm():
     message1 = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
     message_react_v1(user["token"], message1["message_id"], 1)
 
-    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    message_info = dm_messages_v1(user["token"], dm["dm_id"], 0)
 
     for msg in message_info["messages"]:
-        if msg["u_id"] is user2["auth_user_id"]:
+        if msg["u_id"] is user["auth_user_id"]:
             assert msg["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [user["auth_user_id"]],
@@ -1038,10 +1038,10 @@ def testunreact_valid_case_dm():
     message1 = message_senddm_v1(user2["token"], dm["dm_id"], "Jonathan")
     message_react_v1(user["token"], message1["message_id"], 1)
 
-    message_info = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    message_info = dm_messages_v1(user["token"], dm["dm_id"], 0)
 
     for msg in message_info["messages"]:
-        if msg["u_id"] is user2["auth_user_id"]:
+        if msg["u_id"] is user["auth_user_id"]:
             assert msg["reacts"] == [{
                 "react_id": 1,
                 "u_ids": [user["auth_user_id"]],
@@ -1050,7 +1050,7 @@ def testunreact_valid_case_dm():
 
     message_unreact_v1(user["token"], message1["message_id"], 1)
 
-    message_info_later = dm_messages_v1(user2["token"], dm["dm_id"], 0)
+    message_info_later = dm_messages_v1(user["token"], dm["dm_id"], 0)
 
     for msg in message_info_later["messages"]:
         if msg["u_id"] is user2["auth_user_id"]:
