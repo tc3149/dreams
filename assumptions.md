@@ -82,6 +82,7 @@
 **message.py**
 - Overall:
     - Assumes that any message that is "" is considered removed, and its message_id would be invalid
+    
 - message_send_v2:
     - Assumes the message can be of 1000 characters, but no more
     - Assumes a message cannot be empty ('') as this is considered a removed message
