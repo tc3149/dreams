@@ -6,6 +6,33 @@ from src.message import message_send_v2
 import datetime
 import threading
 
+'''
+standup_start_v1 take in the token of a user, a channel_id and a length(seconds) for
+the standup to last. It first performs security checks (channel id, active, authorisation)
+before going into the main substance of the function. This is by using datetime to find
+the timestamp of when standup finishes, then creating a dictionary(standupData) to store
+into the database. Following this, threading is imported so that the package of messages
+can be sent at the end of the length(seconds) of the function - this calls standup
+collection send - which packages up the messages then sends through the creator of
+the standup.
+
+Arguments:
+    token (string) - User's Authorisation Hash
+    channel_id (integer) - Channel Id
+    length (integer) - seconds that the standup will last for
+
+Exceptions:
+    AccessError - when the token is not valid
+    InputError - When the channel id is not valid
+    InputError - When a standup is already active in the channel
+    AccessError - User is not authorised to perform the standup (i.e. not in the channel)
+
+Return Value:
+    Returns {
+        'time_finish': time_finish.timestamp (timestamp of time generated from datetime function)
+    }
+
+'''
 def standup_start_v1(token, channel_id, length):
 
     auth_user_id = get_user_id_from_token(token)
@@ -46,6 +73,10 @@ def standup_start_v1(token, channel_id, length):
         "time_finish": int(time_finish.timestamp()),
     }
 
+'''
+Helper function for standup start - this is called when the standup ends and packages
+all strings into a single string which is sent via the owners token
+'''
 def standup_collection_send(token, channel_id):
 
     # This function is active when the standup is finished.
@@ -72,7 +103,26 @@ def standup_collection_send(token, channel_id):
     return
 
 '''
-Check if Standup is active in channel. COMPLETED
+standup_active_v1 takes in the token of a user and a channel_id to tell the function caller
+whether a standup is active on that particular channel.
+It functions via checking the database structure "standupList" and seeing whether any
+standups contain the specified channel id. If so, is_active is sent to true, and time_finish is
+also recorded.
+
+Arguments:
+    token (string) - User's Authorisation Hash
+    channel_id (integer) - Channel Id
+
+Exceptions:
+    AccessError - when the token is not valid
+    InputError - When the channel id is not valid
+    AccessError - User is not authorised to perform the standup (i.e. not in the channel)
+
+Return Value:
+    Returns {
+        'is_active': is_active (either True or False)
+        'time_finish': time_finish (the timestamp of when the standup finishes)
+    }
 '''
 def standup_active_v1(token, channel_id):
 
@@ -96,7 +146,29 @@ def standup_active_v1(token, channel_id):
         "is_active": is_active,
         "time_finish": time_finish,
     }
-    
+
+'''
+standup_send_v1 takes in the token of a user, the channel_id and the message the user wants
+to send into the standup. Firstly, security checks are performed, e.g. if the length of str
+is over 1000 characters. Next, the message is altered to add the users handle to the front -
+identified by looping through the account data database structure - then this is appended into 
+the standupList["messages"] key for further manipulation once the standup finishes.
+
+Arguments:
+    token (string) - User's Authorisation Hash
+    channel_id (integer) - Channel Id
+    message (string) - message user wants to send
+
+Exceptions:
+    AccessError - when the token is not valid
+    InputError - When the channel id is not valid
+    AccessError - User is not authorised to perform the standup (i.e. not in the channel)
+    InputError - When the length of the string is greater than 1000 characters
+    InputError - When there is no standup to send into
+
+Returns:
+    {}
+'''
 def standup_send_v1(token, channel_id, message):
 
     auth_user_id = get_user_id_from_token(token)
