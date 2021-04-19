@@ -168,7 +168,7 @@ def test_http_dm_invite_working():
     dmList = requests.get(config.url + funcURL + "?" + qData)
     dmListR = json.loads(dmList.text)
     
-    assert dmListR == {"dms": [{"dm_id": 0, "dm_name": "namefirstnamelast,namefirstnamelast0"}]}
+    assert dmListR == {"dms": [{"dm_id": 0, "name": "namefirstnamelast,namefirstnamelast0"}]}
 
 def test_http_dm_invite_invalid_dmid():
     requests.delete(config.url + "clear/v1")
@@ -394,8 +394,8 @@ def test_http_dm_list_working():
     qData = urllib.parse.urlencode(inputData)
     dmList = requests.get(config.url + funcURL + "?" + qData)
     dmListR = json.loads(dmList.text)
-    assert dmListR == {"dms": [{"dm_id": 0, "dm_name": "namefirstnamelast,namefirstnamelast0"},
-     {"dm_id": 1, "dm_name": "namefirstnamelast,namefirstnamelast1"}]}
+    assert dmListR == {"dms": [{"dm_id": 0, "name": "namefirstnamelast,namefirstnamelast0"},
+     {"dm_id": 1, "name": "namefirstnamelast,namefirstnamelast1"}]}
 
 def test_http_dm_list_invalid_token():
     requests.delete(config.url + "clear/v1")
