@@ -3,7 +3,7 @@ from src.error import InputError, AccessError
 import src.database as database
 from src.channels import channels_create_v2
 from src.auth import auth_register_v2
-from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner, inviteNotification, getUserProfileData
+from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner, inviteNotification, checkDreamowner, getUserProfileData
 
 '''
 channel_invite_v2 takes in a token, a channel_id integer and u_id integer. 
@@ -367,6 +367,8 @@ Return Value:
 def channel_addowner_v1(token, channel_id, u_id):
 
     auth_user_id = get_user_id_from_token(token)
+
+    DreamOwner = checkDreamowner(auth_user_id)
     
     # If u_id is valid
     if valid_userid(u_id) is False:
@@ -385,7 +387,7 @@ def channel_addowner_v1(token, channel_id, u_id):
         raise InputError(description="Error: Already Owner")
 
     # If the token is not an owner / also checks if they're in channel
-    if checkOwner(auth_user_id, channel_id) is False:
+    if checkOwner(auth_user_id, channel_id) is False and DreamOwner is False:
         raise AccessError(description="Error: Not an owner")
     
     for counter in database.data["channelList"]:
@@ -419,6 +421,8 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     auth_user_id = get_user_id_from_token(token)
 
+    DreamOwner = checkDreamowner(auth_user_id)
+
     # If u_id is valid
     if valid_userid(u_id) is False:
         raise InputError(description="Error: Invalid user id")
@@ -438,7 +442,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
                 raise InputError(description="Error: Only one owner")
 
     # If the token is not an owner
-    if checkOwner(auth_user_id, channel_id) is False:
+    if checkOwner(auth_user_id, channel_id) is False and DreamOwner is False:
         raise InputError(description="Error: Token is Not Owner")
 
     # Main Implemenation
