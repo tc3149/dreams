@@ -656,7 +656,6 @@ def test_without_optional_message_dm():
 def test_no_channel_or_dm_specified ():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
 
     og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
