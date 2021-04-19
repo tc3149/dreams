@@ -466,7 +466,7 @@ def testremove_dream_owner():
         assert msg["message"] == ""
         assert msg["u_id"] == user2["auth_user_id"]    
 
-'''
+
 # MESSAGE SENDDM TESTING ------------------------------------------------------------------------
 
 # Empty Message
@@ -1600,4 +1600,3 @@ def testunpin_dream_owner():
         if msg["u_id"] is user2["auth_user_id"]:
             assert msg["is_pinned"] == False
     
-'''
