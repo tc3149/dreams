@@ -385,7 +385,7 @@ def testremove_not_in_dm_anymore():
 
 
 # valid test of removing in  channel
-def testremove_valid_case_channel():
+def test_remove_valid_case_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -401,25 +401,17 @@ def testremove_valid_case_channel():
     message_remove_v1(user2["token"], m_id)
     messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
-    for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
-        assert msg["message"] == ""
-        assert msg["u_id"] == user1["auth_user_id"]
-
+    assert messages1 == {'end': -1, 'messages': [], 'start': 0}
     message_info2 = message_send_v2(user3["token"], channel["channel_id"], "lol")  
     m_id2 = message_info2.get("message_id")
 
     message_remove_v1(user3["token"], m_id2)
     messages2 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
-    for msg in messages2["messages"]:
-        if msg["u_id"] == user3["auth_user_id"]:
-            assert msg["message_id"] == 2
-            assert msg["message"] == ""
-
+    assert messages2 == {'end': -1, 'messages': [], 'start': 0}
 
 # a valid case in DM
-def testremove_valid_case_in_DM():
+def test_remove_valid_case_in_DM():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -431,14 +423,10 @@ def testremove_valid_case_in_DM():
 
     messages1 = dm_messages_v1(user["token"], dm["dm_id"], 0)
 
-    for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
-        assert msg["message"] == ''
-        assert msg["u_id"] == user2["auth_user_id"]
-
+    assert messages1 == {'end': -1, 'messages': [], 'start': 0}
 
 # Comprehensive Testing Case
-def testremove_comprehensive():
+def test_remove_comprehensive():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -450,14 +438,10 @@ def testremove_comprehensive():
 
     messages1 = channel_messages_v2(user2["token"], channel["channel_id"], 0)
 
-    for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
-        assert msg["message"] == ""
-        assert msg["u_id"] == user2["auth_user_id"]    
-
+    assert messages1 == {'end': -1, 'messages': [], 'start': 0}
 
 # Dream Owner Removing
-def testremove_dream_owner():
+def test_remove_dream_owner():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -474,16 +458,12 @@ def testremove_dream_owner():
 
     messages1 = channel_messages_v2(user2["token"], channel["channel_id"], 0)
 
-    for msg in messages1["messages"]:
-        assert msg["message_id"] == 1
-        assert msg["message"] == ""
-        assert msg["u_id"] == user2["auth_user_id"]    
-
+    assert messages1 == {'end': -1, 'messages': [], 'start': 0}
 
 # MESSAGE SENDDM TESTING ------------------------------------------------------------------------
 
 # Empty Message
-def testsenddm_empty_message():
+def test_senddm_empty_message():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -505,7 +485,7 @@ def testsenddm_long_message():
         message_senddm_v1(user["token"], dm["dm_id"], temp)
 
 # invalid token ID
-def testsenddm_invalid_token():
+def test_senddm_invalid_token():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
@@ -518,7 +498,7 @@ def testsenddm_invalid_token():
 
 
 # invalid dm_ID
-def testsenddm_invalid_dm_ID():
+def test_senddm_invalid_dm_ID():
     clear_v1()
     user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
