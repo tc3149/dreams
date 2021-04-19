@@ -3,6 +3,21 @@ from src.error import InputError, AccessError
 import src.database as database
 from src.utils import get_user_id_from_token, make_dm_name, valid_userid, valid_dmid
 
+
+
+'''
+Arguments:
+    token (string)      - jwt encrypted session id
+    u_id (int)          - user id
+
+Exceptions:
+    InputError - Occurs when u_id is not a valid user
+    InputError - Occurs when user is currently the only owner
+    AccessError - Occurs when auth user is not owner
+
+Return Value:
+    {}  - empty dictionary
+'''
 def admin_user_remove_v1(token, u_id):
     #get auth_user_id 
     auth_user_id = get_user_id_from_token(token)
@@ -54,7 +69,19 @@ def admin_user_remove_v1(token, u_id):
 
     return{}
 
+'''
+Arguments:
+    token (string)         - jwt encrypted session id
+    u_id (int)             - user id 
+    permission_id (int)    - permission status to set user id to
 
+Exceptions:
+    InputError - Occurs when u_id is not a valid user
+    InputError - Occurs when permissioin is is not a valid permission
+    AccessError - Occurs when auth_user is not owner
+Return Value:
+    {}  - empty dictionary
+'''
 def admin_userpermission_change_v1(token, u_id, permission_id):
     #get auth_user_id
     auth_user_id = get_user_id_from_token(token)
