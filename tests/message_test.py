@@ -151,21 +151,95 @@ def testedit_notedited_by_owner():
         message_edit_v2(user2["token"], m_id, 'Russell Westbrook')
 
 
-# a valid test
-def testedit_valid_case():
+# original poster not in channel but edits
+def testedit_not_in_channel_anymore():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user2["token"], channel["channel_id"], "Thomas Qiu")
+    channel_leave_v1(user2["token"], channel["channel_id"])
+
+    with pytest.raises(AccessError):
+        message_edit_v2(user2["token"], message1["message_id"], "Let me edit!")
+
+# original poster not in dm but edits
+def testedit_not_in_dm_anymore():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"], user3["auth_user_id"]])
+
+    m_id = message_senddm_v1(user2["token"], dm["dm_id"], "LMFAO LMBAO")
+
+    dm_leave_v1(user2["token"], dm["dm_id"])
+
+    with pytest.raises(AccessError):
+            message_edit_v2(user2["token"], m_id["message_id"], "Let me edit!")
+
+# a valid test in channel
+def testedit_valid_case_in_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
     channel = channels_create_v2(user1["token"], "testchannel", True)
-    message_info = message_send_v2(user1["token"], channel["channel_id"], "lol")  
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    message_info = message_send_v2(user2["token"], channel["channel_id"], "lol")  
     m_id = message_info.get("message_id")
-    message_edit_v2(user1["token"], m_id, "lmfao")
+    message_edit_v2(user2["token"], m_id, "lmfao")
     messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
     for msg in messages1["messages"]:
         assert msg["message_id"] == 1
         assert msg["message"] == 'lmfao'
-        assert msg["u_id"] == user1["auth_user_id"]
+        assert msg["u_id"] == user2["auth_user_id"]
 
+
+# another valid
+def testedit_valid2():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
+    channel = channels_create_v2(user2["token"], "testchannel", True)
+    channel_join_v2(user1["token"], channel["channel_id"])
+
+    message_info2 = message_send_v2(user1["token"], channel["channel_id"], "lol")  
+    message_edit_v2(user2["token"], message_info2["message_id"], "okay i edit now")
+
+    messages1_later = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+
+    for msg in messages1_later["messages"]:
+        if msg["u_id"] == user1["auth_user_id"]:
+            assert msg["message_id"] == 1
+            assert msg["message"] == "okay i edit now"
+
+
+
+
+# a valid case in DM
+def testedit_valid_case_in_DM():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user3["token"], [user["auth_user_id"], user2["auth_user_id"]])
+    
+    m_id = message_senddm_v1(user2["token"], dm["dm_id"], "LMFAO LMBAO")
+    message_edit_v2(user3["token"], m_id["message_id"], "hookay bro")
+
+    messages1 = dm_messages_v1(user["token"], dm["dm_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == 'hookay bro'
+        assert msg["u_id"] == user2["auth_user_id"]
+    
 
 # more in depth
 def testedit_indepth_validtesting():
@@ -203,6 +277,29 @@ def testedit_empty_message():
         assert msg["message"] == ''
         assert msg["u_id"] == user["auth_user_id"]
 
+
+# Dream Owner Editing
+def testedit_dream_owner():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    
+    channel = channels_create_v2(user2["token"], "testchannel", True)
+    channel_join_v2(user3["token"], channel["channel_id"])
+    channel_join_v2(user["token"], channel["channel_id"])
+
+    message_info = message_send_v2(user2["token"], channel["channel_id"], "lol")
+    m_id = message_info.get("message_id")
+
+    message_edit_v2(user["token"], m_id, "RUSSELL WESTBROOK MVP")
+
+    messages1 = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == "RUSSELL WESTBROOK MVP"
+        assert msg["u_id"] == user2["auth_user_id"]    
 
 
 # MESSAGE REMOVE TESTING ------------------------------------------------------------------
@@ -257,20 +354,87 @@ def testremove_not_authorised():
     with pytest.raises(AccessError):
         message_remove_v1(user2["token"], m_id)
 
-# valid test of removing
-def testremove_valid_case():
+# original poster not in channel but removes
+def testremove_not_in_channel_anymore():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user["token"], "testchannel", True)
+    channel_join_v2(user2["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user2["token"], channel["channel_id"], "Thomas Qiu")
+    channel_leave_v1(user2["token"], channel["channel_id"])
+
+    with pytest.raises(AccessError):
+        message_remove_v1(user2["token"], message1["message_id"])
+
+# original poster not in dm but remove
+def testremove_not_in_dm_anymore():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user["token"], [user2["auth_user_id"], user3["auth_user_id"]])
+
+    m_id = message_senddm_v1(user2["token"], dm["dm_id"], "LMFAO LMBAO")
+
+    dm_leave_v1(user2["token"], dm["dm_id"])
+
+    with pytest.raises(AccessError):
+        message_remove_v1(user2["token"], m_id["message_id"])
+
+
+# valid test of removing in  channel
+def testremove_valid_case_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v2(user1["token"], "testchannel", True)
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+
+    channel = channels_create_v2(user2["token"], "testchannel", True)
+    channel_join_v2(user1["token"], channel["channel_id"])
+    channel_join_v2(user3["token"], channel["channel_id"])
+
     message_info = message_send_v2(user1["token"], channel["channel_id"], "lol")  
     m_id = message_info.get("message_id")
-    message_remove_v1(user1["token"], m_id)
+
+    message_remove_v1(user2["token"], m_id)
     messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
     for msg in messages1["messages"]:
         assert msg["message_id"] == 1
         assert msg["message"] == ""
         assert msg["u_id"] == user1["auth_user_id"]
+
+    message_info2 = message_send_v2(user3["token"], channel["channel_id"], "lol")  
+    m_id2 = message_info2.get("message_id")
+
+    message_remove_v1(user3["token"], m_id2)
+    messages2 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+
+    for msg in messages2["messages"]:
+        if msg["u_id"] == user3["auth_user_id"]:
+            assert msg["message_id"] == 2
+            assert msg["message"] == ""
+
+
+# a valid case in DM
+def testremove_valid_case_in_DM():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user3["token"], [user2["auth_user_id"], user["auth_user_id"]])
+    
+    m_id = message_senddm_v1(user2["token"], dm["dm_id"], "LMFAO LMBAO")
+    message_remove_v1(user3["token"], m_id["message_id"])
+
+    messages1 = dm_messages_v1(user["token"], dm["dm_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == ''
+        assert msg["u_id"] == user2["auth_user_id"]
 
 
 # Comprehensive Testing Case
@@ -291,6 +455,29 @@ def testremove_comprehensive():
         assert msg["message"] == ""
         assert msg["u_id"] == user2["auth_user_id"]    
 
+
+# Dream Owner Removing
+def testremove_dream_owner():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    
+    channel = channels_create_v2(user2["token"], "testchannel", True)
+    channel_join_v2(user3["token"], channel["channel_id"])
+    channel_join_v2(user["token"], channel["channel_id"])
+
+    message_info = message_send_v2(user2["token"], channel["channel_id"], "lol")
+    m_id = message_info.get("message_id")
+
+    message_remove_v1(user["token"], m_id)
+
+    messages1 = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 1
+        assert msg["message"] == ""
+        assert msg["u_id"] == user2["auth_user_id"]    
 
 
 # MESSAGE SENDDM TESTING ------------------------------------------------------------------------
@@ -486,6 +673,7 @@ def test_without_optional_message_dm():
     assert messages1["messages"][0]["message_id"] == 2
     assert messages1["messages"][0]["message"] == '\n\n"""\nThis is a message\n"""'
     assert messages1["messages"][0]["u_id"] == user1["auth_user_id"]
+
 
 
 # MESSAGE SEND LATER TESTING -------------------------------------------------------
@@ -1062,7 +1250,6 @@ def testunreact_valid_case_dm():
 
 
 
-
 # MESSAGE PIN TESTING -----------------
 
 # Invalid Token
@@ -1199,6 +1386,28 @@ def testpin_valid_dm():
         if msg["u_id"] is user2["auth_user_id"]:
             assert msg["is_pinned"] == True
 
+
+# Dream Owner Check
+def testpin_dream_owner():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+
+    channel = channels_create_v2(user2["token"], "testchannel", True)
+    channel_join_v2(user3["token"], channel["channel_id"])
+    channel_join_v2(user["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user2["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user["token"], m_id)
+    
+    message_info = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == True
 
 
 
@@ -1372,3 +1581,35 @@ def testunpin_valid_dm():
     for msg in message_info_later["messages"]:
         if msg["u_id"] is user2["auth_user_id"]:
             assert msg["is_pinned"] == False
+
+
+# Dream Owner Check
+def testunpin_dream_owner():
+    clear_v1()
+    user = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+
+    channel = channels_create_v2(user2["token"], "testchannel", True)
+    channel_join_v2(user3["token"], channel["channel_id"])
+    channel_join_v2(user["token"], channel["channel_id"])
+
+    message1 = message_send_v2(user2["token"], channel["channel_id"], "Thomas Qiu")
+    m_id = message1.get('message_id')
+
+    message_pin_v1(user2["token"], m_id)
+    
+    message_info = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in message_info["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == True
+
+    message_unpin_v1(user["token"], m_id)
+
+    message_info_later = channel_messages_v2(user2["token"], channel["channel_id"], 0)
+
+    for msg in message_info_later["messages"]:
+        if msg["u_id"] is user2["auth_user_id"]:
+            assert msg["is_pinned"] == False
+    

@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.utils import valid_userid, valid_dmid, check_useralreadyindm, valid_channelid, check_useralreadyinchannel, check_messageid, get_user_id_from_token, getchannelID, checkOwner
-from src.utils import check_messageid_in_DM, getdmID, checkOwnerinDM, checkTags, message_send_sendlater_channel, message_send_sendlater_dm
+from src.utils import check_messageid_in_DM, getdmID, checkOwnerinDM, checkTags, message_send_sendlater_channel, message_send_sendlater_dm, checkDreamowner
 import src.database as database
 from datetime import datetime
 from threading import Timer
@@ -112,16 +112,45 @@ def message_remove_v1(token, message_id):
     
     u_id = get_user_id_from_token(token)
 
-    if check_messageid(message_id) is True:
+    DreamOwner = checkDreamowner(u_id)
+
+    in_channel = check_messageid(message_id)
+    in_dm = check_messageid_in_DM(message_id)
+
+    if in_channel and in_dm is True:
         raise InputError(description="Error: Invalid message ID")
 
-    channel_id = getchannelID(message_id)
+    if in_channel is False:
+        channel_id = getchannelID(message_id)
 
-    for channel in database.data["channelList"]:
+        if check_useralreadyinchannel(u_id, channel_id) is False:
+            raise AccessError(description="Error: User is not in channel")
+
+        address = database.data["channelList"]
+
+    elif in_dm is False:
+        dm_id = getdmID(message_id)
+
+        if check_useralreadyindm(u_id, dm_id) is False:
+            raise AccessError(description="Error: User is not in dm")
+
+        address = database.data["dmList"]
+
+    for channel in address:
         for messages1 in channel["messages"]:
             if messages1["message_id"] == message_id:
-                if checkOwner(u_id, channel_id) is True or messages1["u_id"] == u_id:
+                if DreamOwner is True:
                     messages1["message"] = ""
+
+                elif in_channel is False and checkOwner(u_id, channel_id) is True:
+                    messages1["message"] = ""
+                
+                elif in_dm is False and checkOwnerinDM(u_id, dm_id) is True:
+                    messages1["message"] = ""
+
+                elif messages1["u_id"] == u_id:
+                    messages1["message"] = ""
+
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
     
@@ -161,22 +190,48 @@ def message_edit_v2(token, message_id, message):
 
     u_id = get_user_id_from_token(token)
 
-    if check_messageid(message_id) is True:
+    DreamOwner = checkDreamowner(u_id)
+
+    in_channel = check_messageid(message_id)
+    in_dm = check_messageid_in_DM(message_id)
+
+    if in_channel and in_dm is True:
         raise InputError(description="Error: Invalid message ID")
+
+
+    if in_channel is False:
+        channel_id = getchannelID(message_id)
+
+        if check_useralreadyinchannel(u_id, channel_id) is False:
+            raise AccessError(description="Error: User is not in channel")
+
+        address = database.data["channelList"]
+
+    elif in_dm is False:
+        dm_id = getdmID(message_id)
+
+        if check_useralreadyindm(u_id, dm_id) is False:
+            raise AccessError(description="Error: User is not in dm")
+
+        address = database.data["dmList"]
 
 
     if not message:
         message_remove_v1(token, message_id)
 
     else: 
-        channel_id = getchannelID(message_id)
-
-        for channels1 in database.data["channelList"]:
+        for channels1 in address:
             for message_info in channels1.get('messages'):
                 if message_info.get("message_id") is message_id:
-                    if checkOwner(u_id, channel_id):
+                    if DreamOwner is True:
+                        message_info["message"] = message
+
+                    elif in_channel is False and checkOwner(u_id, channel_id) is True:
                         message_info["message"] = message
                     
+                    elif in_dm is False and checkOwnerinDM(u_id, dm_id) is True:
+                        message_info["message"] = message
+
                     elif message_info.get("u_id") is u_id:
                         message_info["message"] = message
                     
@@ -664,6 +719,8 @@ Return Value:
 def message_pin_v1(token, message_id):
     u_id = get_user_id_from_token(token)
 
+    DreamOwner = checkDreamowner(u_id)
+
     in_channel = check_messageid(message_id)
     in_dm = check_messageid_in_DM(message_id)
 
@@ -677,7 +734,7 @@ def message_pin_v1(token, message_id):
         if check_useralreadyinchannel(u_id, channel_id) is False:
             raise AccessError(description="Error: User is not in channel")
 
-        if checkOwner(u_id, channel_id) is False:
+        if checkOwner(u_id, channel_id) is False and DreamOwner is False:
             raise AccessError(description="Error: User is not authorised to do so")
 
         address = database.data["channelList"]
@@ -689,7 +746,7 @@ def message_pin_v1(token, message_id):
         if check_useralreadyindm(u_id, dm_id) is False:
             raise AccessError(description="Error: User is not in DM")
 
-        if checkOwnerinDM(u_id, dm_id) is False:
+        if checkOwnerinDM(u_id, dm_id) is False and DreamOwner is False:
             raise AccessError(description="Error: User is not authorised to do so")
 
         address = database.data["dmList"]
@@ -739,6 +796,8 @@ Return Value:
 def message_unpin_v1(token, message_id):
     u_id = get_user_id_from_token(token)
 
+    DreamOwner = checkDreamowner(u_id)
+
     in_channel = check_messageid(message_id)
     in_dm = check_messageid_in_DM(message_id)
 
@@ -752,7 +811,7 @@ def message_unpin_v1(token, message_id):
         if check_useralreadyinchannel(u_id, channel_id) is False:
             raise AccessError(description="Error: User is not in channel")
 
-        if checkOwner(u_id, channel_id) is False:
+        if checkOwner(u_id, channel_id) is False and DreamOwner is False:
             raise AccessError(description="Error: User is not authorised to do so")
 
         address = database.data["channelList"]
@@ -763,7 +822,7 @@ def message_unpin_v1(token, message_id):
         if check_useralreadyindm(u_id, dm_id) is False:
             raise AccessError(description="Error: User is not in DM")
 
-        if checkOwnerinDM(u_id, dm_id) is False:
+        if checkOwnerinDM(u_id, dm_id) is False and DreamOwner is False:
             raise AccessError(description="Error: User is not authorised to do so")
         
         address = database.data["dmList"]
