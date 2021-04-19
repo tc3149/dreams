@@ -81,7 +81,7 @@ def test_http_standup_invalid():
         "channel_id": channelR["channel_id"],
         "length": 2,
     }
-    standup = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
     # Try to start a standup when there is already an active standup
     funcURL = "standup/start/v1"
     inputData = {
@@ -128,7 +128,7 @@ def test_http_standup_active_working():
         "channel_id": channelR["channel_id"],
         "length": 2,
     }
-    standup = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     # Standup Active
     funcURL = "standup/active/v1"
@@ -175,7 +175,7 @@ def test_http_standup_active_invalid():
         "channel_id": channelR["channel_id"],
         "length": 2,
     }
-    standup = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     invalid_channelId = 500
     # Standup Active
@@ -216,7 +216,7 @@ def test_http_standup_send_working():
         "name_last": "Smith",
     }
     user2 = requests.post(config.url + funcURL, json=inputData)
-    user2R = json.loads(user.text)
+    user2R = json.loads(user2.text)
 
     # Channel Create -------
     funcURL = "channels/create/v2"
@@ -234,7 +234,7 @@ def test_http_standup_send_working():
         "token": user2R["token"],
         "channel_id": channelR["channel_id"],
     }
-    join = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     # Start the standup in the channel
     # Standup Start -------
@@ -245,7 +245,7 @@ def test_http_standup_send_working():
         "length": 2,
     }
     standup = requests.post(config.url + funcURL, json=inputData)
-    standupR = json.loads(standup.text)
+    _ = json.loads(standup.text)
 
     # If it is not none therefore a time has been generated for the standup
     # I.e. it is existing
@@ -259,7 +259,7 @@ def test_http_standup_send_working():
         "message": "Hello World",
     }
     standupSend = requests.post(config.url + funcURL, json=inputData)
-    standupSendR = json.loads(standupSend.text)
+    _ = json.loads(standupSend.text)
 
     # Message Send -------
     funcURL = "standup/send/v1"
@@ -270,7 +270,7 @@ def test_http_standup_send_working():
         "message": "This is awesome",
     }
     standupSend2 = requests.post(config.url + funcURL, json=inputData)
-    standupSend2R = json.loads(standupSend2.text)
+    _ = json.loads(standupSend2.text)
 
     time.sleep(3)
 
@@ -285,7 +285,7 @@ def test_http_standup_send_working():
     channelMessages = requests.get(config.url + funcURL + "?" + qData)
     channelMessagesR = json.loads(channelMessages.text)
 
-    assert channelMessagesR["messages"][0]["message"] == "namefirstnamelast: Hello World\nnamefirstnamelast: This is awesome"
+    assert channelMessagesR["messages"][0]["message"] == "namefirstnamelast: Hello World\nhaydensmith: This is awesome"
 
 def test_http_standup_send_invalid():
 
@@ -311,7 +311,7 @@ def test_http_standup_send_invalid():
         "name_last": "Smith",
     }
     user2 = requests.post(config.url + funcURL, json=inputData)
-    user2R = json.loads(user.text)
+    user2R = json.loads(user2.text)
 
     # Channel Create -------
     funcURL = "channels/create/v2"
@@ -329,7 +329,7 @@ def test_http_standup_send_invalid():
         "token": user2R["token"],
         "channel_id": channelR["channel_id"],
     }
-    join = requests.post(config.url + funcURL, json=inputData)
+    _ = requests.post(config.url + funcURL, json=inputData)
 
     # Start the standup in the channel
     # Standup Start -------
@@ -340,7 +340,7 @@ def test_http_standup_send_invalid():
         "length": 2,
     }
     standup = requests.post(config.url + funcURL, json=inputData)
-    standupR = json.loads(standup.text)
+    _ = json.loads(standup.text)
 
     # If it is not none therefore a time has been generated for the standup
     # I.e. it is existing
