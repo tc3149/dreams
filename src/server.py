@@ -18,6 +18,7 @@ from src.channel import channel_messages_v2, channel_join_v2, channel_leave_v1, 
 from src.dm import dm_leave_v1, dm_remove_v1, dm_messages_v1, dm_create_v1, dm_list_v1, dm_invite_v1, dm_details_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.notifications import notifications_get_v1
+from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
 
 
 def defaultHandler(err):
@@ -449,6 +450,34 @@ def uploadImage(filename):
 @APP.before_first_request
 def getURL():
     config.url = request.url_root
+
+# #############################################################################
+#                                                                             #
+#                           STANDUP FUNCTIONS                                 #
+#                                                                             #
+# #############################################################################
+
+@APP.route("/standup/start/v1", methods=["POST"])
+def standupStart():
+    inputData = request.get_json()
+    returnData = standup_start_v1(inputData["token"], inputData["channel_id"], inputData["length"])
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/standup/active/v1", methods=["GET"])
+def standupActive():
+    inputToken = request.args.get("token")
+    inputchannelID = int(request.args.get("channel_id"))
+    returnData = standup_active_v1(inputToken, inputChannelID)
+    saveData()
+    return dumps(returnData)
+
+@APP.route("/standup/send/v1", methods=["POST"])
+def standupSend():
+    inputData = request.get_json()
+    returnData = standup_send_v1(inputData["token"], inputData["channel_id"], inputData["message"])
+    saveData()
+    return dumps(returnData)
 
 # ########################################################################
 
