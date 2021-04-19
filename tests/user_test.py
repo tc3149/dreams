@@ -341,11 +341,11 @@ def test_users_stats_channel_dm():
 # /////////////////////////////////////////////////////////////////////////////////////////////  
 # user_profile_uploadphoto_v1 TESTS
 # Test requires http connection
-'''
+
 def test_user_profile_uploadphoto_working():
     clear_v1()
     user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
-    profileURL = "https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg"
+    profileURL = "http://personal.psu.edu/xqz5228/jpg.jpg"
     user1Profile = user_profile_v2(user1["token"], user1["auth_user_id"])
 
     expectedOutput = {
@@ -357,7 +357,7 @@ def test_user_profile_uploadphoto_working():
         "profile_img_url": config.url + "static/default.jpg"
     }
     assert user1Profile["user"] == expectedOutput
-    _ = user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 500, 500)
+    _ = user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 300, 300)
 
     expectedOutput = {
         "u_id": user1["auth_user_id"],
@@ -368,4 +368,20 @@ def test_user_profile_uploadphoto_working():
         "profile_img_url": user1Profile["user"]["profile_img_url"],
     }
     assert user1Profile["user"] == expectedOutput
-'''
+
+def test_user_profile_uploadphoto_crop_out_of_bounds():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    profileURL = "http://personal.psu.edu/xqz5228/jpg.jpg"
+
+    with pytest.raises(InputError):
+        user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 1000, 1000)
+
+def test_user_profile_uploadphoto_not_jpg():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    profileURL = "https://preview.redd.it/an871k4o1sn51.png?width=440&format=png&auto=webp&s=85dcd6cb73b8760802e254ee14dfa3c7ab444591"
+
+    with pytest.raises(InputError):
+        user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 50, 50)
+    clear_v1()

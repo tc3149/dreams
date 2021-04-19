@@ -210,6 +210,15 @@ def dm_messages_v1(token, dm_id, start):
     if authorisation is False:
         raise AccessError(description="User is not in dm")
 
+    for dm in database.data["dmList"]:
+        if dm["id"] == dm_id:
+            for message in dm["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
+
     # Return Function
     for dm in database.data["dmList"]:
         if dm["id"] is dm_id:

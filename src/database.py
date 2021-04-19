@@ -47,6 +47,7 @@ data = {
     "dmList": [],
     "resetdataList": [],
     "userProfiles": [],
+    "standupList": [],
 }
 
 idData = {

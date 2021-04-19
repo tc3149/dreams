@@ -231,6 +231,15 @@ def channel_messages_v2(token, channel_id, start):
     if authorisation is False:
         raise AccessError(description="User is not in channel")
 
+    for channel in database.data["channelList"]:
+        if channel["id"] == channel_id:
+            for message in channel["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
+
     # Return Function
     for channel in database.data["channelList"]:
         if channel["id"] is channel_id:

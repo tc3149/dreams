@@ -39,6 +39,7 @@ def clear_v1():
     database.data["message_ids"].clear()
     database.data["dmList"].clear()
     database.data["userProfiles"].clear()
+    database.data["standupList"].clear()
     database.dreamsAnalytics["channels_exist"].clear()
     database.dreamsAnalytics["dms_exist"].clear()
     database.dreamsAnalytics["messages_exist"].clear()
@@ -80,6 +81,23 @@ def search_v1(token, query_str):
     if len(query_str) > 1000:
         raise InputError(description="Error: Query string is above 1000 characters")
 
+    for channel in database.data["channelList"]:
+        if auth_user_id in channel["member_ids"]:
+            for message in channel["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
+    
+    for dm in database.data["dmList"]:
+        if auth_user_id in dm["member_ids"]:
+            for message in dm["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
     # Store every message in channels/dms that the user is a part of
     message_list = []
     for channel in database.data["channelList"]:
