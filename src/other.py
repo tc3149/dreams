@@ -39,6 +39,7 @@ def clear_v1():
     database.data["message_ids"].clear()
     database.data["dmList"].clear()
     database.data["userProfiles"].clear()
+    database.data["standupList"].clear()
     database.dreamsAnalytics["channels_exist"].clear()
     database.dreamsAnalytics["dms_exist"].clear()
     database.dreamsAnalytics["messages_exist"].clear()

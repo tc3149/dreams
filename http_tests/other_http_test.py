@@ -73,6 +73,7 @@ def test_http_clear_channel():
         "dmList": [],
         "resetdataList": [],
         "userProfiles": [],
+        "standupList": [],
     }
 
 def test_http_clear_dm():
@@ -126,6 +127,7 @@ def test_http_clear_dm():
         "dmList": [],
         "resetdataList": [],
         "userProfiles": [],
+        "standupList": [],
     }
 
 # SEARCH TEST #################################################
