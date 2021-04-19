@@ -653,7 +653,106 @@ def test_without_optional_message_dm():
     assert messages1["messages"][0]["message_id"] == 2
     assert messages1["messages"][0]["message"] == '\n\n"""\nThis is a message\n"""'
     assert messages1["messages"][0]["u_id"] == user1["auth_user_id"]
+def test_no_channel_or_dm_specified ():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
 
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
+    message = ""
+    channel_id = -1
+    dm_id = -1
+    with pytest.raises(InputError):
+        message_share_v1(user1["token"],og_message_id,message,channel_id,dm_id)
+
+def test_final_message_too_long_channel():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    channel2 = channels_create_v2(user1["token"], "testchannel2", True)
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],'x')
+    message = 'x' * 1000
+    dm_id = -1
+    
+    with pytest.raises(InputError):
+        message_share_v1(user1["token"], og_message_id["message_id"], message,channel2['channel_id'], dm_id)
+
+def test_final_message_too_long_dm ():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+
+    og_message_id = message_send_v2(user1["token"],channel['channel_id'],"x")
+    message = 'x' * 1000
+    channel_id = -1
+
+    with pytest.raises(InputError):
+        message_share_v1(user1["token"],og_message_id["message_id"],message,channel_id,dm["dm_id"])
+
+def test_final_message_is_empty_channel ():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+    og_message_id = 3
+    message = ''
+    dm_id = -1
+    
+    with pytest.raises(InputError):
+        message_share_v1(user1["token"], og_message_id, message,channel['channel_id'], dm_id)
+
+
+def test_final_message_is_empty_dm():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    og_message_id = 3
+    message = ''
+    channel_id = -1
+
+    with pytest.raises(InputError):
+        message_share_v1(user1["token"],og_message_id,message,channel_id,dm["dm_id"])
+
+def test_dm_to_dm():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    dm2 = dm_create_v1(user1["token"], [user3["auth_user_id"]])
+
+    og_message_id = message_senddm_v1(user1["token"],dm['dm_id'],'This is a message')
+    message = ''
+    channel_id = -1
+
+    message_share_v1(user1["token"],og_message_id["message_id"],message,channel_id,dm2["dm_id"])
+    messages1 = dm_messages_v1(user1["token"], dm2["dm_id"], 0)
+
+    assert messages1["messages"][0]["message_id"] == 2
+    assert messages1["messages"][0]["message"] == '\n\n"""\nThis is a message\n"""'
+    assert messages1["messages"][0]["u_id"] == user1["auth_user_id"]
+
+def test_dm_to_channel():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
+    channel = channels_create_v2(user1["token"], "testchannel", True)
+
+    og_message_id = message_senddm_v1(user1["token"],dm['dm_id'],'This is a message')
+    message = ''
+    dm_id = -1
+
+    message_share_v1(user1["token"],og_message_id["message_id"],message,channel['channel_id'],dm_id)
+    messages1 = channel_messages_v2(user1["token"], channel["channel_id"], 0)
+
+    for msg in messages1["messages"]:
+        assert msg["message_id"] == 2
+        assert msg["message"] == '\n\n"""\nThis is a message\n"""'
+        assert msg["u_id"] == user1["auth_user_id"]
 
 
 # MESSAGE SEND LATER TESTING -------------------------------------------------------
