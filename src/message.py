@@ -140,16 +140,16 @@ def message_remove_v1(token, message_id):
         for messages1 in channel["messages"]:
             if messages1["message_id"] == message_id:
                 if DreamOwner is True:
-                    messages1["message"] = ""
+                    channel["messages"].remove(messages1)
 
                 elif in_channel is False and checkOwner(u_id, channel_id) is True:
-                    messages1["message"] = ""
+                    channel["messages"].remove(messages1)
                 
                 elif in_dm is False and checkOwnerinDM(u_id, dm_id) is True:
-                    messages1["message"] = ""
+                    channel["messages"].remove(messages1)
 
                 elif messages1["u_id"] == u_id:
-                    messages1["message"] = ""
+                    channel["messages"].remove(messages1)
 
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
