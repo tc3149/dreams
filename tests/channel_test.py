@@ -86,6 +86,17 @@ def test_join_correct():
     assert check_useralreadyinchannel(user2["auth_user_id"], c_id) == True
     assert check_useralreadyinchannel(user3["auth_user_id"], c_id) == True
 
+
+def test_dream_owner_private():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    channel_info = channels_create_v2(user2.get("token"), "channel1", False)
+    c_id = channel_info["channel_id"]
+    
+    channel_join_v2(user1["token"], c_id)
+    assert check_useralreadyinchannel(user1["auth_user_id"], c_id) == True
+
     
 # FAIL CASES
 
@@ -645,6 +656,23 @@ def test_removeowner_not_authorised_user():
     with pytest.raises(AccessError):
         channel_removeowner_v1(temp, channel1.get("channel_id"), user1["auth_user_id"])
 
+# Testing user not in channel to remove
+def test_removeowner_not_in_channel():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
+    
+    channel1 = channels_create_v2(user1["token"], "channel1", True)
+    channel_join_v2(user2["token"], channel1["channel_id"])
+
+    channel_addowner_v1(user1["token"], channel1["channel_id"], user2["auth_user_id"])
+    channel_leave_v1(user2["token"], channel1["channel_id"])
+
+    with pytest.raises(AccessError):
+        channel_removeowner_v1(user3["token"], channel1["channel_id"], user2["auth_user_id"])
+
+
 
 #Testing token not an owner
 def test_removeowner_token_not_owner():
@@ -659,7 +687,7 @@ def test_removeowner_token_not_owner():
 
     channel_addowner_v1(user1["token"], channel1["channel_id"], user3["auth_user_id"])
 
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_removeowner_v1(user2["token"], channel1.get("channel_id"), user3["auth_user_id"])
 
 

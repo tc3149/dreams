@@ -60,19 +60,20 @@ Meeting minutes - Echo
         Colin: message/sendlater/v1, message/sendlaterdm/v1, message/react/v1, message/unreact/v1, message/pin/v1, message/unpin/v1
         Jonathan: auth/passwordreset/request, auth/passwordreset/reset
         Rodney: user/profile/uploadphoto, user/stats, users/stats
-        Mansirat: 
+        Mansirat: Documentation of the planning of new features
 
     -We then proceeded to fix our iteration 2 by testing our code with the front end. This was achieved through one person discord screensharing and others pair programming to find the issues.
     -After this, we added more test cases to bring our coverage up higher and cleaned up code that was unnecessary.
     -This roughly took around 5 hours 10 minutes.
 
 10/04/2021 - 11/04/2021 (10:00 pm - 2:00 am)
-    -This was our first standup, where we discussed the progress of our code. This took 1 hour and 45 minutes. The meeting followed:
+    -This was our first standup, where we discussed the progress of our code. This took 1 hour and 55 minutes. The meeting followed:
 
         - Thomas had issues with standup as he did not understand. We pair programmed and decided to complete standup/send first (w/ tests) before creating the standup. (~30 minutes)
         - Colin was progressing well, where he finished message/sendlater and message/sendlaterdm. There were issues as to how to return the message ID, but Rodney, Thomas and Jonathan assisted with finding how to. (~15 minutes)
         - Jonathan completed auth/passwordreset/request, but he had trouble thoroughly testing the function out as he did not know how to access the reset code sent to the email. Rodney gave suggestions to fix this. (~40 minutes)
         - Rodney discussed his user functions, where he completed it to a high standard. He explained it clearly for us to understand and proofcheck for any errors. (~20 minutes)
+        - Mansirat progressed well in his documentation where he gave the sample interview questions to us and explained his thought process (~ 10 minutes)
         
     -Afterwards, we pair programmed to help Thomas and Colin's functions, and coded together for the remaining time.
     -Unsolved issues were written into a notepad to ask the tutor next time in the tutor project check-in.
@@ -81,12 +82,13 @@ Meeting minutes - Echo
 
 
 12/04/2021 - 13/04/2021 (11:00 pm - 3:00 am)
-    -This was our second standup where we discussed how our code was progressing. We worked well in iteration 3 and flowed through the functions easier. This took 2 hours. Our meeting followed:
+    -This was our second standup where we discussed how our code was progressing. We worked well in iteration 3 and flowed through the functions easier. This took 2 hours 15 minutes. Our meeting followed:
 
         - Thomas had finished his standup/send and standup/start. He explained it to us and stated he was going to start now with standup/active. We gave ideas on how to complete this function. (~40 minutes)
         - Colin finished all his python coding for the message functions and discussed it with us. He found an error with message_remove to fix it, then started to complete HTTP tests. (~15 minutes)
         - Jonathan completed all his auth functions of auth, where he explained his code to the group. We found an error with retreiving the reset code but was fixed with pair programming. (~25 minutes)
         - Rodney moved onto deploying the backend to the cloud after finishing all the user functions. He also mentioned an error about uploading the photo where we gave suggestions to him on how to fix. This took a while but got there in the end. (~40 minutes)
+        - Mansirat had finished drawing up his diagrams in Google Docs, where he screenshared and we all had a say on where to improve, quality-wise. (15 minutes)
 
     -As we were close to finishing our function codes, we decided for everyone to help do "document the planning of new features" and "analytics".
     -We then pair programmed and coded for the rest of the night, popping questions whenever needed.
@@ -94,15 +96,15 @@ Meeting minutes - Echo
 16/04/2021 - 17/04/2021 (11:30 pm - 3:00 am)
     -This was our third standup where we dissussed our code, cleaning it up and finalising anything. This took 2 hour 15 minutes. Our meeting included:
 
-        - Thomas had finished his standup/active and started working on documenting new features. He interviewed three people outside of our project group and provided insights and ideas on what he's going to write. (~20 minutes)
-        - Colin interviewed two people also, and provided insights into the new features and planning/implemtation of them. (~20 minutes)
+        - Thomas had finished his standup/active and started working on helping in documenting new features. He interviewed another person outside of our project group and provided insights and ideas on what he's going to write. (~20 minutes)
+        - Colin interviewed someone else also, and provided insights into the new features and planning/implemtation of them. (~20 minutes)
         - Jonathan had progressed fairly well in "analytics", as he decided to pair program with Rodney.
         - Together, Rodney and Jonathan discussed their analytics code, and how they implmeneted statistics across all functions. They were 3/4 of the way through. (~1 hour)
         - Rodney had also finished deploying the backend to the cloud, and went through it with the group. Explaning and proofreading his code allowed us to spot any mistakes made, but luckily, there were none. (~ 35 minutes)
 
     -Instead of everyone doing the planning of new features and analytics, we decided to split it up:
 
-        - Thomas and Colin - "document the planning of new features"
+        - Thomas and Colin - help Mansirat in "document the planning of new features"
         - Jonathan and Rodney - "analytics"
 
     -This way, it was more efficient to pair program and finish the two functions concurrently.
@@ -111,7 +113,7 @@ Meeting minutes - Echo
 19/04/2021 - 20/04/2021 (7:00 pm - 4:00 am)
     -Our final standup and meeting as a group :(, we discussed our code in which were finalized and fixed if any mistakes were made. This took 3 hours as it was the final standup. Our meeting included:
 
-        - Thomas and Colin presenting the documentation of the planning of new features. This was explained and read over by the group and any suggestions/input were added onto. (~ 1 hour 30 min)
+        - Mansirat, Thomas and Colin presenting the documentation of the planning of new features. This was explained and read over by the group and any suggestions/input were added onto. (~ 1 hour 30 min)
         - Rodney and Jonathan presented their final additions and cleanups of the "analytics" coding, providing an analysis of how they went to implement it, finishing off adding statistics in the message functions. (~ 1 hour 30 min)
 
     -As it was our final meeting and iteration, we went through each python files and double checked to make sure it was right. This included front end testing also.
