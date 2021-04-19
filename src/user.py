@@ -169,6 +169,24 @@ def users_all_v1(token):
     
     return {"users": database.data["userProfiles"]}
 
+
+'''
+Arguments:
+    token (string)      - jwt encrypted session id
+    img_url (string)    - url of jpg image to be used for user profile photo
+    x_start (int)       - x axis starting crop
+    y_start (int)       - y axis starting crop
+    x_end (int)         - x axis ending crop
+    y_end (int)         - y axis ending crop
+
+Exceptions:
+    InputError - Occurs when img_url does not return success
+    InputError - Occurs when cropping dimensins are out of image bounds
+    InputError - Occurs when image is not a jpg
+
+Return Value:
+    {}  - empty dictionary
+'''
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     userId = get_user_id_from_token(token)
     user = getUserProfileData(userId)
@@ -202,6 +220,23 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     return {}
 
+
+
+'''
+Arguments:
+    token (string)      - jwt encrypted session id
+
+Exceptions:
+    N/A
+
+Return Value:
+    {user_stats}  - Dictionary of shape {
+                     channels_joined: [{num_channels_joined, time_stamp}],
+                     dms_joined: [{num_dms_joined, time_stamp}], 
+                     messages_sent: [{num_messages_sent, time_stamp}], 
+                     involvement_rate 
+                    }
+'''
 def user_stats_v1(token):
     userId = get_user_id_from_token(token)
     funcCallDatetime = int(datetime.timestamp(datetime.now()))
@@ -265,6 +300,23 @@ def user_stats_v1(token):
         "user_stats": database.userAnalytics
     }
 
+
+
+'''
+Arguments:
+    token (string)      - jwt encrypted session id
+
+Exceptions:
+    N/A
+
+Return Value:
+    {dreams_stats}  - Dictionary of shape {
+                     channels_exist: [{num_channels_exist, time_stamp}], 
+                     dms_exist: [{num_dms_exist, time_stamp}], 
+                     messages_exist: [{num_messages_exist, time_stamp}], 
+                     utilization_rate 
+                    }
+'''
 def users_stats_v1(token):
     funcCallDatetime = int(datetime.timestamp(datetime.now()))
 
