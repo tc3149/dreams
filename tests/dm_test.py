@@ -36,7 +36,7 @@ def test_dm_create_multiple_dms():
     test = dm_create_v1(user1["token"], id_list)
     dm = dm_create_v1(user["token"], id_list2)
 
-    assert test == {'dm_id': 0, 'name': 'awolastname, namelastname, onelastname'}
+    assert test == {'dm_id': 0, 'dm_name': 'awolastname, namelastname, onelastname'}
     assert dm == {'dm_id': 1, 'dm_name': 'namelastname, onelastname'}
    
 def test_dm_create_invalid_token():
