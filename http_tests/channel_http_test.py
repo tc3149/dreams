@@ -754,24 +754,23 @@ def testaddowner_valid_case():
     channelDetailsR = json.loads(channelDetails.text)
 
     assert channelDetailsR["owner_members"] == [
-                                            {
-                                                'u_id': userR["auth_user_id"],
-                                                'email': 'test@hotmail.com',
-                                                'name_first': 'nameFirst',
-                                                'name_last': 'nameLast',
-                                                'handle_str': 'namefirstnamelast',
-                                                
-                                            },
-                                            
-                                            {
-                                                'u_id': user2R["auth_user_id"],
-                                                'email': 'test2@hotmail.com',
-                                                'name_first': 'nameFirst',
-                                                'name_last': 'nameLast',
-                                                'handle_str': 'namefirstnamelast0',
-                                                
-                                            }
-                                            ]
+        {
+            'u_id': userR["auth_user_id"],
+            'email': 'test@hotmail.com',
+            'name_first': 'nameFirst',
+            'name_last': 'nameLast',
+            'handle_str': 'namefirstnamelast',
+            'profile_img_url': channelDetailsR["owner_members"][0]["profile_img_url"],
+        },
+        {
+            'u_id': user2R["auth_user_id"],
+            'email': 'test2@hotmail.com',
+            'name_first': 'nameFirst',
+            'name_last': 'nameLast',
+            'handle_str': 'namefirstnamelast0',
+            'profile_img_url': channelDetailsR["owner_members"][1]["profile_img_url"],
+        }
+    ]
 
 #CHANNEL REMOVEOWNER TEST---------------------------------------------------------------------------------------------------------
 def test_http_channel_removeowner_working():

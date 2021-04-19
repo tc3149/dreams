@@ -255,31 +255,32 @@ def test_valid_input ():
 
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel1 = channels_create_v2(user1.get("token"), "testchannel", True)
+    returnData = channel_details_v2(user1["token"], channel1["channel_id"])
 
-    assert channel_details_v2(user1["token"], channel1["channel_id"]) == {
-                                        'name': 'testchannel',
-                                        'is_public': True,
-                                        'owner_members': [
-                                            {
-                                                'u_id': user1["auth_user_id"],
-                                                'email': 'email@gmail.com',
-                                                'name_first': 'Name',
-                                                'name_last': 'Lastname',
-                                                'handle_str': 'namelastname',
-                                                
-                                            }
-                                        ],
-                                        'all_members': [
-                                            {
-                                                'u_id': user1["auth_user_id"],
-                                                'email': 'email@gmail.com',
-                                                'name_first': 'Name',
-                                                'name_last': 'Lastname',
-                                                'handle_str': 'namelastname',
-                                                
-                                            }
-                                        ],
-                                        } 
+    assert  returnData == {
+        'name': 'testchannel',
+        'is_public': True,
+        'owner_members': [
+            {
+                'u_id': user1["auth_user_id"],
+                'email': 'email@gmail.com',
+                'name_first': 'Name',
+                'name_last': 'Lastname',
+                'handle_str': 'namelastname',
+                'profile_img_url': returnData["owner_members"][0]["profile_img_url"],
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': user1["auth_user_id"],
+                'email': 'email@gmail.com',
+                'name_first': 'Name',
+                'name_last': 'Lastname',
+                'handle_str': 'namelastname',
+                'profile_img_url': returnData["owner_members"][0]["profile_img_url"],
+            }
+        ],
+    } 
 
 ''' Cant pass nothing to a function that requires arguments
 def test_empty():
@@ -299,35 +300,39 @@ def test_identical_handles_details():
     channel1 = channels_create_v2(user1.get("token"), "testchannel", True)
     user2 = auth_register_v2("email2@gmail.com", "password2", "Name", "Lastname")
     channel_invite_v2(user1["token"], channel1["channel_id"], user2["auth_user_id"])
-    assert channel_details_v2(user1["token"], channel1["channel_id"]) == {
-                                        'name': 'testchannel',
-                                        'is_public': True,
-                                        'owner_members': [
-                                            {
-                                                'u_id': user1["auth_user_id"],
-                                                'email': 'email@gmail.com',
-                                                'name_first': 'Name',
-                                                'name_last': 'Lastname',
-                                                'handle_str': 'namelastname',                                             
-                                            }
-                                        ],
-                                        'all_members': [
-                                            {
-                                                'u_id': user1["auth_user_id"],
-                                                'email': 'email@gmail.com',
-                                                'name_first': 'Name',
-                                                'name_last': 'Lastname',
-                                                'handle_str': 'namelastname',                                               
-                                            },
-                                            {
-                                                'u_id': user2["auth_user_id"],
-                                                'email':'email2@gmail.com',
-                                                'name_first': 'Name',
-                                                'name_last': 'Lastname',
-                                                'handle_str': 'namelastname0',
-                                            }
-                                        ],
-                                        } 
+    returnData = channel_details_v2(user1["token"], channel1["channel_id"])
+    assert returnData == {
+        'name': 'testchannel',
+        'is_public': True,
+        'owner_members': [
+            {
+                'u_id': user1["auth_user_id"],
+                'email': 'email@gmail.com',
+                'name_first': 'Name',
+                'name_last': 'Lastname',
+                'handle_str': 'namelastname',
+                'profile_img_url': returnData["owner_members"][0]["profile_img_url"],                                        
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': user1["auth_user_id"],
+                'email': 'email@gmail.com',
+                'name_first': 'Name',
+                'name_last': 'Lastname',
+                'handle_str': 'namelastname',
+                'profile_img_url': returnData["all_members"][0]["profile_img_url"],                                            
+            },
+            {
+                'u_id': user2["auth_user_id"],
+                'email':'email2@gmail.com',
+                'name_first': 'Name',
+                'name_last': 'Lastname',
+                'handle_str': 'namelastname0',
+                'profile_img_url': returnData["all_members"][1]["profile_img_url"],
+            }
+        ],
+    } 
 # ------------------------------------------------------------------------------------------------------
 #channel_leave_v1
 def test_channel_leave():

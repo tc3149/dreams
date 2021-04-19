@@ -7,6 +7,13 @@ def admin_user_remove_v1(token, u_id):
     #get auth_user_id 
     auth_user_id = get_user_id_from_token(token)
 
+    #auth_user_id not an owner
+    for user in database.data["accData"]:
+        if user["id"] == auth_user_id:
+            permission_id = user["permission"]
+    if permission_id != 1:
+        raise AccessError(description="User is not an owner")
+
     #user does not exist
     if not valid_userid(u_id):
         # user_id does not exist
@@ -21,13 +28,6 @@ def admin_user_remove_v1(token, u_id):
         
         if ownerCount == 1:
             raise InputError(description='User is currently the only owner of Dreams')
-    
-    #auth_user_id not an owner
-    for user in database.data["accData"]:
-        if user["id"] == auth_user_id:
-            permission_id = user["permission"]
-    if permission_id != 1:
-        raise AccessError(description="User is not an owner")
     
     # Change all user message contents to "Remove User" in channel
     for channel in database.data['channelList']:
@@ -59,6 +59,13 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     #get auth_user_id
     auth_user_id = get_user_id_from_token(token)
 
+    #auth_user_id not an owner
+    for user in database.data["accData"]:
+        if user["id"] == auth_user_id:
+            auth_permission_id = user["permission"]
+    if auth_permission_id != 1:
+        raise AccessError(description='User is not an owner')
+
     #user does not exist
     if not valid_userid(u_id):
         # user_id does not exist
@@ -73,15 +80,8 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         
         if ownerCount == 1:
             raise InputError(description='User is currently the only owner of Dreams')
-    
-    #auth_user_id not an owner
-    for user in database.data["accData"]:
-        if user["id"] == auth_user_id:
-            auth_permission_id = user["permission"]
-    if auth_permission_id != 1:
-        raise AccessError(description='User is not an owner')
 
-    #permission_id is not valid
+    #permission_id is valid
     if permission_id == 1 or permission_id == 2:
         #replace value of key permission_id
         for user in database.data["accData"]:
