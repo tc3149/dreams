@@ -659,8 +659,6 @@ def test_no_channel_or_dm_specified ():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
 
-    dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
-
     og_message_id = message_send_v2(user1["token"],channel['channel_id'],"This is a message")
     message = ""
     channel_id = -1
@@ -699,21 +697,18 @@ def test_final_message_is_empty_channel ():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channel = channels_create_v2(user1["token"], "testchannel", True)
-    channel2 = channels_create_v2(user1["token"], "testchannel2", True)
     og_message_id = 3
     message = ''
     dm_id = -1
     
     with pytest.raises(InputError):
-        message_share_v1(user1["token"], og_message_id, message,channel2['channel_id'], dm_id)
+        message_share_v1(user1["token"], og_message_id, message,channel['channel_id'], dm_id)
 
 
 def test_final_message_is_empty_dm():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    channel = channels_create_v2(user1["token"], "testchannel", True)
-
     dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
     og_message_id = 3
     message = ''
@@ -745,7 +740,6 @@ def test_dm_to_channel():
     clear_v1()
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
-    user3 = auth_register_v2("email3@gmail.com", "password", "Name", "Lastname")
     dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])
     channel = channels_create_v2(user1["token"], "testchannel", True)
 
