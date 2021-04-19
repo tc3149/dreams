@@ -369,3 +369,19 @@ def test_user_profile_uploadphoto_working():
     }
     assert user1Profile["user"] == expectedOutput
 
+def test_user_profile_uploadphoto_crop_out_of_bounds():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    profileURL = "http://personal.psu.edu/xqz5228/jpg.jpg"
+
+    with pytest.raises(InputError):
+        user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 1000, 1000)
+
+def test_user_profile_uploadphoto_not_jpg():
+    clear_v1()
+    user1 = auth_register_v2("testemail@hotmail.com", "password1", "firstName", "lastName")
+    profileURL = "https://preview.redd.it/an871k4o1sn51.png?width=440&format=png&auto=webp&s=85dcd6cb73b8760802e254ee14dfa3c7ab444591"
+
+    with pytest.raises(InputError):
+        user_profile_uploadphoto_v1(user1["token"], profileURL, 0, 0, 50, 50)
+    clear_v1()
