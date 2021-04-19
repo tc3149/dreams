@@ -3,7 +3,7 @@ from src.error import InputError, AccessError
 import src.database as database
 from src.channels import channels_create_v2
 from src.auth import auth_register_v2
-from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner, inviteNotification, checkDreamowner
+from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner, inviteNotification, checkDreamowner, getUserProfileData
 
 '''
 channel_invite_v2 takes in a token, a channel_id integer and u_id integer. 
@@ -61,16 +61,17 @@ def channel_invite_v2(token, channel_id, u_id):
         raise InputError ("Invited user does not exist")
     
     #check if u_id already member of the channel
-    for user2 in database.data["channelList"][channel_id]['member_ids']:
-        if u_id in database.data["channelList"][channel_id]['member_ids']:
-            #u_id is member of channel
-            raise InputError ("User already a member")    
-
-            
+    for channel in database.data["channelList"]:
+        if channel["id"] == channel_id:
+            if u_id in channel["member_ids"]:            
+                #u_id is member of channel
+                raise InputError ("User already a member")    
     
     #add u_id to channel
-    
-    database.data["channelList"][channel_id]['member_ids'].append(u_id)
+    for channel in database.data["channelList"]:
+        if channel["id"] == channel_id:
+            channel["member_ids"].append(u_id)
+
     inviteNotification(channel_id, -1, u_id, auth_user_id)
     
     return {
@@ -144,36 +145,19 @@ def channel_details_v2(token, channel_id):
     
     allMembers = []
     ownMembers = []
-    for memberID in database.data["channelList"][channel_id]['member_ids']:
-        for mem in database.data["accData"]:
-            if memberID is mem['id']:
-                new_member = {
-                    'u_id':memberID,
-                    'email': database.data["accData"][memberID]['email'],
-                    'name_first': database.data["accData"][memberID]['name_first'],
-                    'name_last': database.data["accData"][memberID]['name_last'],
-                    'handle_str': database.data["accData"][memberID]['handle']
-                }
-                allMembers.append(new_member)
-                break
-            
-            
-    #loop to add owner details
     
-    for ownerID in database.data["channelList"][channel_id]['owner_ids']:       
-        for own in database.data["accData"]:
-            if ownerID is own['id']:
-                owner = {
-                    'u_id':ownerID,
-                    'email': database.data["accData"][ownerID]['email'],
-                    'name_first': database.data["accData"][ownerID]['name_first'],
-                    'name_last': database.data["accData"][ownerID]['name_last'],
-                    'handle_str': database.data["accData"][ownerID]['handle']
-                }
-                ownMembers.append(owner)
-                break
+    for channel in database.data["channelList"]:
+        if channel["id"] == channel_id:
+            for member in channel["member_ids"]:
+                memberProfile = getUserProfileData(member)
+                allMembers.append(memberProfile)
             
-            
+    #loop to add owner details          
+    for channel in database.data["channelList"]:
+        if channel["id"] == channel_id:
+            for owner in channel["owner_ids"]:
+                ownerProfile = getUserProfileData(owner)
+                ownMembers.append(ownerProfile)   
     
     return {
         'name': channelName,

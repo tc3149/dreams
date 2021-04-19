@@ -92,7 +92,7 @@ def dm_list_v1(token):
         if auth_user_id in dm.get('member_ids'):
             dmDict = {}
             dmDict['dm_id'] = dm.get('id')
-            dmDict['dm_name'] = dm.get('dm_name')
+            dmDict['name'] = dm.get('dm_name')
             newdmList.append(dmDict)
     
     return {'dms': newdmList}

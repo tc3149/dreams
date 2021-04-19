@@ -45,7 +45,7 @@ def test_http_dm_create_working():
 
     assert dmR == {
         'dm_id': 0,
-        'dm_name': "namefirstnamelast,namefirstnamelast0"
+        'dm_name': "namefirstnamelast, namefirstnamelast0"
     }
 
 def test_http_dm_create_invalid_user():
@@ -168,7 +168,7 @@ def test_http_dm_invite_working():
     dmList = requests.get(config.url + funcURL + "?" + qData)
     dmListR = json.loads(dmList.text)
     
-    assert dmListR == {"dms": [{"dm_id": 0, "dm_name": "namefirstnamelast,namefirstnamelast0"}]}
+    assert dmListR == {"dms": [{"dm_id": 0, "name": "namefirstnamelast, namefirstnamelast0"}]}
 
 def test_http_dm_invite_invalid_dmid():
     requests.delete(config.url + "clear/v1")
@@ -394,8 +394,8 @@ def test_http_dm_list_working():
     qData = urllib.parse.urlencode(inputData)
     dmList = requests.get(config.url + funcURL + "?" + qData)
     dmListR = json.loads(dmList.text)
-    assert dmListR == {"dms": [{"dm_id": 0, "dm_name": "namefirstnamelast,namefirstnamelast0"},
-     {"dm_id": 1, "dm_name": "namefirstnamelast,namefirstnamelast1"}]}
+    assert dmListR == {"dms": [{"dm_id": 0, "name": "namefirstnamelast, namefirstnamelast0"},
+     {"dm_id": 1, "name": "namefirstnamelast, namefirstnamelast1"}]}
 
 def test_http_dm_list_invalid_token():
     requests.delete(config.url + "clear/v1")
@@ -1294,15 +1294,15 @@ def test_http_dm_details_valid():
     dmDetails = requests.get(config.url + funcURL + "?" + qData)
     dmDetailsR = json.loads(dmDetails.text)
     assert dmDetailsR == {
-        'name': 'namelastname,namelastname0',
+        'name': 'namelastname, namelastname0',
         'members': [
             {
                 'u_id': userR["auth_user_id"],
                 'email': 'email@gmail.com',
                 'name_first': 'Name',
                 'name_last': 'Lastname',
-                'profile_img_url': config.url + 'static/default.jpg',
                 'handle_str': 'namelastname',
+                'profile_img_url': dmDetailsR["members"][0]["profile_img_url"],
                 
             },
             {
@@ -1310,8 +1310,8 @@ def test_http_dm_details_valid():
                 'email': 'email2@gmail.com',
                 'name_first': 'Name',
                 'name_last': 'Lastname',
-                'profile_img_url': config.url + 'static/default.jpg',
                 'handle_str': 'namelastname0',   
+                'profile_img_url': dmDetailsR["members"][0]["profile_img_url"],
             }
         ]
     }

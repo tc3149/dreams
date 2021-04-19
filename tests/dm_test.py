@@ -21,7 +21,7 @@ def test_dm_create_single():
     user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
     id_list = [user1.get("auth_user_id")]
     dm = dm_create_v1(user["token"], id_list)
-    assert dm == {'dm_id': 0, 'dm_name': 'namelastname,onelastname'}
+    assert dm == {'dm_id': 0, 'dm_name': 'namelastname, onelastname'}
 
 def test_dm_create_multiple_dms():
 
@@ -36,8 +36,8 @@ def test_dm_create_multiple_dms():
     test = dm_create_v1(user1["token"], id_list)
     dm = dm_create_v1(user["token"], id_list2)
 
-    assert test == {'dm_id': 0, 'dm_name': 'awolastname,namelastname,onelastname'}
-    assert dm == {'dm_id': 1, 'dm_name': 'namelastname,onelastname'}
+    assert test == {'dm_id': 0, 'dm_name': 'awolastname, namelastname, onelastname'}
+    assert dm == {'dm_id': 1, 'dm_name': 'namelastname, onelastname'}
    
 def test_dm_create_invalid_token():
 
@@ -72,7 +72,7 @@ def test_dm_list_once():
     id_list.append(user2.get("auth_user_id"))
     dm_create_v1(user1["token"], id_list)
     list1 = dm_list_v1(user["token"])
-    assert list1 == {'dms': [{'dm_id': 0, 'dm_name': 'awolastname,namelastname,onelastname'}]}
+    assert list1 == {'dms': [{'dm_id': 0, 'name': 'awolastname, namelastname, onelastname'}]}
    
 
 def test_dm_list_multiple():
@@ -87,10 +87,10 @@ def test_dm_list_multiple():
     id_list2 = [user1.get("auth_user_id")]
     dm_create_v1(user1["token"], id_list)
     list1 = dm_list_v1(user["token"])
-    assert list1 == {'dms': [{'dm_id': 0, 'dm_name': 'awolastname,namelastname,onelastname'}]}
+    assert list1 == {'dms': [{'dm_id': 0, 'name': 'awolastname, namelastname, onelastname'}]}
     dm_create_v1(user["token"], id_list2)
     list2 = dm_list_v1(user["token"])
-    assert list2 == {'dms': [{'dm_id': 0, 'dm_name': 'awolastname,namelastname,onelastname'}, {'dm_id': 1, 'dm_name': 'namelastname,onelastname'}]}
+    assert list2 == {'dms': [{'dm_id': 0, 'name': 'awolastname, namelastname, onelastname'}, {'dm_id': 1, 'name': 'namelastname, onelastname'}]}
 
 def test_dm_list_invalidtoken():
 
@@ -460,26 +460,26 @@ def test_valid_input():
     user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
 
     dm = dm_create_v1(user1["token"], [user2["auth_user_id"]])    
+    returnData = dm_details_v1(user1['token'], dm['dm_id'])
 
-    assert dm_details_v1(user1['token'], dm['dm_id']) == {
-                                            'name': 'namelastname,namelastname0',
-                                            'members': [
-                                                {
-                                                    'u_id': user1["auth_user_id"],
-                                                    'email': 'email@gmail.com',
-                                                    'name_first': 'Name',
-                                                    'name_last': 'Lastname',
-                                                    'profile_img_url': f"{config.url}static/default.jpg",
-                                                    'handle_str': 'namelastname',
-                                                    
-                                                },
-                                                {
-                                                    'u_id': user2["auth_user_id"],
-                                                    'email': 'email2@gmail.com',
-                                                    'name_first': 'Name',
-                                                    'name_last': 'Lastname',
-                                                    'profile_img_url': f"{config.url}static/default.jpg",
-                                                    'handle_str': 'namelastname0',   
-                                                }
-                                            ],
-                                           }
+    assert returnData == {
+        'name': 'namelastname, namelastname0',
+        'members': [
+            {
+                'u_id': user1["auth_user_id"],
+                'email': 'email@gmail.com',
+                'name_first': 'Name',
+                'name_last': 'Lastname',
+                'handle_str': 'namelastname',
+                'profile_img_url': returnData["members"][0]["profile_img_url"],
+            },
+            {
+                'u_id': user2["auth_user_id"],
+                'email': 'email2@gmail.com',
+                'name_first': 'Name',
+                'name_last': 'Lastname',
+                'handle_str': 'namelastname0',
+                'profile_img_url': returnData["members"][1]["profile_img_url"],
+            }
+        ],
+    }

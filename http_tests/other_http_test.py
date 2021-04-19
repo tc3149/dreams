@@ -115,7 +115,7 @@ def test_http_clear_dm():
 
     assert dmR == {
         'dm_id': 0,
-        'dm_name': "namefirstnamelast,namefirstnamelast0"
+        'dm_name': "namefirstnamelast, namefirstnamelast0"
     }
 
     requests.delete(config.url + "clear/v1")
