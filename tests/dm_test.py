@@ -21,7 +21,7 @@ def test_dm_create_single():
     user1 = auth_register_v2("one@gmail.com", "password", "One", "Lastname")
     id_list = [user1.get("auth_user_id")]
     dm = dm_create_v1(user["token"], id_list)
-    assert dm == {'dm_id': 0, 'name': 'namelastname, onelastname'}
+    assert dm == {'dm_id': 0, 'dm_name': 'namelastname, onelastname'}
 
 def test_dm_create_multiple_dms():
 
@@ -37,7 +37,7 @@ def test_dm_create_multiple_dms():
     dm = dm_create_v1(user["token"], id_list2)
 
     assert test == {'dm_id': 0, 'name': 'awolastname, namelastname, onelastname'}
-    assert dm == {'dm_id': 1, 'name': 'namelastname, onelastname'}
+    assert dm == {'dm_id': 1, 'dm_name': 'namelastname, onelastname'}
    
 def test_dm_create_invalid_token():
 
@@ -87,10 +87,10 @@ def test_dm_list_multiple():
     id_list2 = [user1.get("auth_user_id")]
     dm_create_v1(user1["token"], id_list)
     list1 = dm_list_v1(user["token"])
-    assert list1 == {'dms': [{'dm_id': 0, 'name': 'awolastname, namelastname,onelastname'}]}
+    assert list1 == {'dms': [{'dm_id': 0, 'name': 'awolastname, namelastname, onelastname'}]}
     dm_create_v1(user["token"], id_list2)
     list2 = dm_list_v1(user["token"])
-    assert list2 == {'dms': [{'dm_id': 0, 'name': 'awolastname, namelastname,onelastname'}, {'dm_id': 1, 'name': 'namelastname, onelastname'}]}
+    assert list2 == {'dms': [{'dm_id': 0, 'name': 'awolastname, namelastname, onelastname'}, {'dm_id': 1, 'name': 'namelastname, onelastname'}]}
 
 def test_dm_list_invalidtoken():
 
