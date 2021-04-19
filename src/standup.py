@@ -97,8 +97,6 @@ def standup_active_v1(token, channel_id):
         "time_finish": time_finish,
     }
     
-
-
 def standup_send_v1(token, channel_id, message):
 
     auth_user_id = get_user_id_from_token(token)
