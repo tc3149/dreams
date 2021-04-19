@@ -468,7 +468,7 @@ def standupStart():
 def standupActive():
     inputToken = request.args.get("token")
     inputchannelID = int(request.args.get("channel_id"))
-    returnData = standup_active_v1(inputToken, inputChannelID)
+    returnData = standup_active_v1(inputToken, inputchannelID)
     saveData()
     return dumps(returnData)
 
