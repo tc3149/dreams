@@ -337,12 +337,14 @@ Return Value:
 def channel_join_v2(token, channel_id):
     auth_user_id = get_user_id_from_token(token)
 
+    DreamOwner = checkDreamowner(auth_user_id)
+
     # check whether channel is invalid
     if valid_channelid(channel_id) is False:
         raise InputError(description="Error: Invalid channel")
 
     # check if channel is private
-    if check_channelprivate(channel_id) is True:
+    if check_channelprivate(channel_id) is True and DreamOwner is False:
         raise AccessError(description="Private Channel")
     
     # check user already in channel
@@ -447,6 +449,10 @@ def channel_removeowner_v1(token, channel_id, u_id):
     if valid_channelid(channel_id) is False:
         raise InputError(description="Error: Invalid channel ID")
 
+    # If u_id is in the channel
+    if check_useralreadyinchannel(u_id, channel_id) is False:
+        raise AccessError(description="Error: Not in channel")
+
     # If the u_id is not an owner
     if checkOwner(u_id, channel_id) is False:
         raise InputError(description="Error: Not An Owner")
@@ -459,7 +465,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     # If the token is not an owner
     if checkOwner(auth_user_id, channel_id) is False and DreamOwner is False:
-        raise InputError(description="Error: Token is Not Owner")
+        raise AccessError(description="Error: Token is Not Owner")
 
     # Main Implemenation
     for channel in database.data["channelList"]:
