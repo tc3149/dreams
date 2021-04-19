@@ -149,7 +149,7 @@ def message_remove_v1(token, message_id):
                     messages1["message"] = ""
 
                 elif messages1["u_id"] == u_id:
-                    mmessages1["message"] = ""
+                    messages1["message"] = ""
 
                 else:
                     raise AccessError(description="Error: Remover not an owner nor original poster")
