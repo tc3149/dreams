@@ -165,7 +165,7 @@ def make_dm_name(u_ids):
         if user["id"] in u_ids:
             handle_list.append(user["handle"])
     sortedHandle = sorted(handle_list)
-    return ",".join(sortedHandle)
+    return ", ".join(sortedHandle)
 
 
 # Save to data file
