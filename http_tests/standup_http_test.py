@@ -9,6 +9,8 @@ from src import config
 
 #STANDUP START TEST--------------------------------------
 
+# Test standup working by creating user, channel then standup. Should return
+# a timestamp of when standup finishes
 def test_http_standup_working():
     requests.delete(config.url + "clear/v1")
 
@@ -48,6 +50,8 @@ def test_http_standup_working():
     # I.e. it is existing
     assert standupR != None
 
+# Test for whether standup start is working by creating two standups.
+# The second one should create an error
 def test_http_standup_invalid():
 
     requests.delete(config.url + "clear/v1")
@@ -95,6 +99,8 @@ def test_http_standup_invalid():
 
 #STANDUP ACTIVE TEST--------------------------------------
 
+# Test for whether standup active is working by first creating a standup
+# and applying the active function
 def test_http_standup_active_working():
 
     requests.delete(config.url + "clear/v1")
@@ -192,6 +198,8 @@ def test_http_standup_active_invalid():
 
 #STANDUP SEND TEST--------------------------------------
 
+# Test if standup send works in conjunction to standup start, i.e.
+# a package is formed from the messages sent
 def test_http_standup_send_working():
 
     requests.delete(config.url + "clear/v1")
@@ -287,6 +295,7 @@ def test_http_standup_send_working():
 
     assert channelMessagesR["messages"][0]["message"] == "namefirstnamelast: Hello World\nhaydensmith: This is awesome"
 
+# Test standup send when the message to be sent is over 1000 characters
 def test_http_standup_send_invalid():
 
     requests.delete(config.url + "clear/v1")
