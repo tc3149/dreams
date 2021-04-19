@@ -28,6 +28,12 @@ def valid_dmid(dm_id):
             return True
     return False
 
+def checkDreamowner(auth_user_id):
+    for user in database.data["accData"]:
+        if auth_user_id == user["id"]:
+            if user["permission"] == 1:
+                return True
+    return False
 
 def check_channelprivate(channel_id):
 
