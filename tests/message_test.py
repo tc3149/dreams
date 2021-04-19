@@ -199,14 +199,27 @@ def testedit_valid_case_in_channel():
         assert msg["message"] == 'lmfao'
         assert msg["u_id"] == user2["auth_user_id"]
 
-    message_edit_v2(user1["token"], m_id, "okay i edit now")
+
+# another valid
+def testedit_valid2():
+    clear_v1()
+    user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
+    user2 = auth_register_v2("email2@gmail.com", "password", "Name", "Lastname")
+
+    channel = channels_create_v2(user2["token"], "testchannel", True)
+    channel_join_v2(user1["token"], channel["channel_id"])
+
+    message_info2 = message_send_v2(user1["token"], channel["channel_id"], "lol")  
+    message_edit_v2(user2["token"], message_info2["message_id"], "okay i edit now")
 
     messages1_later = channel_messages_v2(user1["token"], channel["channel_id"], 0)
 
     for msg in messages1_later["messages"]:
-        assert msg["message_id"] == 1
-        assert msg["message"] == "okay i edit now"
-        assert msg["u_id"] == user2["auth_user_id"]
+        if msg["u_id"] == user1["auth_user_id"]:
+            assert msg["message_id"] == 1
+            assert msg["message"] == "okay i edit now"
+
+
 
 
 # a valid case in DM
