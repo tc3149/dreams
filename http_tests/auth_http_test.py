@@ -236,11 +236,10 @@ def test_http_logout_working():
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     jwtToken = respD["token"]
-    token = jwt.decode(jwtToken, database.secretSauce, algorithms="HS256")
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"sessionId": token["sessionId"]}, database.secretSauce, algorithm="HS256")
+    inputData = {"token": jwtToken}
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD == {
@@ -262,7 +261,7 @@ def test_http_logout_invalid_token_key():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"invalidKey": 6}, database.secretSauce, algorithm="HS256")
+    inputData = {"token": jwt.encode({"invalidKey": 6}, database.secretSauce, algorithm="HS256")}
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
@@ -282,7 +281,7 @@ def test_http_logout_invalid_token_value():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"sessionId": "notAnInt"}, database.secretSauce, algorithm="HS256")
+    inputData = {"token": jwt.encode({"sessionId": "notAnInt"}, database.secretSauce, algorithm="HS256")}
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
@@ -302,7 +301,7 @@ def test_http_logout_invalid_token_type():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"invalidKey": 9999}, database.secretSauce, algorithm="HS256")
+    inputData = {"token": jwt.encode({"invalidKey": 9999}, database.secretSauce, algorithm="HS256")}
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
@@ -322,7 +321,97 @@ def test_http_logout_nonexistant_user():
     # ----------------------------
 
     funcURL = "auth/logout/v1"
-    inputData = jwt.encode({"sessionId": -99999}, database.secretSauce, algorithm="HS256")
+    inputData = {"token": jwt.encode({"sessionId": -99999}, database.secretSauce, algorithm="HS256")}
     rawResponseData = requests.post(config.url + funcURL, json=inputData)
     respD = json.loads(rawResponseData.text)
     assert respD["code"] == 403
+
+# ------------------------------------------------------------------------------
+# RESET REQUEST TEST FUNCTIONS
+def test_http_passwordreset_request_working():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # Reset--------------------
+    funcURL = "auth/passwordreset/request/v1"
+    inputData = {
+        "email": "test@hotmail.com",
+    }
+    rawResponseData  = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD == {}
+
+
+def test_http_passwordreset_request_invalid_email():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # Reset--------------------
+    funcURL = "auth/passwordreset/request/v1"
+    inputData = {
+        "email": "invalidemail@hotmail.com",
+    }
+    rawResponseData  = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD["code"] == 400
+
+# RESET REQUEST TEST FUNCTIONS
+def test_http_passwordreset_reset_invalid_code():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # Reset--------------------
+    funcURL = "auth/passwordreset/reset/v1"
+    inputData = {
+        "reset_code": "invalidcode",
+        "new_password": "newpassword",
+    }
+    rawResponseData  = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD["code"] == 400
+
+def test_http_passwordreset_reset_invalid_password():
+    requests.delete(config.url + "clear/v1")
+
+    # Register--------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    _ = requests.post(config.url + funcURL, json=inputData)
+    # Reset--------------------
+    funcURL = "auth/passwordreset/reset/v1"
+    inputData = {
+        "reset_code": "validcode",
+        "new_password": "pass",
+    }
+    rawResponseData  = requests.post(config.url + funcURL, json=inputData)
+    respD = json.loads(rawResponseData.text)
+    assert respD["code"] == 400

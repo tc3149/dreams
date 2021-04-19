@@ -2,11 +2,13 @@ import pytest
 import re
 from json import dumps
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+import src.config as config
 from src.error import InputError, AccessError
 from src.channel import channel_messages_v2
 from src.channels import channels_create_v2
 import src.database as database
 from json import dumps, loads
+import os
 from src.utils import saveData, get_user_id_from_token
 
 '''
@@ -22,20 +24,36 @@ Return Value:
 '''
 def clear_v1():
 
+    if database.data["accData"]:
+        for userId in database.data["userProfiles"]:
+            pImageName = userId["profile_img_url"][-9:]
+            if os.path.exists(f"src/static/{pImageName}"):
+                os.remove(f"src/static/{pImageName}")
+
     database.idData["sessionId"] = 0
     database.idData["userId"] = 0
     database.idData["dmId"] = 0
     database.idData["messageId"] = 0
-
-
     database.data["accData"].clear() 
     database.data["channelList"].clear() 
     database.data["message_ids"].clear()
     database.data["dmList"].clear()
     database.data["userProfiles"].clear()
     database.data["standupList"].clear()
+    database.dreamsAnalytics["channels_exist"].clear()
+    database.dreamsAnalytics["dms_exist"].clear()
+    database.dreamsAnalytics["messages_exist"].clear()
+    database.dreamsAnalytics["utilization_rate"] = 0
 
-    with open("serverDatabase.json", "w") as dataFile:
+    database.userAnalytics["channels_joined"].clear()
+    database.userAnalytics["dms_joined"].clear()
+    database.userAnalytics["messages_sent"].clear()
+    database.userAnalytics["involvement_rate"] = 0
+
+    database.onlineURL = ""
+    database.data["resetdataList"].clear()
+
+    with open("src/serverDatabase.json", "w") as dataFile:
         dataFile.write(dumps(database.data))
 
 '''
@@ -63,6 +81,23 @@ def search_v1(token, query_str):
     if len(query_str) > 1000:
         raise InputError(description="Error: Query string is above 1000 characters")
 
+    for channel in database.data["channelList"]:
+        if auth_user_id in channel["member_ids"]:
+            for message in channel["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
+    
+    for dm in database.data["dmList"]:
+        if auth_user_id in dm["member_ids"]:
+            for message in dm["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
     # Store every message in channels/dms that the user is a part of
     message_list = []
     for channel in database.data["channelList"]:

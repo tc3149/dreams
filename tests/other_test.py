@@ -17,7 +17,7 @@ def test_clear_register():
     clear_v1()
     auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     clear_v1()
-    assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': [], "standupList": []}
+    assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], "resetdataList": [], 'userProfiles': [], "standupList": []}
 
 def test_clear_channel():
 
@@ -25,7 +25,7 @@ def test_clear_channel():
     user1 = auth_register_v2("email@gmail.com", "password", "Name", "Lastname")
     channels_create_v2(user1["token"], "testchannel", True)
     clear_v1()
-    assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': [], "standupList": []}
+    assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], "resetdataList": [], 'userProfiles': [], "standupList": []}
 
 def test_clear_dm():
 
@@ -35,7 +35,7 @@ def test_clear_dm():
     id_list = [user1.get("auth_user_id")]
     dm_create_v1(user["token"], id_list)
     clear_v1()
-    assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], 'userProfiles': [], "standupList": []}
+    assert data == {'accData': [], 'channelList': [], 'message_ids': [], 'dmList': [], "resetdataList": [], 'userProfiles': [], "standupList": []}
 
 # ------------------------------------------------------------------------------------------------------
 # Search_v1 tests

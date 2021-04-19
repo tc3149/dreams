@@ -71,6 +71,7 @@ def test_http_clear_channel():
         "channelList": [],
         "message_ids": [],
         "dmList": [],
+        "resetdataList": [],
         "userProfiles": [],
         "standupList": [],
     }
@@ -104,7 +105,6 @@ def test_http_clear_dm():
     # Creating DM-----------------
     funcURL = "dm/create/v1"
     userList = []
-    userList.append(userR["auth_user_id"])
     userList.append(user2R["auth_user_id"])
     inputData = {
         "token": userR["token"],
@@ -125,6 +125,7 @@ def test_http_clear_dm():
         "channelList": [],
         "message_ids": [],
         "dmList": [],
+        "resetdataList": [],
         "userProfiles": [],
         "standupList": [],
     }

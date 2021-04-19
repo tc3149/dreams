@@ -3,7 +3,7 @@ from src.error import InputError, AccessError
 import src.database as database
 from src.channels import channels_create_v2
 from src.auth import auth_register_v2
-from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner
+from src.utils import valid_channelid, valid_userid, check_channelprivate, check_useralreadyinchannel, get_user_id_from_token, checkOwner, inviteNotification
 
 '''
 channel_invite_v2 takes in a token, a channel_id integer and u_id integer. 
@@ -71,6 +71,7 @@ def channel_invite_v2(token, channel_id, u_id):
     #add u_id to channel
     
     database.data["channelList"][channel_id]['member_ids'].append(u_id)
+    inviteNotification(channel_id, -1, u_id, auth_user_id)
     
     return {
 
@@ -229,6 +230,15 @@ def channel_messages_v2(token, channel_id, start):
                     break
     if authorisation is False:
         raise AccessError(description="User is not in channel")
+
+    for channel in database.data["channelList"]:
+        if channel["id"] == channel_id:
+            for message in channel["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
 
     # Return Function
     for channel in database.data["channelList"]:

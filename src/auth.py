@@ -1,10 +1,18 @@
 import re
+import random
+import string
 import jwt
+import string
+import random
 import src.database as database
-from src.utils import is_valid_token_return_data
+from flask import request
+from src.utils import is_valid_token_return_data, check_reset_code, find_reset_email, getUserAccData
+import src.config as config
 from src.error import InputError, AccessError
 from hashlib import sha256
 from json import loads
+from flask import Flask, current_app
+from flask_mail import Mail, Message
 
 
 
@@ -126,6 +134,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "handle": userHandle, 
                 "sessions": [],
                 "permission": (1 if userID == 0 else 2),
+                "notifications": [],
             }
             newSessionId = new_session_id()
             sessionToken = create_session_token(newSessionId)
@@ -139,6 +148,7 @@ def auth_register_v2(email, password, name_first, name_last):
                 "name_first": name_first,
                 "name_last": name_last,
                 "handle_str": userHandle,
+                "profile_img_url": f"{config.url}static/default.jpg",
             }
             database.data["userProfiles"].append(userProfile)
     else:
@@ -176,6 +186,76 @@ def auth_logout_v1(token):
                 }
     raise AccessError(description="Session doesn't exist")
 
+'''
+auth_passwordreset_request_v1 takes in an email.
+The function then checks if the email is valid and if a user exists for that email.
+The function then creates a reset code that is emailed to the user's email if the email is valid.
+Returns an empty dictionary, otherwise raises an InputError.
+
+Arguments:
+    email (string)    - Email of user
+
+Exceptions:
+    InputError  - Occurs when given email is not registered
+
+Return Value:
+    Returns {}
+'''
+def auth_passwordreset_request_v1(email):
+    # Creating the resetData 
+    resetData = {
+        "reset_code": "",
+        "email": email
+    }
+    # Creating a randomized 5 character code
+    reset_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for characters in range(5))
+    # Appending the Data
+    for user in database.data["accData"]:
+        if user["email"] == email:
+            resetData["reset_code"] = reset_code
+            database.data["resetdataList"].append(resetData)
+    if not resetData["reset_code"]:
+        raise InputError(description="Email doesn't exist")
+    # Setting mail contents and sending
+    msg = Message('Your reset code for Dream Server',
+                recipients = [email]
+               )
+    msg.body = "Hello,\nThis is your reset code: {}".format(reset_code)
+    return msg
+'''
+auth_passwordreset_request_v1 takes in an email.
+The function then checks if the email is valid and if a user exists for that email.
+The function then creates a reset code that is emailed to the user's email if the email is valid.
+Returns an empty dictionary, otherwise raises an InputError.
+
+Arguments:
+    email (string)    - Email of user
+
+Exceptions:
+    InputError  - Occurs when given email is not registered
+
+Return Value:
+    Returns {}
+'''
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    #Checking length of password
+    if len(new_password) < 6:
+        raise InputError(description="Password needs to be at least 6 characters")
+    #Checking validity of code
+    if check_reset_code(reset_code) is False:
+        raise InputError(description="Code is invalid")
+    hashedPass = sha256(new_password.encode()).hexdigest()
+    #Retrieving the email of user
+    reset_email = find_reset_email(reset_code)
+    #Assigning the new password
+    for user in database.data["accData"]:
+        if user["email"] == reset_email:
+            user["password"] = hashedPass
+    #Removing the token
+    for resetData in database.data["resetdataList"]:
+        if resetData["reset_code"] == reset_code:
+            database.data["resetdataList"].remove(resetData)
+            return {}
 
 # util functions
 def search_email(email):

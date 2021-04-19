@@ -1,6 +1,6 @@
 import re
 import src.database as database
-from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid, getUserProfileData
+from src.utils import get_user_id_from_token, make_dm_name, valid_dmid, valid_userid, getUserProfileData, inviteNotification
 from src.error import InputError, AccessError
 
 '''
@@ -30,6 +30,9 @@ def dm_create_v1(token, u_ids):
     
     #Obtain user id of creator from token
     auth_user_id = get_user_id_from_token(token)
+
+    if auth_user_id in u_ids:
+        raise InputError(description="DM owner is in member list")
 
     # Check if u_ids are valid
     for u_id in u_ids:
@@ -153,6 +156,8 @@ def dm_invite_v1(token, dm_id, u_id):
         if dm.get("id") is dm_id:
             dm["member_ids"].append(u_id)
 
+    inviteNotification(-1, dm_id, u_id, auth_user_id)
+
     return {}
 
 
@@ -204,6 +209,15 @@ def dm_messages_v1(token, dm_id, start):
                     break
     if authorisation is False:
         raise AccessError(description="User is not in dm")
+
+    for dm in database.data["dmList"]:
+        if dm["id"] == dm_id:
+            for message in dm["messages"]:
+                for react in message["reacts"]:
+                    if auth_user_id in react["u_ids"]:
+                        react["is_this_user_reacted"] = True
+                    else:
+                        react["is_this_user_reacted"] = False
 
     # Return Function
     for dm in database.data["dmList"]:

@@ -80,6 +80,9 @@
 
 
 **message.py**
+- Overall:
+    - Assumes that any message that is "" is considered removed, and its message_id would be invalid
+    
 - message_send_v2:
     - Assumes the message can be of 1000 characters, but no more
     - Assumes a message cannot be empty ('') as this is considered a removed message
@@ -107,6 +110,29 @@
     - Assumes messages can be shared to the same channel
     - The opposite of shared will be searched first for message id
     - Assumes if both dm_id and channel_id are -1 or both not -1 returns InputError
+
+- message_sendlater_v1
+    - Assumes an invalid channel ID will produce an InputError
+    - Assumes an invalid message ID will produce an InputError
+    - Assumes the message_id is assigned to a message at the time the function is called rather than when it is sent when the Timer finishes
+
+- message_sendlaterdm_v1
+    - Assumes an invalid dm ID will produce an InputError
+    - Assumes an invalid message ID will produce an InputError
+    - Assumes the message_id is assigned to a message at the time the function is called rather than when it is sent when the Timer finishes
+
+- message_react_v1
+    - Assumes that the only valid react is 1 (as of no challenge exercises)
+
+- message_unreact_v1
+    - As the only valid react is 1, then the only valid unreact is 1
+    - Assumes that the user has previously reacted to the message
+
+- message_pin_v1
+    - 
+
+- message_unpin_v1
+    -
 
 
 **dm.py**

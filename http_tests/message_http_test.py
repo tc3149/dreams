@@ -270,53 +270,6 @@ def testsend_valid_case():
 
 # MESSAGE EDIT TESTING
 
-# Empty Message
-def testedit_empty():
-    requests.delete(config.url + "clear/v1")
-
-    # Register --------
-    funcURL = "auth/register/v2"
-    inputData = {
-        "email": "test@hotmail.com",
-        "password": "password1",
-        "name_first": "nameFirst",
-        "name_last": "nameLast",
-    }
-    user = requests.post(config.url + funcURL, json=inputData)
-    userR = json.loads(user.text)
-
-    # Channel Create -------
-    funcURL = "channels/create/v2"
-    inputData = {
-        "token": userR["token"],
-        "name": "testchannel",
-        "is_public": True,
-    }
-    channel = requests.post(config.url + funcURL, json=inputData)
-    channelR = json.loads(channel.text)
-
-    # Message Send
-    funcURL = "message/send/v2"
-    inputData = {
-        "token": userR["token"],
-        "channel_id": channelR["channel_id"],
-        "message": "Thomas Chen and Jonathan Qiu",
-    }
-    messageSend = requests.post(config.url + funcURL, json=inputData)
-    messageSendR = json.loads(messageSend.text)
-    
-    # Message Edit
-    funcURL = "message/edit/v2"
-
-    inputData = {
-        "token": userR["token"],
-        "message_id": messageSendR["message_id"],
-        "message": '',
-    }
-    messageEdit = requests.put(config.url + funcURL, json=inputData)
-    messageEditR = json.loads(messageEdit.text)
-    assert messageEditR["code"] == 400
-
 # Invalid Long Message
 def testedit_invalid_long_msg():
     requests.delete(config.url + "clear/v1")
@@ -2132,4 +2085,906 @@ def testsendlaterdm_wrong_token():
     messageSendlaterdmR = json.loads(messageSendlaterdm.text)
     assert messageSendlaterdmR["code"] == 403
 
+
+# Invalid dm ID
+def testsendlaterdm_wrong_dm_ID():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(dm.text)
+
+    # Message sendlater
+    funcURL = "message/sendlaterdm/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": userR["token"],
+        "dm_id": "invalid_id",
+        "message": "Thomas' DLore",
+        "time_sent": time,
+    }
+    messageSendlaterdm = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterdmR = json.loads(messageSendlaterdm.text)
+    assert messageSendlaterdmR["code"] == 400
+
+
+# Empty Message
+def testsendlaterdm_empty_msg():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message sendlater
+    funcURL = "message/sendlaterdm/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "",
+        "time_sent": time,
+    }
+    messageSendlaterdm = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterdmR = json.loads(messageSendlaterdm.text)
+    assert messageSendlaterdmR["code"] == 400
+
+
+# User not in DM
+def testsendlaterdm_user_not_found():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # Register Third Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test3@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    } 
+    user3 = requests.post(config.url + funcURL, json=inputData)
+    user3R = json.loads(user3.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message sendlater
+    funcURL = "message/sendlaterdm/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": user3R["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Terry Crews",
+        "time_sent": time,
+    }
+    messageSendlaterdm = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterdmR = json.loads(messageSendlaterdm.text)
+    assert messageSendlaterdmR["code"] == 403
+
+
+# Time set in past
+def testsendlaterdm_past_time():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message sendlater
+    funcURL = "message/sendlaterdm/v1"
+    time = int(datetime.timestamp(datetime.now()) - 2)
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Jake Perolta",
+        "time_sent": time,
+    }
+    messageSendlaterdm = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterdmR = json.loads(messageSendlaterdm.text)
+    assert messageSendlaterdmR["code"] == 400
+
+
+# Valid
+def testsendlaterdm_valid():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message sendlater
+    funcURL = "message/sendlaterdm/v1"
+    time = int(datetime.timestamp(datetime.now()) + 2)
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Jake Perolta",
+        "time_sent": time,
+    }
+    messageSendlaterdm = requests.post(config.url + funcURL, json=inputData)
+    messageSendlaterdmR = json.loads(messageSendlaterdm.text)
+
+    # DM Message Info -------
+    funcURL = "dm/messages/v1"
+
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+
+    assert len(dmMessagesR["messages"]) == 0
+
+    sleep(3)
+
+    # DM Message Info 2 -------
+    funcURL = "dm/messages/v1"
+
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages2 = requests.get(config.url + funcURL + "?" + qData)
+    dmMessages2R = json.loads(dmMessages2.text)
+
+    for dms in dmMessages2R["messages"]:
+        if dms["u_id"] is user2R["auth_user_id"]:
+            assert dms["message"] == "Jake Perolta"
+            assert dms["time_created"] == time
+            assert dms["message_id"] == messageSendlaterdmR["message_id"]
+
+
+# MESSAGE REACT TESTING --------------------------------------------------
+
+# Message already reacted
+def testreact_reacted_already():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message Send -------
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Thomas",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    # Message React ----
+    funcURL = "message/react/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+        "react_id": 1,
+    }
+    messageReact = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageReact.text)
+
+
+    # Message React 2 ----
+    funcURL = "message/react/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+        "react_id": 1,
+    }
+    messageReact2 = requests.post(config.url + funcURL, json=inputData)
+    messageReact2R = json.loads(messageReact2.text)
+    assert messageReact2R["code"] == 400
+
+
+# Valid DM Message React
+def testreact_dm_valid():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message Send -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Jake Perolta",
+    }
+    messageSendDM = requests.post(config.url + funcURL, json=inputData)
+    messageSendDMR = json.loads(messageSendDM.text)
+
+    # Message React ----
+    funcURL = "message/react/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendDMR["message_id"],
+        "react_id": 1,
+    }
+    messageReact = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageReact.text)
+
+    # DM Message Info -------
+    funcURL = "dm/messages/v1"
+
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+
+    for dms in dmMessagesR["messages"]:
+        if dms["u_id"] is userR["auth_user_id"]:
+            assert dms["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [userR["auth_user_id"]],
+                "is_this_user_reacted": True,
+            }]
+
+
+# MESSAGE UNREACT TESTING ----------------------------------------------
+
+# Unreacting a message that has already been unreacted
+def testunreact_unreacted_message():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message Send -------
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Thomas",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    # Message React ----
+    funcURL = "message/react/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+        "react_id": 1,
+    }
+    messageReact = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageReact.text)
+
+    # Message Unreact -----
+    funcURL = "message/unreact/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+        "react_id": 1,
+    }
+    messageUnreact = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageUnreact.text)
+
+    # Message Unreact 2 -----
+    funcURL = "message/unreact/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+        "react_id": 1,
+    }
+    messageUnreact2 = requests.post(config.url + funcURL, json=inputData)
+    messageUnreact2R = json.loads(messageUnreact2.text)
+    assert messageUnreact2R["code"] == 400
+
+
+# Valid DM Unreact
+def testunreact_valid_dm():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message Send -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Jake Perolta",
+    }
+    messageSendDM = requests.post(config.url + funcURL, json=inputData)
+    messageSendDMR = json.loads(messageSendDM.text)
+
+    # Message React ----
+    funcURL = "message/react/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendDMR["message_id"],
+        "react_id": 1,
+    }
+    messageReact = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageReact.text)
+
+    # DM Message Info -------
+    funcURL = "dm/messages/v1"
+
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+
+    for dms in dmMessagesR["messages"]:
+        if dms["u_id"] is userR["auth_user_id"]:
+            assert dms["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [userR["auth_user_id"]],
+                "is_this_user_reacted": True,
+            }]
+
+    # Message Unreact 2 -----
+    funcURL = "message/unreact/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendDMR["message_id"],
+        "react_id": 1,
+    }
+    messageUnreact = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageUnreact.text)
+
+    # DM Message Info 2 -------
+    funcURL = "dm/messages/v1"
+    inputData = {
+        "token": userR["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages2 = requests.get(config.url + funcURL + "?" + qData)
+    dmMessages2R = json.loads(dmMessages2.text)
+
+    for dms in dmMessages2R["messages"]:
+        if dms["u_id"] is userR["auth_user_id"]:
+            assert dms["reacts"] == [{
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False,
+            }]
+
+
+# MESSAGE PIN TESTING --------------------------------------
+
+# Message Already Pinned
+def testpin_pinned_already():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message Send -------
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Amy Santiago",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    # Message Pin --------
+    funcURL = "message/pin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+    }
+    messagePin = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messagePin.text)
+
+    # Message Pin --------
+    funcURL = "message/pin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+    }
+    messagePin2 = requests.post(config.url + funcURL, json=inputData)
+    messagePin2R = json.loads(messagePin2.text)
+    assert messagePin2R["code"] == 400
+
+
+# Valid DM Test
+def testpin_dm_valid():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message Send -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Jake Perolta",
+    }
+    messageSendDM = requests.post(config.url + funcURL, json=inputData)
+    messageSendDMR = json.loads(messageSendDM.text)
+
+    # Message Pin --------
+    funcURL = "message/pin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendDMR["message_id"],
+    }
+    messagePin = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messagePin.text)
     
+    # DM Message Info -------
+    funcURL = "dm/messages/v1"
+
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+
+    for dms in dmMessagesR["messages"]:
+        if dms["u_id"] is user2R["auth_user_id"]:
+            assert dms["is_pinned"] == True
+
+
+# MESSAGE UNPIN TESTING ----------------------------------------------
+def testunpin_unpinned_already():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Channel Create -------
+    funcURL = "channels/create/v2"
+    inputData = {
+        "token": userR["token"],
+        "name": "testchannel",
+        "is_public": True,
+    }
+    channel = requests.post(config.url + funcURL, json=inputData)
+    channelR = json.loads(channel.text)
+
+    # Message Send -------
+    funcURL = "message/send/v2"
+    inputData = {
+        "token": userR["token"],
+        "channel_id": channelR["channel_id"],
+        "message": "Amy Santiago",
+    }
+    messageSend = requests.post(config.url + funcURL, json=inputData)
+    messageSendR = json.loads(messageSend.text)
+
+    # Message Pin --------
+    funcURL = "message/pin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+    }
+    messagePin = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messagePin.text)
+
+    # Message Unpin --------
+    funcURL = "message/unpin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+    }
+    messageUnpin = requests.post(config.url + funcURL, json=inputData)
+    messageUnpinR = json.loads(messageUnpin.text)
+
+    # Message Unpin --------
+    funcURL = "message/unpin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendR["message_id"],
+    }
+    messageUnpin = requests.post(config.url + funcURL, json=inputData)
+    messageUnpinR = json.loads(messageUnpin.text)
+    assert messageUnpinR["code"] == 400
+
+
+# Valid Case for DM
+def testunpin_dm_valid():
+    requests.delete(config.url + "clear/v1")
+
+    # Register --------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user = requests.post(config.url + funcURL, json=inputData)
+    userR = json.loads(user.text)
+
+    # Register Second Person --------------------
+    funcURL = "auth/register/v2"
+    inputData = {
+        "email": "test2@hotmail.com",
+        "password": "password1",
+        "name_first": "nameFirst",
+        "name_last": "nameLast",
+    }
+    user2 = requests.post(config.url + funcURL, json=inputData)
+    user2R = json.loads(user2.text)
+
+    # DM Create -------
+    funcURL = "dm/create/v1"
+    userList = []
+    userList.append(user2R["auth_user_id"])
+    inputData = {
+        "token": userR["token"],
+        "u_ids": userList,
+    }
+    dm = requests.post(config.url + funcURL, json=inputData)
+    dmR = json.loads(dm.text)
+
+    # Message Send -------
+    funcURL = "message/senddm/v1"
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "message": "Jake Perolta",
+    }
+    messageSendDM = requests.post(config.url + funcURL, json=inputData)
+    messageSendDMR = json.loads(messageSendDM.text)
+
+    # Message Pin --------
+    funcURL = "message/pin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendDMR["message_id"],
+    }
+    messagePin = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messagePin.text)
+    
+    # DM Message Info -------
+    funcURL = "dm/messages/v1"
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages = requests.get(config.url + funcURL + "?" + qData)
+    dmMessagesR = json.loads(dmMessages.text)
+
+    for dms in dmMessagesR["messages"]:
+        if dms["u_id"] is user2R["auth_user_id"]:
+            assert dms["is_pinned"] == True
+
+
+    # Message Unpin --------
+    funcURL = "message/unpin/v1"
+    inputData = {
+        "token": userR["token"],
+        "message_id": messageSendDMR["message_id"],
+    }
+    messageUnpin = requests.post(config.url + funcURL, json=inputData)
+    _ = json.loads(messageUnpin.text)
+
+    # DM Message Info -------
+    funcURL = "dm/messages/v1"
+    inputData = {
+        "token": user2R["token"],
+        "dm_id": dmR["dm_id"],
+        "start": 0,
+    }
+    qData = urllib.parse.urlencode(inputData)
+    dmMessages2 = requests.get(config.url + funcURL + "?" + qData)
+    dmMessages2R = json.loads(dmMessages2.text)
+
+    for dms in dmMessages2R["messages"]:
+        if dms["u_id"] is user2R["auth_user_id"]:
+            assert dms["is_pinned"] == False
